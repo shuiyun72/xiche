@@ -1,0 +1,1 @@
+{"version":3,"sources":["webpack:///D:/项目/总项目/洗车/washTheCar/main.js"],"names":["createPage","Page"],"mappings":";;;;;;;;;;kDAAA;AACA;AACA,8N;AACAA,UAAU,CAACC,oBAAD,CAAV,C","file":"pages/packagePage/packagePage.js","sourcesContent":["import 'uni-pages';\nimport Vue from 'vue'\nimport Page from './pages/packagePage/packagePage.vue'\ncreatePage(Page)"],"sourceRoot":""}

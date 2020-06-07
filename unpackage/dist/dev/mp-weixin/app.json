@@ -1,0 +1,75 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/index/perfectCarInfo",
+    "pages/orderPage/index",
+    "pages/set/changePsw/changePsw",
+    "pages/set/agree/agree",
+    "pages/set/set",
+    "pages/myInfoPage/advice/advice",
+    "pages/myInfoPage/about/about",
+    "pages/myInfoPage/phoneList/phoneList",
+    "pages/myInfoPage/addrssList/addrssList",
+    "pages/myInfoPage/carList/carList",
+    "pages/myInfoPage/personInfo/personInfo",
+    "pages/orderPage/elaList/elaList",
+    "pages/orderPage/elaSucc/elaSucc",
+    "pages/orderPage/ela/ela",
+    "pages/orderPage/orderDetails/orderDetails",
+    "pages/orderPage/order/order",
+    "pages/finishCarInfo/applySucc/applySucc",
+    "pages/finishCarInfo/applyAddr/applyAddr",
+    "pages/finishCarInfo/carSign/carSign",
+    "pages/finishCarInfo/addCar/addCar",
+    "pages/packagePage/paySuccessPage",
+    "pages/packagePage/choosePayWay",
+    "pages/packagePage/list",
+    "pages/index/addSuccessPage",
+    "pages/index/addAddressInfoPage",
+    "pages/index/infoList",
+    "pages/myInfoPage/index",
+    "pages/packagePage/index",
+    "pages/login/phoneAuthorization",
+    "pages/login/index"
+  ],
+  "subPackages": [],
+  "window": {
+    "navigationBarTextStyle": "black",
+    "navigationBarTitleText": "AUTO WASH",
+    "navigationBarBackgroundColor": "#FFFFFF",
+    "backgroundColor": "#FFFFFF"
+  },
+  "tabBar": {
+    "color": "#999999",
+    "selectedColor": "#409EFF",
+    "borderStyle": "black",
+    "backgroundColor": "#ffffff",
+    "list": [
+      {
+        "pagePath": "pages/index/index",
+        "iconPath": "static/bottomNav/syhs.png",
+        "selectedIconPath": "static/bottomNav/syce.png",
+        "text": "首页"
+      },
+      {
+        "pagePath": "pages/packagePage/index",
+        "iconPath": "static/bottomNav/flhs.png",
+        "selectedIconPath": "static/bottomNav/flcs.png",
+        "text": "套餐"
+      },
+      {
+        "pagePath": "pages/orderPage/order/order",
+        "iconPath": "static/bottomNav/zxhe.png",
+        "selectedIconPath": "static/bottomNav/zxce.png",
+        "text": "订单"
+      },
+      {
+        "pagePath": "pages/myInfoPage/index",
+        "iconPath": "static/bottomNav/wdhs.png",
+        "selectedIconPath": "static/bottomNav/wdce.png",
+        "text": "我的"
+      }
+    ]
+  },
+  "usingComponents": {}
+}
