@@ -20,7 +20,15 @@ export default {
 	src: url('/static/uni.ttf');
 }
 /* #endif */
-
+page{
+	font-size: 32upx;
+}
+.blue{
+	color: $uni-bl;
+}
+.red{
+	color: #f00;
+}
 .icon_input_sy{
 	display: flex;
 	border-bottom: 3rpx solid #eee;
@@ -66,10 +74,25 @@ export default {
 		color: #fff;
 		border: 2upx solid $uni-bl;
 	}
+	&.blue_n{
+		background-color: #fff;
+		color: $uni-bl;
+		border: 2upx solid $uni-bl;
+	}
 	&.orange_n{
 		background-color: #fff;
 		color: $uni-or;
 		border: 2upx solid $uni-or;
+	}
+	&.default{
+		background-color: #ddd;
+		border: 2upx solid #ddd;
+		color: #fff;
+		&.active{
+			background-color: #fff;
+			color: $uni-or;
+			border: 2upx solid $uni-or;
+		}
 	}
 	&.default_n{
 		background-color: #fff;

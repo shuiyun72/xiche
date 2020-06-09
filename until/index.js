@@ -3,7 +3,7 @@ import "static/icon/iconfont.css";
 import store from '../store';
 // let apiUrl = "http://39.100.62.29:9922";
 let apiUrl = 'https://yuyue.wsstreet.net';
-Vue.prototype.$gitApi = function(url, data,callsuc,callerr, method, token) {
+Vue.prototype.$getApi = function(url, data,callsuc,callerr, method, token) {
 	// url = 'System/Login?loginContent=admin&password=123456'
 		method = method || 'post';
 		token = token || true;
@@ -39,3 +39,7 @@ const msg = (title, duration=1500, mask=false, icon='none')=>{
 	});
 }
 Vue.prototype.$msg = msg;
+
+import lodash from 'lodash';
+Vue.prototype._ = lodash;
+

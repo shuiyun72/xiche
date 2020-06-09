@@ -1,0 +1,75 @@
+<template>
+	<view class="orders_reject_suc">
+		
+		<view class="icon_msg_sy">
+			<view class="iconfont iconselected"></view>
+			<view class="text">
+				信息添加成功
+			</view>
+		</view>
+		<view class="re_mtop4">
+			<button class="btn  blue ms" @click="reLaunch('../orders/toOrder')">去下单</button>
+		</view>
+		<view class="re_mtop4">
+			<button class="btn  blue_n ms" @click="reLaunch('./addCar')">继续添加车辆</button>
+		</view>
+		<view class="re_mtop4">
+			<button class="btn  blue_n ms" @click="reLaunch('./addAddress')">继续添加地址</button>
+		</view>
+		<view class="re_mtop4">
+			<button class="btn  blue_n ms" @click="switchTab('../home/home')">返回首页</button>
+		</view>
+	</view>
+</template>
+
+<script>
+	export default {
+		data() {
+			return {
+				
+			};
+		}, 
+		methods:{
+			navigateTo(url){
+				uni.navigateTo({
+					url:url
+				})
+			},
+			switchTab(el){
+				uni.switchTab({
+				    url: el
+				});
+			},
+			reLaunch(el){
+				uni.reLaunch({
+				    url: el
+				});
+			}
+		}
+	}
+</script>
+
+<style lang="scss" scoped>
+
+.orders_reject_suc{
+	border-top: 1upx solid #eee;
+	padding: 0 26upx;
+}
+.re_mtop4{
+	margin-top:60upx;
+	padding: 0 20upx;
+}
+.icon_msg_sy{
+	text-align: center;
+	padding: 80upx 0 40upx;
+	.iconselected{
+		font-size: 120upx;
+		color:$uni-bl ;
+	}
+	.text{
+		font-size: 32upx;
+		color: #666;
+		padding-top: 30upx;
+	}
+}
+</style>
