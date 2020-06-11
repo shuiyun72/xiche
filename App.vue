@@ -1,7 +1,21 @@
 <script>
 export default {
 	onLaunch: function() {
-		console.log('App Launch');
+		let userInfo;
+		if(uni.getStorageSync('userInfo')){
+			userInfo = uni.getStorageSync('userInfo');
+		}else{
+			userInfo = ""
+		}
+		if(userInfo && userInfo.id){
+			uni.switchTab({
+				url:'pages/home/home'
+			})
+		}else{
+			uni.navigateTo({
+				url:'pages/login/login'
+			})
+		}	
 	},
 	onShow: function() {
 		console.log('App Show');
@@ -12,9 +26,8 @@ export default {
 };
 </script>
 
-<style>
-@import 'common/main.css';
-@import 'common/icon.css';
+<style lang="scss">
+@import "./static/icon/iconfont.css";
 /* 解决头条小程序组件内引入字体不生效的问题 */
 /* #ifdef MP-TOUTIAO */
 @font-face {
@@ -22,14 +35,73 @@ export default {
 	src: url('/static/uni.ttf');
 }
 /* #endif */
-.over-bg-white {
-	width: 100%;
-	height: 100%;
-	background-color: white;
-	position: absolute;
 
+.icon_input_sy{
+	display: flex;
+	border-bottom: 3rpx solid #eee;
+	padding: 50rpx 12rpx 12rpx;
+	.iconfont{
+		font-size: 44upx;
+	}
+	.input{
+		font-size: 26upx;
+		padding: 4rpx 10rpx 4rpx 20upx;
+		margin-left: 12rpx;
+		width: 300rpx;
+	}
 }
-.need-top-border{
-	border-top: 2px solid rgba(240,240,240,1);
+.t_right{
+	text-align: right;
+}
+.t_center{
+	text-align: center;
+}
+.t_left{
+	text-align: left;
+}
+.c_fff{
+	color: #fff;
+}
+.c_or{
+	color:$uni-or ;
+}
+.btn{
+	line-height: 1;
+	font-size: 28upx;
+	&.round{
+		border-radius: 80upx;
+	}
+	&.orange{
+		background-color: $uni-or;
+		color: #fff;
+		border: 2upx solid $uni-or;
+	}
+	&.orange_n{
+		background-color: #fff;
+		color: $uni-or;
+		border: 2upx solid $uni-or;
+	}
+	&.default_n{
+		background-color: #fff;
+		border: 2upx solid #ddd;
+		color: #aaa;
+		&.active{
+			background-color: #fff;
+			color: $uni-or;
+			border: 2upx solid $uni-or;
+		}
+	}
+	&.mini{
+		padding: 2upx 10upx;
+	}
+	&.sm{
+		padding: 16upx 20upx;
+	}
+	&.ms{
+		padding: 26upx 30upx;
+	}
+	&.lg{
+		padding: 20upx 30upx;
+	}
 }
 </style>

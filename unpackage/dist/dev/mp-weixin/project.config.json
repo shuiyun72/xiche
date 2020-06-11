@@ -8,8 +8,8 @@
   },
   "compileType": "miniprogram",
   "libVersion": "2.9.2",
-  "appid": "touristappid",
-  "projectname": "washTheCar",
+  "appid": "wx00d45381568089f6",
+  "projectname": "serveCar",
   "condition": {
     "search": {
       "current": -1,

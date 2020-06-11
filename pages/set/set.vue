@@ -1,68 +1,20 @@
 <template>
 	<view>
-		<view class="main">
-			<view class="main-thr width100">
-				<view class="row " @click="skip('/pages/set/changePsw/changePsw')">
-					<view class="mr-lt30 cl-333">
-
-						账号与安全
-					</view>
-					<view class="right">
-						<image src="../../static/my/jinr.png"></image>
-					</view>
-				</view>
-				<view class="row" @click="skip('/pages/myInfoPage/advice/advice','2')">
-					<view class="mr-lt30 cl-333">
-
-						意见反馈
-					</view>
-					<view class="right">
-						<image src="../../static/my/jinr.png"></image>
-					</view>
-				</view>
-				<view class="row" @click="tip(1)">
-					<view class="mr-lt30 cl-333">
-
-						联系客服
-					</view>
-					<view class="right">
-						<image src="../../static/my/jinr.png"></image>
-					</view>
-				</view>
-				<view class="row" @click="skip('/pages/set/agree/agree','2')">
-					<view class="mr-lt30 cl-333">
-
-						用户协议
-					</view>
-					<view class="right">
-						<image src="../../static/my/jinr.png"></image>
-					</view>
-				</view>
-				<view class="row" @click="update">
-					<view class="mr-lt30 cl-333">
-
-						版本更新
-					</view>
-					<view class="right">
-						100
-					</view>
-				</view>
-				<view class="row" @click="tip(2)">
-					<view class="left flex align-center">
-
-						<text class="mr-lt30 cl-333">账号注销</text>
-					</view>
-					<view class="right">
-						<image src="../../static/my/jinr.png"></image>
-					</view>
-				</view>
-
-
-			</view>
-
-
-			<button class="retire fs-32 cl-333 flex align-center justify-center">退出登录</button>
-
+		<uni-list>
+			<uni-list-item title="修改手机号" @click="navigatorUrl('./setPhone')"></uni-list-item>
+			<uni-list-item title="修改密码" @click="navigatorUrl('./setPsd')"></uni-list-item>
+			<uni-list-item title="联系客服" @click="tellServe"></uni-list-item>
+			<uni-list-item title="用户协议"></uni-list-item>
+			<uni-list-item title="清楚缓存"></uni-list-item>
+			<uni-list-item title="版本更新" :showArrow="false">
+				<template v-slot:right="">
+					V1.01
+				</template>
+			</uni-list-item>
+			<uni-list-item title="账号注销"></uni-list-item>
+		</uni-list>
+		<view class="login_out" @click="loginOut">
+			退出登录
 		</view>
 	</view>
 </template>
@@ -72,33 +24,40 @@
 		data() {
 			return {
 
-			}
+			};
 		},
 		methods: {
-             tip(index){
-				 if(index==1){
-					 //客服
-					uni.showModal({
-						title:"提示",
-						content:"客服电话：11111",
-						success: () => {
-							
-						}
-					})
-				 }else{
-					 //注销
-					 uni.showModal({
-					 	title:"提示",
-					 	content:"确认注销账号吗？？",
-					 	success: () => {
-					 		
-					 	}
-					 })
-				 }
-			 },
-			skip(url, type) {
+			navigatorUrl(url) {
 				uni.navigateTo({
-					url: url + "?type=" + type
+					url: url
+				})
+			},
+			tellServe() {
+				uni.showModal({
+					title: "联系客服",
+					content: "客服电话: 0374-2935009",
+					confirmText: "确定",
+					confirmColor: "#f00",
+					cancelText: "取消",
+					success: function(res) {
+						if (res.confirm) {
+							uni.makePhoneCall({
+								phoneNumber: '0374-2935009'
+							});
+						}
+					}
+				})
+			},
+			loginOut(){
+				console.log("退出登录")
+				try {
+				    uni.removeStorageSync('userInfo');
+				} catch (e) {
+				    // error
+				}
+				console.log("退出登录")
+				uni.reLaunch({
+					url: '../login/login'
 				})
 			}
 		}
@@ -106,42 +65,15 @@
 </script>
 
 <style lang="scss">
-	.main{
-		min-height: 100vh;
-		
+	page {
+		background-color: #f0f0f0;
 	}
-	.main-thr {
-		display: flex;
-		flex-direction: column;
-		margin-top: 1px;
-        
-		.row {
-			padding: 0 20rpx;
-			box-sizing: border-box;
-			height: 88rpx;
-			display: flex;
-			align-items: center;
-			justify-content: space-between;
-            background-color: white;
-			border-bottom: 1px solid #eee;
-			.left {
-				font-weight: 900;
-			}
 
-			.right {
-				image {
-					width: 44rpx;
-					height: 44rpx;
-
-				}
-			}
-		}
-	}
-	
-	
-	.retire{
-		background-color: white;
-		
-		margin-top: 100rpx;
+	.login_out {
+		font-size: 28upx;
+		background-color: #fff;
+		margin-top: 140upx;
+		text-align: center;
+		padding: 26upx 0;
 	}
 </style>

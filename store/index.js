@@ -1,25 +1,35 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
- import mutations from './mutations';
 
 Vue.use(Vuex)
-	const state = {
-		curOrderInfo:{
-			car:0,
-			address:'',
-			park:'',
-			washType:0,
-			dala:false,
-			neishi:false,
-			othersServer:false,
-			time:'',
-			phone:'',
-			note:'',
-		},
-		orderArr:[],
-	}
 
-export default new Vuex.Store({
-  state,
-  mutations,
-});
+const store = new Vuex.Store({
+	state: {
+		hasLogin: false,
+		userInfo: {},
+	},
+	mutations: {
+		login(state, provider) {
+
+			state.hasLogin = true;
+			state.userInfo = provider;
+			uni.setStorage({//缓存用户登陆状态
+			    key: 'userInfo',  
+			    data: provider  
+			}) 
+			console.log(state.userInfo);
+		},
+		logout(state) {
+			state.hasLogin = false;
+			state.userInfo = {};
+			uni.removeStorage({  
+                key: 'userInfo'  
+            })
+		}
+	},
+	actions: {
+		
+	}
+})
+
+export default store
