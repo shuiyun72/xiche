@@ -65,7 +65,13 @@
         ,{
             "path" : "pages/mine/mine",
             "style" : {
-				"navigationBarTitleText": "我的"
+				"navigationBarTitleText": "我的",
+				"app-plus": {
+					"titleNView": {
+						"type": "transparent"
+					}
+				}
+				
 			}
         }
         
@@ -172,6 +178,102 @@
             "path" : "pages/store/coupon",
             "style" : {
 				"navigationBarTitleText": "优惠券"
+			}
+        }
+        ,{
+            "path" : "pages/store/vouchersCar",
+            "style" : {
+				"navigationBarTitleText": "我的洗车券"
+			}
+        }
+        ,{
+            "path" : "pages/mine/moneyBox",
+            "style" : {
+				"navigationBarTitleText": "钱包"
+			}
+        }
+        ,{
+            "path" : "pages/mine/withdrawMoney",
+            "style" : {
+				"navigationBarTitleText": "提现"
+			}
+        }
+        ,{
+            "path" : "pages/mine/withdrawMsg",
+            "style" : {
+				"navigationBarTitleText": "提现完成"
+			}
+        }
+        ,{
+            "path" : "pages/store/couponList",
+            "style" : {
+				"navigationBarTitleText": "优惠券"
+			}
+        }
+        ,{
+            "path" : "pages/mine/appraise",
+            "style" : {
+				"navigationBarTitleText": "我的评价"
+			}
+        }
+        ,{
+            "path" : "pages/mine/teamworkSW",
+            "style" : {
+				"navigationBarTitleText": "商务合作"
+			}
+        }
+        ,{
+            "path" : "pages/mine/aboutMine",
+            "style" : {
+				"navigationBarTitleText": "关于我们"
+			}
+        }
+        ,{
+            "path" : "pages/mine/set",
+            "style" : {
+				"navigationBarTitleText": "设置"
+			}
+        }
+        ,{
+            "path" : "pages/mine/editPhone",
+            "style" : {
+				"navigationBarTitleText": "修改手机号"
+			}
+        }
+        ,{
+            "path" : "pages/mine/ideaFor",
+            "style" : {
+				"navigationBarTitleText": "意见反馈"
+			}
+        }
+        ,{
+            "path" : "pages/mine/ideaForMsg",
+            "style" : {
+				"navigationBarTitleText": "反馈成功"
+			}
+        }
+        ,{
+            "path" : "pages/store/addPhone",
+            "style" : {
+				"navigationBarTitleText": "添加手机号"
+			}
+        }
+        ,{
+            "path" : "pages/store/addressList",
+            "style" : {
+				"navigationBarTitleText": "地址库"
+			}
+        }
+        ,{
+            "path" : "pages/orders/orderDetail",
+            "style" : {
+				"navigationBarTitleText": "订单"
+			}
+        }
+        ,{
+            "path" : "pages/mine/mineInfo",
+            "style" : {
+				"navigationBarTitleText": "个人信息"
 			}
         }
     ],

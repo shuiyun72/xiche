@@ -1,6 +1,6 @@
 <template>
 	<view class="home">
-		<image src="../../static/img/home/bg.png" class="home_bg"></image>
+		<image src="../../static/img/home/bg.jpg" class="home_bg"></image>
 		<view class="home_body">
 			<view class="get_s">
 				<view class="address">
@@ -116,7 +116,7 @@
 	export default {
 		data() {
 			return {
-				state: 0,
+				state: 3,
 				juan1List: [{
 						num: 1,
 						zhe: 1,

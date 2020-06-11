@@ -1,15 +1,15 @@
 <template>
 	<view class="msg">
-		<view class="msg_item" v-for="i in 3">
+		<view class="msg_item" v-for="(item,index) in msgList">
 			<view class="time">
-				2019年5月17日
+				{{item.created_at | formatDate}}
 			</view>
 			<view class="m_box">
 				<view class="t_t">
-					系统消息
+					{{item.title}}
 				</view>
 				<view class="text">
-					系统消息系统消息系统消息系统消息系统消息系统消息系统消息系统消息系统消息系统消息系统消息系统消息系统消息系统消息系统消息系统消息系统消
+					{{item.content}}
 				</view>
 			</view>
 		</view>
@@ -20,8 +20,34 @@
 	export default {
 		data() {
 			return {
-				
-			};
+				msgList:[]
+			}
+		},
+		mounted() {
+			this.getMsg();
+		},
+		filters:{
+			formatDate(value){//value需要过滤的数据
+				var date = new Date(value);
+				var year = date.getFullYear();
+				var month = date.getMonth()+1;
+				var day = date.getDate();
+				var hours = date.getHours();
+				var minutes = date.getMinutes();
+				var seconds = date.getSeconds();
+				return year+"年"+month+"月"+day+"日 "+hours+":"+minutes+":"+seconds;
+			}
+		},
+		methods:{
+			getMsg(){
+				this.$getApi("user/my/message",{
+					page:1,
+					paginate:100
+				},res=>{
+					this.msgList = res.data.data;
+					console.log(this.msgList)
+				})
+			}
 		}
 	}
 </script>
@@ -33,6 +59,7 @@ page{
 .msg{
 	min-height: 100vh;
 	background-color: #f0f0f0;
+	padding-bottom: 60upx;
 	.msg_item{
 		padding: 0 26upx;
 		.time{

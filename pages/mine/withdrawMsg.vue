@@ -2,18 +2,15 @@
 	<view class="orders_reject_suc">
 		<view class="icon_msg_sy">
 			<view class="iconfont iconselected"></view>
-			<view class="text">
-				感谢您的信息提交我们将尽快开通
+			<view class="text_title">
+				提现申请提交成功
 			</view>
-			<view class="text">
-				此区域的洗车服务
+			<view class="text_info">
+				审核通过后20小时内到账,若未及时到账请联系线下客服人员
 			</view>
 		</view>
 		<view class="re_mtop4">
-			<button class="btn  blue ms" @click="navigateTo('./addAddress')">返回上一级</button>
-		</view>
-		<view class="re_mtop4 mt10">
-			<button class="btn  blue_n ms" @click="switchTab('../home/home')">返回首页</button>
+			<button class="btn  blue ms" @click="switchTab('./mine')">返回钱包</button>
 		</view>
 	</view>
 </template>
@@ -64,6 +61,15 @@
 		font-size: 32upx;
 		color: #666;
 		padding-top: 30upx;
+	}
+	.text_title{
+		font-weight: bold;
+		padding: 30upx 0 20upx;
+	}
+	.text_info{
+		font-size: 28upx;
+		color: #999;
+		padding: 0 100upx;
 	}
 }
 </style>

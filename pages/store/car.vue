@@ -21,7 +21,7 @@
 						<text class="iconfont icontianxiegongdan-kuozhan-hebing"></text>
 						<text>编辑</text>
 					</view>
-					<view class="item2">
+					<view class="item2" @click="deleteP(1)">
 						<text class="iconfont iconqingkongshanchu"></text>
 						<text>删除</text>
 					</view>
@@ -43,7 +43,19 @@
 			}
 		},
 		methods: {
-			
+			deleteP(item){
+				uni.showModal({
+				    title: '删除',
+				    content: '是否确认删除?',
+				    success: function (res) {
+				        if (res.confirm) {
+				            console.log('用户点击确定');
+				        } else if (res.cancel) {
+				            console.log('用户点击取消');
+				        }
+				    }
+				});
+			}
 		}
 	}
 </script>

@@ -54,33 +54,31 @@
 				});
 			},
 			//获取验证码
-			getYZM() {
+			getYZM(){
 				let data = {
-					phone: this.phone,
-					from: "login,forget"
+					phone:this.phone,
+					from: "login"
 				}
-				this.$gitApi('auth/sendmsg', data, res => {
+				this.$getApi('auth/sendmsg',data,res=>{
 					console.log(res)
-				}, null, false)
+				},"false")
 			},
-			//重置密码
-			loginIn() {
-				if (this.phone && this.psd && this.yzm) {
+			loginIn(){
+				if(this.phone && this.yzm){
 					let data = {
-						phone: this.phone,
-						password: this.psd,
-						code: this.yzm
+						phone:this.phone,
+						code:this.yzm
 					}
-					this.$gitApi('auth/forget/password', data, res => {
+					this.$getApi('auth/phone/login',data,res=>{
+						uni.setStorageSync('userInfo', res.data);
 						console.log(res)
-						if (res.code == 200) {
-							uni.navigateTo({
-								url: '../home/home'
-							})
-						}
-					}, null, false)
-				} else {
-					this.$msg();
+						uni.switchTab({
+							url:'../home/home'
+						})
+						
+					},"false")
+				}else{
+					
 				}
 			}
 		}

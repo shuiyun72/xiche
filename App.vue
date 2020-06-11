@@ -1,7 +1,31 @@
 <script>
 export default {
 	onLaunch: function() {
-		console.log('App Launch');
+		let userInfo;
+		if(uni.getStorageSync('userInfo')){
+			userInfo = uni.getStorageSync('userInfo');
+		}else{
+			userInfo = ""
+		}
+		if(userInfo && userInfo.id){
+			uni.switchTab({
+				url:'./pages/home/home'
+			})
+		}else{
+			uni.navigateTo({
+				url:'./pages/login/yLogin'
+			})
+		}	
+		this.$getApi("user/car/xing",{},res=>{
+			uni.setStorageSync('carXing',res.data);
+		})
+		this.$getApi("user/car/color",{},res=>{
+			uni.setStorageSync('carColor',res.data);
+		})
+		this.$getApi("user/car/brand",{},res=>{
+			uni.setStorageSync('carBrand',res.data);
+		})
+		
 	},
 	onShow: function() {
 		console.log('App Show');
@@ -13,6 +37,7 @@ export default {
 </script>
 
 <style lang="scss">
+@import "./static/icon/iconfont.css";
 /* 解决头条小程序组件内引入字体不生效的问题 */
 /* #ifdef MP-TOUTIAO */
 @font-face {

@@ -3,14 +3,16 @@
 		<view class="icon_msg_sy">
 			<view class="iconfont iconselected"></view>
 			<view class="text">
-				感谢您的信息提交我们将尽快开通
+				感谢您的信息提交
 			</view>
 			<view class="text">
-				此区域的洗车服务
+				敬请关注
 			</view>
 		</view>
 		<view class="re_mtop4">
-			<button class="btn  blue ms" @click="navigateTo('./addAddress')">返回上一级</button>
+			<navigator open-type="navigateBack">
+				<button class="btn  blue ms">返回上一级</button>
+			</navigator>
 		</view>
 		<view class="re_mtop4 mt10">
 			<button class="btn  blue_n ms" @click="switchTab('../home/home')">返回首页</button>

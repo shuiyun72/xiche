@@ -12,20 +12,24 @@
 				</view>
 				<view class="part2">
 					<view class="item2">
-						<text class="iconfont icontianxiegongdan-kuozhan-hebing"></text>
-						<text>编辑</text>
+						<navigator url="../store/addPhone">
+							<text class="iconfont icontianxiegongdan-kuozhan-hebing"></text>
+							<text>编辑</text>
+						</navigator>
 					</view>
-					<view class="item2">
+					<view class="item2" @click="deleteP(i)">
 						<text class="iconfont iconqingkongshanchu"></text>
 						<text>删除</text>
 					</view>
 				</view>
 			</view>
 		</view>
+		<navigator url="../store/addPhone">
 		<view class="add_car_btn">
 			<text class="iconfont icontianjia"></text>
 			<text>新建手机号</text>
 		</view>
+		</navigator>
 	</view>
 </template>
 
@@ -37,7 +41,19 @@
 			}
 		},
 		methods: {
-			
+			deleteP(item){
+				uni.showModal({
+				    title: '删除',
+				    content: '是否确认删除?',
+				    success: function (res) {
+				        if (res.confirm) {
+				            console.log('用户点击确定');
+				        } else if (res.cancel) {
+				            console.log('用户点击取消');
+				        }
+				    }
+				});
+			}
 		}
 	}
 </script>

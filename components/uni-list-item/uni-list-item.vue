@@ -20,7 +20,7 @@
 					<uni-badge v-if="showBadge" :type="badgeType" :text="badgeText" />
 					<switch v-if="showSwitch" :disabled="disabled" :checked="switchChecked" @change="onSwitchChange" />
 					<slot name="right"></slot>
-					<uni-icons v-if="showArrow" :size="20" class="uni-icon-wrapper" color="#bbb" type="arrowright" />
+					<uni-icons v-if="showArrow" :size="15" class="uni-icon-wrapper" color="#bbb" type="arrowright" />
 				</view>
 			</view>
 		</view>
