@@ -1,21 +1,7 @@
 <script>
 export default {
 	onLaunch: function() {
-		let userInfo;
-		if(uni.getStorageSync('userInfo')){
-			userInfo = uni.getStorageSync('userInfo');
-		}else{
-			userInfo = ""
-		}
-		if(userInfo && userInfo.id){
-			uni.switchTab({
-				url:'pages/home/home'
-			})
-		}else{
-			uni.navigateTo({
-				url:'pages/login/login'
-			})
-		}	
+			
 	},
 	onShow: function() {
 		console.log('App Show');

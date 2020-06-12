@@ -112,6 +112,32 @@
 				msgInfo: []
 			}
 		},
+		onLoad() {
+			let userInfo;
+			if(uni.getStorageSync('userInfo')){
+				userInfo = uni.getStorageSync('userInfo');
+			}else{
+				userInfo = ""
+			}
+			if(!userInfo){
+				uni.reLaunch({
+					url: '../login/login'
+				});
+				// uni.showModal({
+				// 	title: '未登录',
+				// 	content: '您未登录，需要登录后才能继续',
+				// 	success: (res) => {
+				// 		if (res.confirm) {
+				// 			uni.reLaunch({
+				// 				url: '../login/login'
+				// 			});
+				// 		}else{
+				// 			this.$msg("游客")
+				// 		}
+				// 	}
+				// });
+			}
+		},
 		mounted() {
 
 		},
