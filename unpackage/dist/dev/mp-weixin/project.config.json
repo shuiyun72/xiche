@@ -4,12 +4,14 @@
     "ignore": []
   },
   "setting": {
-    "urlCheck": true
+    "urlCheck": false,
+    "es6": false,
+    "postcss": true
   },
   "compileType": "miniprogram",
   "libVersion": "2.9.2",
   "appid": "wx00d45381568089f6",
-  "projectname": "serveCar",
+  "projectname": "washTheCar",
   "condition": {
     "search": {
       "current": -1,

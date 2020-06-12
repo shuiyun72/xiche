@@ -16,6 +16,8 @@
 		<view>
 			<button class="btn round orange ms" @click="loginIn">登录</button>
 		</view>
+		
+		<button open-type="getUserInfo" @getuserinfo="getUserInfo">weixin</button>
 	</view>
 </template>
 
@@ -28,6 +30,23 @@
 			};
 		},
 		methods: {
+			getUserInfo({
+				detail
+			}) {
+				console.log(detail)
+				if (detail.userInfo) {
+					uni.showToast({
+						icon: 'none',
+						title: '登陆成功'
+					});
+					// this.toMain(detail.userInfo.nickName);
+				} else {
+					uni.showToast({
+						icon: 'none',
+						title: '登陆失败'
+					});
+				}
+			},
 			loginIn() {
 				console.log(this.phone,this.psd)
 				if (this.phone && this.psd) {
