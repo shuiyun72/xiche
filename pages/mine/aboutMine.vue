@@ -3,9 +3,12 @@
 		<view class="hezuo_img">
 			<image src="../../static/img/logo.png" mode="widthFix" class="img"></image>
 		</view>
-		<view class="text_p1">
-			预约洗车预约洗车预约洗车预约洗车预约洗车预约洗车预约洗车预约洗车预约洗车预约洗车预约洗车预约洗车预约洗车预约洗车预约洗车预约洗车预约洗车
+		<view class="text_p1" v-html="swMsg">
+			<!-- {{swMsg.content}} -->
 		</view>
+<!-- 		<view class="text_p1">
+			预约洗车预约洗车预约洗车预约洗车预约洗车预约洗车预约洗车预约洗车预约洗车预约洗车预约洗车预约洗车预约洗车预约洗车预约洗车预约洗车预约洗车
+		</view> -->
 	</view>
 </template>
 
@@ -13,8 +16,17 @@
 	export default {
 		data() {
 			return {
-				
+				swMsg:""
 			};
+		},
+		mounted() {
+			this.$getApi("/api/user/my/hezuo",{},res=>{
+				let  swM = res.data.content;
+				this.phone =  res.data.tel;
+				const regex = new RegExp('<img','gi')
+				swM = swM.replace(regex,`<img style="max-width:100%;"`);
+				this.swMsg = swM;
+			})
 		}
 	}
 </script>

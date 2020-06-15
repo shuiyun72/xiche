@@ -3,41 +3,52 @@
 		<view class="tab_list_sy">
 			<view class="item" v-for="(item,index) in tabList" :class="{'active':index == tabSel}" @click="selectTab(item,index)">{{item.text}}</view>
 		</view>
-
-		<view class="o_card_list" v-for="item in msgInfo">
+		<view class="no_order"  v-if="msgInfo.length == 0">
+			<image src="../../static/img/zanwdd.png" mode="widthFix"></image>
+		</view>
+		<view class="o_card_list" v-for="item in msgInfo" v-if="msgInfo.length > 0">
 			<view @click="toDetail(item)">
 				<view class="o_title">
-					<text>{{item.type}}</text>
-					<text>{{item.state}}</text>
+					<text class="tt_t"><text class="iconfont icon-"></text> <text>{{item.title}}</text> </text>
+					<text>{{itemState(item.stateN)}}</text>
 				</view>
 				<view class="o_p1">
-					{{item.car}} {{item.carP}}
+					<view class="">
+						{{item.xing}} {{item.carNum}}
+					</view> 
+					<view class="">
+						￥18元
+					</view>
 				</view>
-				<view class="o_msg_info">
+				<!-- <view class="o_msg_info">
 					<text class="iconfont iconyonghuming"><text>{{item.name}}</text></text>
 				</view>
 				<view class="o_msg_info">
 					<text class="iconfont icondianhua"><text>{{item.phone | psd}}</text></text>
 					<text class="tell_phone" @click.stop="tellPhone(item.phone)" v-show="tabSel==1">拨打电话</text>
-				</view>
+				</view> -->
 				<view class="o_msg_info">
 					<text class="iconfont iconshijian"><text>{{item.time}}</text></text>
 				</view>
 				<view class="o_msg_info">
-					<text class="iconfont iconshijian"><text>{{item.p}}</text></text>
+					<text class="iconfont icontingche"><text>{{item.location}}</text></text>
 				</view>
 				<view class="o_msg_info">
-					<text class="iconfont iconlocation"><text>{{item.addr}}</text></text>
-					<text class="iconfont iconzhifeiji" v-show="tabSel==1" @click.stop="toPosition(item)"></text>
+					<text class="iconfont iconlocation"><text>{{item.address}}</text></text>
+					<text class="iconfont iconzhifeiji" v-show="item.stateN==2 || item.stateN==3" @click.stop="toPosition(item)"></text>
 				</view>
-				<view class="o_msg_info" v-show="item.ftime && tabSel==2">
-					<text class="iconfont iconxuanzhong"><text>{{item.ftime}}</text></text>
-				</view>
-				<view class="o_msg_info" v-show="tabSel==3">
-					<text class="iconfont iconcuowu"><text>{{item.ntime}}</text></text>
+				<view class="o_msg_info" v-show="item.stateN==4">
+					<text class="iconfont iconxuanzhong"><text>{{item.afterTime}}</text></text>
 				</view>
 				<view class="o_msg_info" v-show="tabSel==3">
-					<text class="iconfont iconwendang"><text>{{item.cause}}</text></text>
+					<text class="iconfont iconcuowu"><text>{{item.qxTime}}</text></text>
+				</view>
+				<view class="o_msg_info" v-show="tabSel==3">
+					<text class="iconfont iconwendang"><text>{{item.qxCase}}</text></text>
+				</view>
+				<view class="o_msg_info flex_bot">
+					<text>订单编号 {{item.qxCase}}</text>
+					<text class="red_money">实付: ￥0元</text>
 				</view>
 			</view>
 			<view class="sub_btn" v-show="tabSel==0">
@@ -88,19 +99,19 @@
 				tabSel: 0,
 				tabList: [{
 						text: "已确定",
-						type: 0
-					},
-					{
-						text: "作业中",
 						type: 1
 					},
 					{
-						text: "已完成",
+						text: "作业中",
 						type: 2
 					},
 					{
-						text: "特殊订单",
+						text: "已完成",
 						type: 3
+					},
+					{
+						text: "特殊订单",
+						type: 4
 					}
 				],
 				person: {
@@ -159,7 +170,7 @@
 			if (this.state == 0) {
 				this.$refs['juan0'].open()
 			}
-
+			this.getOrder(1);
 		},
 		filters: {
 			psd: function(value) {
@@ -168,6 +179,7 @@
 				return value.slice(0, 3) + '******'
 			}
 		},
+
 		computed: {
 			starC() {
 				if (this.person.star == 5) {
@@ -176,9 +188,33 @@
 			}
 		},
 		methods: {
+			itemState(n){
+				switch (n) {
+					case 1 : return "待接单" ;break;
+					case 2 : return "待完成" ;break;
+					case 3 : return "正在洗车" ;break;
+					case 4 : return "已完成" ;break;
+					case 5 : return "本人取消订单" ;break;
+					case 6 : return "本人拒绝订单" ;break;
+					case 7 : return "客户取消订单" ;break;
+				}
+			},
 			closeJuan(num) {
 				this.$refs['juan' + num].close()
 			},
+			getOrder(type){
+				let orderData = {
+					type:type,
+					page:1,
+					paginate:100
+				}
+				this.$getApi('/api/user/order/list',orderData,res=>{
+					console.log(res.data)
+					this.msgInfo = res.data.data
+				})
+			},
+			
+			
 			reLaunch(url) {
 				uni.reLaunch({
 					url: url
@@ -186,6 +222,7 @@
 			},
 			selectTab(el, i) {
 				this.tabSel = i;
+				this.getOrder(el.type);
 			},
 			tellPhone(phone) {
 				uni.makePhoneCall({
@@ -357,7 +394,7 @@
 			text-align: right;
 			padding-top: 30upx;
 			border-top: 1upx solid #eee;
-			margin-top: 70upx;
+			margin-top: 20upx;
 
 			.nav_to {
 				width: 30%;
@@ -373,15 +410,40 @@
 			font-size: 34upx;
 			border-bottom: 2upx solid #eee;
 			padding-bottom: 12upx;
+			align-items: center;
+			.tt_t{
+				color: #333;
+				display: inline-flex;
+				align-items: center;
+				font-size: 28upx;
+				.icon-{
+					font-size: 60upx;
+					color: $uni-bl;
+					position: relative;
+					top: 10upx;
+				}
+			}
+			
 		}
 
 		.o_p1 {
-			font-size: 36upx;
+			font-size: 32upx;
 			padding: 24upx 0;
+			display: flex;
+			justify-content: space-between;
 		}
 
 		.o_msg_info {
-
+			&.flex_bot{
+				display:flex;
+				justify-content: space-between;
+				font-size: 28upx;
+				padding-top: 10upx;
+				.red_money{
+					color: #f00;
+					
+				}
+			}
 			// font-size: 32upx;
 			.iconfont {
 				font-size: 32upx;
@@ -500,5 +562,11 @@
 
 	.ml10p {
 		margin-left: 10upx;
+	}
+	.no_order{
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		height:70vh ;
 	}
 </style>

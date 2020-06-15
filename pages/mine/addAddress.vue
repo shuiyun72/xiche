@@ -1,8 +1,20 @@
 <template>
 	<view>
 		<uni-list>
-			<uni-list-item-point title="市" point=true rightText="郑州市"></uni-list-item-point>
-			<uni-list-item-point title="县/区" point=true rightText="中原区"></uni-list-item-point>
+			<uni-list-item-point title="市"  point="true">
+				<template v-slot:right="">
+				<picker @change="shiListC" :value="shiListSel" :range="shiList" range-key="name">
+					<view class="uni-input">{{shiList[shiListSel].name}}</view>
+				</picker>
+				</template>
+			</uni-list-item-point>
+			<uni-list-item-point title="县/区"  point="true">
+				<template v-slot:right="">
+				<picker @change="quListC" :value="quListSel" :range="quList" range-key="name">
+					<view class="uni-input">{{quList[quListSel].name}}</view>
+				</picker>
+				</template>
+			</uni-list-item-point>
 			<uni-list-item-point title="街道"  point="true">
 				<template v-slot:right="">
 				<picker @change="routeListC" :value="routeListSel" :range="routeList" range-key="name">
@@ -19,7 +31,7 @@
 			</uni-list-item-point>
 			<uni-list-item-point title="小区期数/楼栋号" :showArrow="false" point="true">
 				<template v-slot:right="">
-					<input type="text" :value="xiaoquInp" placeholder="请填写小区期数/楼栋号" class="add_car_input"/>
+					<input type="text" v-model="xiaoquInp" placeholder="请填写小区期数/楼栋号" class="add_car_input"/>
 				</template>
 			</uni-list-item-point>
 		</uni-list>
@@ -31,27 +43,27 @@
 		<uni-list>
 			<uni-list-item-point title="经常使用的停车位1" point=true :showArrow="false">
 				<template v-slot:right="">
-					<input type="text" :value="inpNum1" placeholder="请填写车位号 / 位置描述" class="add_car_input"/>
+					<input type="text" v-model="inpNum1" placeholder="请填写车位号 / 位置描述" class="add_car_input"/>
 				</template>
 			</uni-list-item-point>
 			<uni-list-item-point title="经常使用的停车位2" :showArrow="false">
 				<template v-slot:right="">
-					<input type="text" :value="inpNum2" placeholder="请填写车位号 / 位置描述" class="add_car_input"/>
+					<input type="text" v-model="inpNum2" placeholder="请填写车位号 / 位置描述" class="add_car_input"/>
 				</template>
 			</uni-list-item-point>
 			<uni-list-item-point title="经常使用的停车位3" :showArrow="false">
 				<template v-slot:right="">
-					<input type="text" :value="inpNum3" placeholder="请填写车位号 / 位置描述" class="add_car_input"/>
+					<input type="text" v-model="inpNum3" placeholder="请填写车位号 / 位置描述" class="add_car_input"/>
 				</template>
 			</uni-list-item-point>
 			<uni-list-item-point title="经常使用的停车位4" :showArrow="false">
 				<template v-slot:right="">
-					<input type="text" :value="inpNum4" placeholder="请填写车位号 / 位置描述" class="add_car_input"/>
+					<input type="text" v-model="inpNum4" placeholder="请填写车位号 / 位置描述" class="add_car_input"/>
 				</template>
 			</uni-list-item-point>
 		</uni-list>
 		<view class="sub_btn">
-			<button class="btn blue" @click="navigateTo('./addSuccess')">提交</button>
+			<button class="btn blue" @click="next">提交</button>
 		</view>
 	</view>
 </template>
@@ -61,27 +73,127 @@
 	export default {
 		data() {
 			return {
-				routeList:[{name:'请选择街道'},{name:'莲花街'},{name: '冬青街'}, {name:'雪松街'}],
+				shiList:[{name:'请选择小区'}],
+				shiListSel:0,
+				quList:[{name:'请选择小区'}],
+				quListSel:0,
+				routeList:[{name:'请选择街道'}],
 				routeListSel:0,
-				areaList:[{name:'请选择小区'},{name:'万科城'},{name: '芒果城'}, {name:'东方又一城'}],
+				areaList:[{name:'请选择小区'}],
 				areaListSel:0,
 				xiaoquInp:"",
 				inpNum1:"",
 				inpNum2:"",
 				inpNum3:"",
-				inpNum4:""
+				inpNum4:"",
+				id:"",
+				lng:113.33,
+				lat:33.03
+				
 			};
 		},
+		mounted(){
+			// this.getLocal(16,1,'shiList');
+			let this_ = this;
+			uni.getLocation({
+			    type: 'wgs84',
+			    success: function (res) {
+					this_.lng = res.longitude;
+					this_.lat = res.latitude;
+					console.log(this_.lng,this_.lat)
+			    }
+			});
+		},
+		onLoad(ph) {
+			if(ph.item){
+				uni.setNavigationBarTitle({
+					title:"编辑地址信息"
+				})
+				let phItem = JSON.parse(ph.item);
+				console.log(phItem);
+				this.shiList = [{name:phItem.city_name,id:phItem.city_id}];
+				this.quList = [{name:phItem.area_name,id:phItem.area_id}];
+				this.routeList = [{name:phItem.street_name,id:phItem.street_id}];
+				this.areaList = [{name:phItem.house_name,id:phItem.house_id}];
+				this.xiaoquInp = phItem.house_detail;
+				this.inpNum1 = phItem.park[0] ? phItem.park[0].name :"";
+				this.inpNum2 = phItem.park[1] ? phItem.park[1].name :"";
+				this.inpNum3 = phItem.park[2] ? phItem.park[2].name :"";
+				this.inpNum4 = phItem.park[3] ? phItem.park[3].name :"";
+				this.id = phItem.id;
+			}else{Zz
+				this.getLocal(16,1,'shiList');
+			}
+		},
+		computed:{
+			parksList(){
+				let parksListO = [];
+				if(this.inpNum1){
+					parksListO.push(this.inpNum1);
+				}
+				if(this.inpNum2){
+					parksListO.push(this.inpNum2);
+				}
+				if(this.inpNum3){
+					parksListO.push(this.inpNum3);
+				}
+				if(this.inpNum4){
+					parksListO.push(this.inpNum4);
+				}
+				return JSON.stringify(parksListO) ;
+			}
+		},
 		methods:{
+			getLocal(id,type,event){
+				this.$getApi("/api/auth/area",{pid:id,type:type},res=>{
+					this[event] = res.data;		
+				});
+			},
+			shiListC(e){
+				this.shiListSel = e.detail.value;
+				this.getLocal(this.shiList[this.shiListSel].id,2,'quList');
+			},
+			quListC(e){
+				this.quListSel = e.detail.value
+				this.getLocal(this.quList[this.quListSel].id,3,'routeList');
+			},
 			routeListC(e){
 				this.routeListSel = e.detail.value
+				console.log(this.routeListSel)
+				console.log(this.routeList[this.routeListSel].id)
+				this.$getApi("/api/auth/house",{pid:this.routeList[this.routeListSel].id},res=>{
+					console.log()
+					let resData = JSON.stringify(res.data) == "[]" ? [{name:'请选择小区'}] :res.data;
+					this.areaList = resData;	
+				});
 			},
 			areaListC(e){
 				this.areaListSel = e.detail.value
 			},
-			navigateTo(url){
+			next(){
+				let dataL  = {
+					id:this.id,
+					city_id:this.shiList[this.shiListSel].id,
+					area_id:this.quList[this.quListSel].id,
+					street_id:this.routeList[this.routeListSel].id,
+					house_id:20020,
+					house_detail:this.xiaoquInp,
+					lng:this.lng,
+					lat:this.lat,
+					parks:this.parksList		
+				}
+				console.log(dataL)
+				this.$getApi("/api/user/address/add",dataL,res=>{
+					uni.navigateTo({
+						url:'./addSuccess'
+					})
+				});
+				
+			},
+			navigateTo(url){	
 				uni.navigateTo({
 					url:url
+					
 				})
 			}
 		}

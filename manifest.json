@@ -48,6 +48,7 @@
         "setting" : {
             "urlCheck" : true,
             "es6" : true
-        }
+        },
+        "permission" : {}
     }
 }

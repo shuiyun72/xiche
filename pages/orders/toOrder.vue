@@ -1,9 +1,17 @@
 <template>
 	<view class="to_order">
+		<view class="show_more_o" v-for="(mo,index) in lastData">
+			<view class="">
+				预约订单{{index+1}}
+			</view> 
+			<view class="r" @click="delet(index)">
+				<text class="iconfont iconqingkongshanchu"></text> 删除
+			</view>
+		</view>
 		<uni-list>
-			<uni-list-item-point title="车辆" point="true" rightText="请选择车辆"  @click="navigateTo('../store/car')"></uni-list-item-point>
-			<uni-list-item-point title="洗车地址" point="true" rightText="请选择地址" @click="navigateTo('../store/address')"></uni-list-item-point>
-			<uni-list-item-point title="停车位" point="true" rightText="请选择停车位" @click="navigateTo('../store/stopCar')"></uni-list-item-point>
+			<uni-list-item-point title="车辆" point="true" :rightText="orderCar.name"  @click="navigateTo('../store/car?from=toorder')"></uni-list-item-point>
+			<uni-list-item-point title="洗车地址" point="true" :rightText="orderAddress.name" @click="navigateTo('../store/address?from=toorder')"></uni-list-item-point>
+			<uni-list-item-point title="停车位" point="true" :rightText="orderP.name" @click="navigateTo('../store/stopCar?from=toorder')"></uni-list-item-point>
 		</uni-list>
 		<uni-list class="mt10">
 			<uni-list-item-point title="洗车内容选择" point="true" :showArrow="false" rightText=""></uni-list-item-point>
@@ -16,14 +24,14 @@
 						<view class="item_b">
 							<view class="part1">
 								<radio :value="item.value" :checked="index === current" class="radio" />
-								<text class="t">{{item.value}}</text>
+								<text class="t">{{item.title}}</text>
 							</view>
 							<view class="part2">
-								<image src="../../static/img/vip.png" mode="widthFix" class="vip_img"></image> {{item.title}}
+								<image src="../../static/img/vip.png" mode="widthFix" class="vip_img"></image> 洗车券1张
 							</view>
-							<view class="p">{{item.p1}}</view>
-							<view class="p">{{item.p2}}</view>
-							<view class="p">{{item.p3}}</view>
+							<view class="p" v-for="ic in item.chexing">{{ic.chexing}}￥{{ic.price}}</view>
+							<!-- <view class="p">{{item.p2}}</view>
+							<view class="p">{{item.p3}}</view> -->
 						</view>
 					</view>
 				</label>
@@ -56,27 +64,31 @@
 			</uni-list-item-point>
 		</uni-list>
 		<uni-list>
-			<uni-list-item-point title="联系电话" point="true" rightText="13899999999" @click="navigateTo('../store/phone')"></uni-list-item-point>
+			<uni-list-item-point title="联系电话" point="true" :rightText="orderPhone.name" @click="navigateTo('../store/phone')"></uni-list-item-point>
 		</uni-list>
 		<view class="bezhu">
 			<view class="title">
 				备注信息
 			</view>
-			<textarea :value="vTextarea" placeholder="请在这里填写备注信息" class="textarea"/>
+			<textarea v-model="vTextarea" placeholder="请在这里填写备注信息" class="textarea"/>
 		</view>
-		<view class="c_add_or">
+		<view class="c_add_or" @click="moreNext">
 			<text class="iconfont icontianjia"></text>
 			<text>继续添加洗车订单</text>
 		</view>
 		<view class="sub_btn">
-			<button class="btn blue" @click="navigateTo('./addAddress')">确认下单</button>
+			<button class="btn blue" @click="next">确认下单</button>
 		</view>
 	</view>
 </template>
 
 <script>
-	import uniListItemPoint from '../../components/uni-list-item-point/uni-list-item-point.vue'
+	import uniListItemPoint from '../../components/uni-list-item-point/uni-list-item-point.vue';
+	import { mapState,mapMutations } from "vuex";
 	export default {
+		components:{
+			uniListItemPoint
+		},
 		data() {
 			return {
 				itemsCarList: [{
@@ -94,7 +106,7 @@
 					p2: "会员SUV￥30元",
 					p3: "会员MVP￥34元"
 				}],
-				current: 1,
+				current: 0,
 				checkboxOther: [{
 						value: 'dl',
 						name: '打蜡',
@@ -116,10 +128,75 @@
 					['上午0:00-8:00', '晚上20:00-24:00']
 				],
 				rinseTimeSel:[0,0],
-				vTextarea:""
+				vTextarea:"",
+				relationId:"",
+				lastData:[]
 			};
+		}, 
+		computed:{
+			...mapState(['orderCar','orderAddress','orderP','orderPhone']),
+			a(){
+				return this.$store.state.initInfo.a || 123456
+			}
+		},
+		mounted() {
+			this.$getApi("/api/auth/mall/neirong",{},res=>{
+				console.log(res)
+				this.itemsCarList = res.data
+			})
 		},
 		methods: {
+			...mapMutations(['setSelCar','setAddress','setP','setPhone']),
+			next(){
+				// navigateTo('./addAddress')
+				this.moreNext();
+				console.log(this.lastData);
+				let sssData = JSON.stringify(this.lastData)
+				// console.log(this.$store.state.userInfo.groupid)
+				uni.navigateTo({
+					url:'./orderTrue'
+				})
+				this.$getApi("/api/user/order/sure",{data:sssData},res=>{
+					//this.itemsCarList = res.data
+					this.setSelCar({name:"请选择车的品牌"});
+					this.setAddress({name:"请选择地址"});
+					this.setP({name:"请选择停车位"});
+					this.setPhone({name:"请选择手机号"});
+					if(this.$store.state.userInfo.groupid == 0){
+						uni.navigateTo({
+							url:'./addAddress'
+						})
+					}else{
+						uni.navigateTo({
+							url:'./orderTrue'
+						})
+					}
+					
+				})
+				
+			},
+			delet(el){
+				this.lastData.splice(el,1)
+			},
+			moreNext(){
+				let dataL = {
+					car_id: this.orderCar.id,
+					address_id: this.orderAddress.id,
+					park_id: this.orderP.id,
+					mall_id: this.itemsCarList[this.current].id,
+					time: this.rinseTimeList[0][this.rinseTimeSel[0]]+' '+this.rinseTimeList[1][this.rinseTimeSel[1]] ,
+					relation_id: this.relationId,
+					remark: this.vTextarea,
+					service_ids:JSON.stringify([1,2]) 
+				}
+				this.lastData.push(dataL);
+				this.setSelCar({name:"请选择车的品牌"});
+				this.setAddress({name:"请选择地址"});
+				this.setP({name:"请选择停车位"});
+				this.setPhone({name:"请选择手机号"});
+				this.rinseTimeSel = [0,0];
+				this.vTextarea = "";
+			},
 			radioChange(e) {
 				console.log(e.detail.value)
 			},
@@ -163,6 +240,18 @@
 </script>
 
 <style lang="scss" scoped>
+	.show_more_o{
+		padding: 20upx 26upx;
+		background-color: $uni-bl;
+		margin-bottom: 20upx;
+		color: #fff;
+		display: flex;
+		justify-content: space-between;
+		.r{
+			font-size: 26upx;
+			color: #ccc;
+		}
+	}
 	.mt10 {
 		margin-top: 22upx;
 	}

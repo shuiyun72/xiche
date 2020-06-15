@@ -143,6 +143,9 @@
 				vTextarea:""
 			};
 		},
+		onLoad() {
+			console.log(this.$store)
+		},
 		methods: {
 			radioChange(e) {
 				console.log(e.detail.value)

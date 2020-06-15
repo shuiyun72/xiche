@@ -52,6 +52,17 @@
 				}else{
 					
 				}
+			},
+			getInit(){
+				this.$getApi("/api/user/car/xing",{},res=>{
+					uni.setStorageSync('carXing',res.data);
+				})
+				this.$getApi("/api/user/car/color",{},res=>{
+					uni.setStorageSync('carColor',res.data);
+				})
+				this.$getApi("/api/user/car/brand",{},res=>{
+					uni.setStorageSync('carBrand',res.data);
+				})
 			}
 		}
 	}

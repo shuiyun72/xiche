@@ -40,7 +40,7 @@
 		},
 		methods:{
 			getMsg(){
-				this.$getApi("user/my/message",{
+				this.$getApi("/api/user/my/message",{
 					page:1,
 					paginate:100
 				},res=>{

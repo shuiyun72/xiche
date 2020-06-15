@@ -1,37 +1,15 @@
 <template>
 	<view class="combo_body">
-		<view class="combo_title">
-			小型汽车车型
-		</view>
-		<navigator url="./comboList?type=1">
-			<view class="car_box">
-				<image src="../../static/img/car1.png" mode="widthFix" class="img"></image>
+		<view  v-for="item in comboList" :key="item.id">
+			<view class="combo_title">
+				{{item.cat_name}}
 			</view>
-		</navigator>
-		<view class="combo_title">
-			SUV车型
+			<navigator :url="'./comboList?item='+JSON.stringify(item)">
+				<view class="car_box">
+					<image :src="$httpp+item.cover" mode="widthFix" class="img"></image>
+				</view>
+			</navigator>
 		</view>
-		<navigator url="./comboList?type=2">
-			<view class="car_box">
-				<image src="../../static/img/car2.png" mode="widthFix" class="img"></image>
-			</view>
-		</navigator>
-		<view class="combo_title">
-			MPV车型
-		</view>
-		<navigator url="./comboList?type=3">
-			<view class="car_box">
-				<image src="../../static/img/car3.png" mode="widthFix" class="img"></image>
-			</view>
-		</navigator>
-		<view class="combo_title">
-			综合车型全家桶
-		</view>
-		<navigator url="./comboList?type=4">
-			<view class="car_box">
-				<image src="../../static/img/car4.png" mode="widthFix" class="img"></image>
-			</view>
-		</navigator>
 	</view>
 </template>
 
@@ -39,8 +17,19 @@
 	export default {
 		data() {
 			return {
-
+				comboList:[]
 			};
+		},
+		mounted() {
+			this.init();
+		},
+		methods:{
+			init(){
+				this.$getApi("/api/auth/mall/index",{},res1=>{
+					console.log(res1)
+					this.comboList = res1.data
+				})
+			}
 		}
 	}
 </script>

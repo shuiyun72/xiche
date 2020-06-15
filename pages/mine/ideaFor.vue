@@ -9,7 +9,7 @@
 		</view>
 		<input type="text" v-model="phone" class="input" placeholder="请留下您的联系方式"/>
 		<view class="sub_btn">
-			<button class="btn blue" @click="navigateTo('./ideaForMsg')">提 交</button>
+			<button class="btn blue" @click="next">提 交</button>
 		</view>
 	</view>
 </template>
@@ -23,10 +23,17 @@
 			};
 		},
 		methods:{
-			navigateTo(url){
-				uni.navigateTo({
-					url:url
-				})
+			next(){
+				let dataL = {
+					contact:this.phone,
+					content:this.yijian
+				}
+				this.$getApi("/api/user/my/feedback",dataL,res=>{
+					uni.reLaunch({
+						url:'./ideaForMsg'
+					})
+				});
+				
 			}
 		}
 	}

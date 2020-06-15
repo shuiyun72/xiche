@@ -18,14 +18,14 @@
 			</view>
 			<view class="h_card">
 				<view class="h_title">
-					张大大-欢迎您
+					{{userInfo && userInfo.nickname || '游客'}}-欢迎您
 				</view>
 				<view class="user_s">
 					<text class="iconfont iconyonghuming"></text>
 					<text>游客</text>
 				</view>
 				<view class="libao_list">
-					<view class="libao">
+					<view class="libao" @click="getXCQ">
 						<view class="li_t">
 							我的洗车卷
 						</view>
@@ -37,13 +37,13 @@
 
 						</view>
 					</view>
-					<view class="libao">
+					<view class="libao" @click="switchTab('../combo/combo')">
 						<view class="li_t">
-							我的洗车卷
+							购买套餐
 						</view>
 						<view class="li_info">
 							<view class="l_l">
-								剩余12张
+								优惠多少
 							</view>
 							<image src="../../static/img/home/taoc.png" mode="widthFix" class="l_r"></image>
 						</view>
@@ -86,7 +86,7 @@
 					<view class="item_ab">
 						<view class="left">
 							<view class="p1">
-								<text class="t">{{item.num}}</text>
+								<text class="t">{{Number(item.discount)}}</text>
 								<text>折</text>
 							</view>
 							<view class="p2">
@@ -95,10 +95,13 @@
 						</view>
 						<view class="right">
 							<view class="p3">
-								预约洗车{{item.zhe}}折优惠
+								<!-- 预约洗车{{item.title}}折优惠 -->
+								{{item.title}}
 							</view>
 							<view class="p4">
-								有效期 {{item.date}}
+								有效期 {{item.created_at && item.created_at.split(" ")[0]}}
+								-
+								{{item.end_time && item.end_time.split(" ")[0]}}
 							</view>
 						</view>
 					</view>
@@ -113,10 +116,13 @@
 </template>
 
 <script>
+	import {
+		mapState
+	} from 'vuex'
 	export default {
 		data() {
 			return {
-				state: 3,
+				
 				juan1List: [{
 						num: 1,
 						zhe: 1,
@@ -138,15 +144,65 @@
 				]
 			};
 		},
-		mounted() {
-			if (this.state == 0) {
-				this.$refs['juan0'].open()
-			}
-			if (this.state == 1) {
-				this.$refs['juan1'].open()
+		computed:{
+			...mapState(['hasLogin', 'userInfo']),
+			group(){
+				if(this.userInfo){
+					switch (this.userInfo.groupid) {
+						case 1 : return "会员" ; break;
+						case 2 : return "vip会员" ; break;
+						default: return "游客" ; break;
+					}
+				}else{
+					return "游客"
+				}
+			},
+			state(){
+				// return this.userInfo && this.userInfo.groupid && 0;
+				return 1
 			}
 		},
+		mounted() {
+			if(!this.hasLogin){
+				uni.reLaunch({
+					url:'../login/yLogin'
+				})
+			}else{
+				this.getQList();
+				if (this.state == 0) {
+					this.getQList();
+					this.$refs['juan0'].open()
+				}
+				if (this.state == 1) {
+					this.$refs['juan1'].open()
+				}
+			}
+			
+		},
 		methods: {
+			
+			//home弹窗优惠券
+			getQList(){
+				this.$getApi("/api/auth/coupon/list",{},res=>{
+					console.log(res.data)
+					this.juan1List = res.data
+				})
+				//  this.$getApi("/api/user/car/xing",{},res=>{
+				// 	 console.log(res)
+				// 	// this.$store.commit("setCarXing",res.data)
+				// })
+			},
+			//跳转洗车券
+			getXCQ(){
+				this.$refs['juan0'].open()
+				// if (this.state == 0) {
+				// 	this.$refs['juan0'].open()
+				// }else{
+				// 	// uni.switchTab({
+				// 	// 	url:'../combo/combo'
+				// 	// })
+				// }
+			},
 			closeJuan(num) {
 				this.$refs['juan' + num].close()
 			},
@@ -156,6 +212,7 @@
 				})
 			},
 			getQuanSucc() {
+				this.$getApi("/api/user/coupon/take");
 				this.$refs['juan1'].close()
 				this.$msg('优惠券领取成功,可在个人中心中查看');
 			}

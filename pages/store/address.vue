@@ -1,7 +1,8 @@
 <template>
 	<view class="address_list">
-		<view class="item" v-for="(item,index) in addressList" :class="{'active':index == sIndex}" @click="selItem(index,item)">
+		<view class="item" v-for="(item,index) in addressList" :class="{'active':index == sIndex}" @click="selItem(item,index)">
 			{{item.text}}
+			{{item.city_name}}{{item.area_name}}{{item.street_name}}{{item.house_detail}}
 		</view>
 		<view class="sub_btn">
 			<button class="btn blue" @click="next">确认</button>
@@ -18,17 +19,21 @@
 					{text:"郑州高频新区郑州高频新区3号楼"},
 					{text:"郑州高频新区郑州高频新区4号楼"}
 				],
-				sIndex:-1,
-				thisItem:{}
+				sIndex:-1
 			};
 		},
+		mounted() {
+			this.$getApi("/api/user/address/list",{},res=>{
+				this.addressList = res.data
+			})
+		},
 		methods:{
-			selItem(i,item){
+			selItem(item,i){
 				this.sIndex = i;
-				this.thisItem = item;
+				this.$store.commit("setAddress",{name:item.street_name+item.house_detail,id:item.id})
 			},
 			next(){
-				
+				uni.navigateBack()
 			}
 		}
 	}

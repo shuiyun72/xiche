@@ -3,11 +3,11 @@
 		<view class="hezuo_img">
 			<image src="../../static/img/logo.png" mode="widthFix" class="img"></image>
 		</view>
-		<view class="text_p1">
-			商务合作商务合作商务合作商务合作商务合作商务合作商务合作商务合作商务合作商务合作商务合作商务合作商务合作商务合作商务合作商务合作商务合作商务合作商务合作商务合作商务合作
+		<view class="text_p1" v-html="swMsg">
+			<!-- {{swMsg.content}} -->
 		</view>
 		<uni-list class="p10_l">
-			<uni-list-item title="商务合作电话" rightText="400-9876365" :showArrow="false"></uni-list-item>
+			<uni-list-item title="商务合作电话" :rightText="phone" :showArrow="false"></uni-list-item>
 		</uni-list>
 	</view>
 </template>
@@ -16,13 +16,24 @@
 	export default {
 		data() {
 			return {
-				
+				swMsg:"",
+				phone:""
 			};
+		},
+		mounted() {
+			this.$getApi("/api/user/my/hezuo",{},res=>{
+				console.log(res)
+				let  swM = res.data.content;
+				this.phone =  res.data.tel;
+				const regex = new RegExp('<img','gi')
+				swM = swM.replace(regex,`<img style="max-width:100%;"`);
+				this.swMsg = swM;
+			})
 		}
 	}
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss" >
 .page{
 	background-color: #f0f0f0;
 	min-height: 100vh;

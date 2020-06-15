@@ -1,18 +1,18 @@
 <template>
 	<view class="page">
-		<view class="add_list_address" v-for="i in 3">
+		<view class="add_list_address" v-for="i in dataList">
 			<view class="p_list">
-				<view class="item_p" v-for="i in 4">
+				<view class="item_p" v-for="it in i.park">
 					<text class="iconfont icontingche"></text>
-					<text>12号停车位</text>
+					<text>{{it.name}}号停车位</text>
 				</view>
 			</view>
 			<view class="info">
-				高新区高新区高新区高新区12号
+				{{i.province_name}}{{i.city_name}}{{i.area_name}}{{i.street_name}}{{i.house_name}}{{i.house_detail}}
 			</view>
 			<view class="part2">
 				<view class="item2">
-					<navigator url="../mine/addAddress">
+					<navigator :url="'../mine/addAddress?item='+JSON.stringify(i)">
 						<text class="iconfont icontianxiegongdan-kuozhan-hebing"></text>
 						<text>编辑</text>
 					</navigator>
@@ -23,10 +23,12 @@
 				</view>
 			</view>
 		</view>
-		<view class="add_car_btn">
-			<text class="iconfont icontianjia"></text>
-			<text>新建地址</text>
-		</view>
+		<navigator url="../mine/addAddress">
+			<view class="add_car_btn">
+				<text class="iconfont icontianjia"></text>
+				<text>新建地址</text>
+			</view>
+		</navigator>
 	</view>
 </template>
 
@@ -37,14 +39,33 @@
 				dataList: [{}]
 			}
 		},
+		mounted() {
+			this.addressInit();
+		},
 		methods: {
+			addressInit(){
+				this.$getApi("/api/user/address/list",{},res=>{
+					console.log(res)
+					this.dataList = res.data;
+					// uni.navigateTo({
+					// 	url:'../mine/addAddress'
+					// })
+				});
+			},
 			deleteP(item){
+				let this_ = this;
 				uni.showModal({
 				    title: '删除',
 				    content: '是否确认删除?',
 				    success: function (res) {
 				        if (res.confirm) {
 				            console.log('用户点击确定');
+							this_.$getApi("/api/user/address/del",{id:item.id},res=>{
+								this_.addressInit();
+								// uni.navigateTo({
+								// 	url:'../mine/addAddress'
+								// })
+							});
 				        } else if (res.cancel) {
 				            console.log('用户点击取消');
 				        }

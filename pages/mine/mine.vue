@@ -11,9 +11,9 @@
 					<navigator url="./mineInfo">
 					<view class="name_img">
 						<view class="t">
-							张大大
+							{{userInfo.nickname}}
 						</view>
-						<image src="../../static/img/mine/toux.png" mode="widthFix" class="title_img"></image>
+						<image :src="$httpp + userInfo.avatar" mode="widthFix" class="title_img"></image>
 					</view>
 					</navigator>
 					<view class="item" @click="topNativeTo(1)">
@@ -83,6 +83,11 @@
 					{icon:"shez.png",title:"设置",type:6},
 				]
 			};
+		},
+		computed:{
+			userInfo(){
+				return this.$store.state.userInfo;
+			}
 		},
 		mounted() {
 			if (this.state == 0) {

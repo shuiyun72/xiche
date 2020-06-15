@@ -1,21 +1,21 @@
 <template>
 	<view class="city_search">
-		<view v-for="(t,i) in City.car">
+		<view v-for="(t,i) in Car">
 			<view class="text_title_city" @tap="selectCityTitle">
 				{{t.title}}
 			</view>
 			<view class="city_title" v-for="(tc,ic) in t.lists" :key="tc.id" @tap="selectCity(tc)">
 				<view class="img_car">
-					<image :src="'../../static/img/subscribe/'+tc.img" mode="widthFix" class="img"></image>
+					<image :src="$httpp+tc.cover" mode="widthFix" class="img"></image>
 				</view>
 				<view class="t_t">
-					{{tc.text}}
+					{{tc.name}}
 				</view>
 				
 			</view>
 		</view>
 		<view class="side_sear">
-			<view class="item" v-for="(t,i) in City.car" :key="i+1900" @click="showSear(i)">
+			<view class="item" v-for="(t,i) in Car" :key="i+1900" @click="showSear(i)">
 				{{t.title}}
 			</view>
 		</view>
@@ -31,17 +31,37 @@
 		data() {
 			return {
 				seaText: "",
-				City: Car
+				Car: []
 			}
+		},
+		mounted() {
+			this.$getApi("/api/user/car/brand",{},res=>{
+				console.log(res)
+				let ss = _.keys(res.data,item=>{
+					return item
+				})
+				console.log(ss)
+				let sscc = [];
+				_.map(ss,itemC=>{
+					sscc.push({
+						title:itemC,
+						lists:res.data[itemC]
+					})
+				})
+				console.log(sscc)
+				this.Car = sscc
+			})
 		},
 		methods: {
 			selectCityTitle(el){
 				console.log(el)
 			},
 			selectCity(el) {
-				uni.navigateTo({
-					url:'../mine/addCar?car='+el.text
-				})
+				this.$store.commit('brand',el)
+				// uni.navigateTo({
+				// 	url:'../mine/addCar?car='+el.id
+				// })
+				uni.navigateBack()
 			},
 			showSear(num){
 				uni.createSelectorQuery().select(".city_search").boundingClientRect(cityBox=>{

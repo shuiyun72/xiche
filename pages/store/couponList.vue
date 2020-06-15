@@ -17,7 +17,8 @@
 				<view class="item_ab">
 					<view class="left" :class="{'long':tabSel != 0}">
 						<view class="p1">
-							<text class="t">{{item.num}}</text>
+						<!-- 	{{item}} -->
+							<text class="t">{{Number(item.discount)}}</text>
 							<text>折</text>
 						</view>
 						<view class="p2">
@@ -26,10 +27,12 @@
 					</view>
 					<view class="right" :class="{'long':tabSel != 0}">
 						<view class="p3">
-							预约洗车{{item.zhe}}折优惠
+							{{item.title}}
 						</view>
 						<view class="p4">
-							有效期 {{item.date}}
+							有效期 {{item.created_at && item.created_at.split(" ")[0]}}
+								-
+								{{item.end_time && item.end_time.split(" ")[0]}}
 						</view>
 					</view>
 				</view>
@@ -100,25 +103,36 @@
 						id: 993,
 						bg:"juansuv.png"
 					}
-				]
+				],
+				juan1ListType :[]
 			};
 		},
 		computed:{
-			juan1ListType(){
-				if(this.tabSel == 0){
-					return this.juan1ListD;
-				}else
-				if(this.tabSel == 1){
-					return this.juan1ListY;
-				}else
-				if(this.tabSel == 2){
-					return this.juan1ListYY;
-				}
-			}
+			// juan1ListType(){
+			// 	if(this.tabSel == 0){
+			// 		return this.juan1ListD;
+			// 	}else
+			// 	if(this.tabSel == 1){
+			// 		return this.juan1ListY;
+			// 	}else
+			// 	if(this.tabSel == 2){
+			// 		return this.juan1ListYY;
+			// 	}
+			// }
+		},
+		mounted() {
+			this.getInit(0);
 		},
 		methods:{
+			getInit(type){
+				this.$getApi("/api/user/coupon/lists",{type:type},ress=>{
+					this.juan1ListType = ress.data.data
+					console.log(this.juan1ListType )
+				})
+			},
 			selectTab(el, i) {
 				this.tabSel = i;
+				this.getInit(el.type);
 			},
 		}
 	}

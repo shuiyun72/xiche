@@ -10,7 +10,7 @@
 				</view>
 				<view class="money">
 					<view class="num">
-						1860.0
+						{{money}}
 					</view>
 					<view class="btn_b">
 						<navigator url="./withdrawMoney">
@@ -24,17 +24,17 @@
 		<view class="title_l_icon">
 			<view class="v1"></view> 余额明细
 		</view>
-		<view class="order_money" v-for="i in 4">
+		<view class="order_money" v-for="item in msg">
 			<view class="o_m_l">
 				<view class="t">
-					订单退款
+					{{item.note}}
 				</view>
 				<view class="date">
-					2020-04-01 18:00
+					{{item.created_at}}
 				</view>
 			</view>
 			<view class="o_m_r">
-				+50元
+				{{item.type == 1 ?'+':'-'}}{{item.amount}}元
 			</view>
 		</view>
 	</view>
@@ -44,8 +44,19 @@
 	export default {
 		data() {
 			return {
-				
+				msg:[]
 			};
+		},
+		computed:{
+			money(){
+				return this.$store.state.userInfo.money;
+			}
+		},
+		mounted() {
+			this.$getApi("/api/user/money",{},res1=>{
+				console.log(res1)
+				this.msg = res1.data.data
+			})
 		}
 	}
 </script>

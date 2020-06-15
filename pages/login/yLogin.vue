@@ -35,6 +35,10 @@
 				psd: ""
 			};
 		},
+		onLoad() {
+			// this.getInit();
+			
+		},
 		methods: {
 			oauthC(){
 				uni.getProvider({
@@ -69,18 +73,33 @@
 						phone:this.phone,
 						code:this.yzm
 					}
-					this.$getApi('auth/phone/login',data,res=>{
-						uni.setStorageSync('userInfo', res.data);
-						console.log(res)
-						uni.switchTab({
-							url:'../home/home'
-						})
-						
+					this.$getApi('/api/auth/phone/login',data,res=>{
+						this.$store.commit('login',res.data);
+						setTimeout(()=>{
+							this.getInit(()=>{
+								uni.switchTab({
+									url:'../home/home'
+								})			
+							});	
+						},1000)
 					},"false")
 				}else{
 					
 				}
+			},
+			async getInit(call){
+				await this.$getApi("/api/user/car/xing",{},res=>{
+					this.$store.commit("setCarXing",res.data)
+				})
+				await this.$getApi("/api/user/car/color",{},res=>{		
+					this.$store.commit("setCarColor",res.data)
+				})
+				await this.$getApi("/api/user/car/brand",{},res=>{
+					this.$store.commit("setCarBrand",res.data)
+				})
+				call instanceof Function && call()
 			}
+			
 		}
 	}
 </script>

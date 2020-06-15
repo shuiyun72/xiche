@@ -23,14 +23,37 @@
 	export default {
 		data() {
 			return {
+				title:"",
 				name:"",
-				phone:""
+				phone:"",
+				id:""
 			};
+		},
+		onLoad(ph) {
+			if(ph.item){
+				uni.setNavigationBarTitle({
+					title:"编辑手机号"
+				})
+				let itemL = JSON.parse(ph.item);
+				this.name = itemL.name;
+				this.phone = itemL.phone;
+				this.id = itemL.id;
+			}
 		},
 		methods:{
 			next(){
+				this.$getApi("/api/user/user/add",{
+					name:this.name,
+					phone:this.phone,
+					id:this.id
+				},res=>{
+					console.log(res)
+					// uni.navigateBack()
+					uni.switchTab({
+						url:"../mine/mine"
+					})
+				})
 				
-				uni.navigateBack()
 			}
 		}
 	}

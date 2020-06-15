@@ -2,7 +2,7 @@
 	<view class="pay">
 		<view class="pay_top">
 			<view class="bl">
-				<view class="t1">￥ {{money}}.0</view>
+				<view class="t1">￥ {{money}}</view>
 				<view class="t2">月套餐</view>
 			</view>
 
@@ -13,21 +13,21 @@
 				<view class="item">
 					<image style="width: 44rpx;height: 44rpx;" src="../../static/img/weixin.png" mode=""></image><text class="margin-left-xs">微信支付</text>
 				</view>
-				<radio :class="radio=='A'?'checked':''" :checked="radio=='A'?true:false" value="A" class="radio"></radio>
+				<radio :class="radio=='wepay'?'checked':''" :checked="radio=='wepay'?true:false" value="wepay" class="radio"></radio>
 			</view>
 			<!-- #ifndef MP-ALIPAY -->
 			<view class="cu-form-group">
 				<view class="item">
 					<image style="width: 44rpx;height: 44rpx;" src="../../static/img/zhifb.png" mode=""></image><text class="margin-left-xs">支付宝支付</text>
 				</view>
-				<radio :class="radio=='B'?'checked':''" :checked="radio=='B'?true:false" value="B"  class="radio"></radio>
+				<radio :class="radio=='alipay'?'checked':''" :checked="radio=='alipay'?true:false" value="alipay"  class="radio"></radio>
 			</view>
 			<view class="cu-form-group">
 				<view class="item">
 					<image style="width: 44rpx;height: 44rpx;" src="../../static/img/yue.png" mode=""></image><text class="margin-left-xs">余额支付</text>
 				</view>
 				<view>
-					<radio :class="radio=='C'?'checked':''" :checked="radio=='C'?true:false" value="C"  class="radio"></radio>
+					<radio :class="radio=='money'?'checked':''" :checked="radio=='money'?true:false" value="money"  class="radio"></radio>
 				</view>
 			</view>
 			<!-- #endif -->
@@ -46,49 +46,32 @@
 	export default {
 		data() {
 			return {
-				radio: 'A',
-				money:0
+				radio: 'alipay',
+				money:0,
+				typeId:""
 			};
 		},
 		onLoad(op) {
-			this.money = op.money;
+			this.money = JSON.parse(op.item).current_price;
+			this.typeId = JSON.parse(op.item).cate_id;
 		},
+
 		methods: {
 			RadioChange(e) {
 				this.radio = e.detail.value;
 			},
 			next() {
-				uni.navigateTo({
-					url: './successMsg'
+				let dataL = {
+					id:this.typeId,
+					payment:this.radio
+				}
+				this.$getApi("/api/user/ticket/buy",dataL,res=>{
+					console.log(res)
+					uni.switchTab({
+						url:"../mine/mine"
+					})	
+				
 				})
-				// // #ifndef MP
-				// 	uni.requestPayment({
-				// 	    provider: 'alipay', // wxpay、alipay
-				// 	    orderInfo: 'orderInfo', //微信、支付宝订单数据
-				// 	    success: function (res) {
-				// 	        console.log('success:' + JSON.stringify(res));
-				// 	    },
-				// 	    fail: function (err) {
-				// 	        console.log('fail:' + JSON.stringify(err));
-				// 	    }
-				// 	});
-				// // #endif
-				// // #ifdef MP
-				// 	uni.requestPayment({
-				// 	    provider: 'wxpay',
-				// 	    timeStamp: String(Date.now()),
-				// 	    nonceStr: 'A1B2C3D4E5',
-				// 	    package: 'prepay_id=wx20180101abcdefg',
-				// 	    signType: 'MD5',
-				// 	    paySign: '',
-				// 	    success: function (res) {
-				// 	        console.log('success:' + JSON.stringify(res));
-				// 	    },
-				// 	    fail: function (err) {
-				// 	        console.log('fail:' + JSON.stringify(err));
-				// 	    }
-				// 	});
-				// // #endif
 			}
 		}
 	};

@@ -1,23 +1,23 @@
 <template>
 	<view>
 		<view class="car_list">
-			<view class="item" v-for="i in 3">
+			<view class="item" v-for="item in phoneList" :key="item.id" @click="selPhone(item)">
 				<view class="part0">
 					<view class="name">
-						张华玲
+						{{item.name}}
 					</view>
 					<view class="phone">
-						13233333333
+						{{item.phone}}
 					</view>
 				</view>
 				<view class="part2">
 					<view class="item2">
-						<navigator url="../store/addPhone">
+						<navigator :url="'../store/addPhone?item='+JSON.stringify(item)">
 							<text class="iconfont icontianxiegongdan-kuozhan-hebing"></text>
 							<text>编辑</text>
 						</navigator>
 					</view>
-					<view class="item2" @click="deleteP(i)">
+					<view class="item2" @click="deleteP(item)">
 						<text class="iconfont iconqingkongshanchu"></text>
 						<text>删除</text>
 					</view>
@@ -37,17 +37,36 @@
 	export default {
 		data() {
 			return {
-				
+				phoneList:[]
 			}
 		},
+		mounted() {
+			this.init();
+		},
 		methods: {
+			selPhone(item){
+				this.$store.commit('setPhone',{name:item.phone,id:item.id});
+				uni.navigateBack({
+					
+				})
+			},
+			init(){
+				this.$getApi("/api/user/user/list",{},res=>{
+					console.log(res)
+					this.phoneList = res.data
+				})
+			},
 			deleteP(item){
+				let this_ = this;
 				uni.showModal({
 				    title: '删除',
 				    content: '是否确认删除?',
 				    success: function (res) {
 				        if (res.confirm) {
 				            console.log('用户点击确定');
+							this_.$getApi("/api/user/user/del",{id:item.id},res=>{
+								this_.init();
+							})
 				        } else if (res.cancel) {
 				            console.log('用户点击取消');
 				        }

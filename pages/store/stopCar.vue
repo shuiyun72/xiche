@@ -1,7 +1,7 @@
 <template>
 	<view class="stop_car">
 		<radio-group @change="radioChange" class="car_gro">
-			<label v-for="(item, index) in items" :key="item.value" class="item">
+			<label v-for="(item, index) in items"  class="item" @click="seItem(item, index)">
 				<view >
 					<radio :value="item.value" :checked="index === current" class="radio"/>
 					<text class="iconfont icontingche"></text>
@@ -14,7 +14,7 @@
 			郑州高新区郑州高新区郑州高新区郑州高新区5号楼
 		</view>
 		<view class="sub_btn">
-			<button class="btn blue" @click="navigateTo('./orders/toOrder')">确定</button>
+			<button class="btn blue" @click="next">确定</button>
 		</view>
 	</view>
 </template>
@@ -26,22 +26,27 @@
 				items: [{
 						value: '1',
 						name: '12号停车位',
-						checked: 'true'
+						checked: 'true',
+						id:1
 					},
 					{
-						value: '1',
-						name: '12号停车位'
+						value: '2',
+						name: '12号停车位',
+						id:2
 					},
 					{
-						value: '1',
-						name: '20号停车位'
+						value: '3',
+						name: '20号停车位',
+						id:3
 					},
 					{
-						value: '1',
-						name: '26号停车位'
+						value: '4',
+						name: '26号停车位',
+						id:4
 					},
 				],
-				current: 0
+				current: 0,
+				currItem:""
 			};
 		},
 		methods: {
@@ -53,10 +58,12 @@
 					}
 				}
 			},
-			navigateTo(url){
-				uni.navigateTo({
-					url:url
-				})
+			seItem(item, index){
+				this.currItem = item;
+			},
+			next(){
+				this.$store.commit('setP',{name:this.currItem.name,id:this.currItem.id})
+				uni.navigateBack()
 			}
 		}
 	}

@@ -4,25 +4,26 @@
 			<view class="combo_title">
 				{{comboTitle}}
 			</view>
-			<view class="taocan_box" :class="{'active':index == selType}" v-for="(item,index) in comboListData" :key="item.money"
+			<view class="taocan_box" :class="{'active':index == selType}" v-for="(item,index) in comboListData" :key="item.current_price"
 			 @click="selectItem(item,index)">
 				<view class="iconl">
-					{{item.class}}
+					<!-- {{item.class}} -->
+					月套餐
 				</view>
 				<view class="info_s">
 					<view class="t">
 						{{item.title}}
 					</view>
 					<view class="money">
-						￥{{item.money}}
+						￥{{item.current_price}}
 					</view>
 				</view>
 				<view class="info_m">
 					<view class="t">
-						有限期{{item.mount}}天/直接抵扣使用
+						有限期{{item.day}}天/直接抵扣使用
 					</view>
 					<view class="o_money">
-						原价:{{item.oldM}}.0
+						原价:{{item.original_price}}
 					</view>
 				</view>
 			</view>
@@ -58,28 +59,38 @@
 			}
 		},
 		onLoad(op) {
-			if(op.type == 1){
-				this.comboListData = comboType1;
-				this.comboTitle = "小型汽车套餐";
-			}else
-			if(op.type == 4){
-				this.comboListData = comboType4;
-				this.comboTitle = "综合车型全家桶";
-			}else{
-				this.comboListData = comboType1
-			}
+			this.init(op.item);
+			// if(op.type == 1){
+			// 	this.comboListData = comboType1;
+			// 	this.comboTitle = "小型汽车套餐";
+			// }else
+			// if(op.type == 4){
+			// 	this.comboListData = comboType4;
+			// 	this.comboTitle = "综合车型全家桶";
+			// }else{
+			// 	this.comboListData = comboType1
+			// }
 		},
 		mounted() {
 			this.corrItem = this.comboListData[0]
 		},
 		methods:{
+			init(item){
+				let itemL = JSON.parse(item);
+				this.comboTitle = itemL.cat_name;
+				this.$getApi("/api/auth/mall/list",{id:itemL.id},res1=>{
+					console.log(res1)
+					this.comboListData = res1.data;
+					this.corrItem = res1.data[0];
+				})
+			},
 			selectItem(item,index){
 				this.selType = index;
 				this.corrItem = item;
 			},
 			payC(){
 				uni.navigateTo({
-					url:'../pay/pay?money='+this.corrItem.money
+					url:'../pay/pay?item='+JSON.stringify(this.corrItem) 
 				})
 			}
 		}

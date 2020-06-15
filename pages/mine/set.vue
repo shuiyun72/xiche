@@ -51,12 +51,12 @@
 				console.log("退出登录")
 				try {
 				    uni.removeStorageSync('userInfo');
+					this.$store.commit('logout')
 				} catch (e) {
 				    // error
 				}
-				console.log("退出登录")
 				uni.reLaunch({
-					url: '../login/login'
+					url: '../login/yLogin'
 				})
 			}
 		}

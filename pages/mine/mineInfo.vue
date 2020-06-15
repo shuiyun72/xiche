@@ -3,22 +3,17 @@
 		<uni-list>
 			<uni-list-item title="头像" :showArrow="false">
 				<template v-slot:right="">
-					<image :src="$httpp+mineMsg.avatar" class="mine_img"></image>
+					<image :src="httpp + userInfo.avatar" class="mine_img"></image>
 				</template>
 			</uni-list-item>
 			<uni-list-item title="姓名" :showArrow="false">
 				<template v-slot:right="">
-					<text class="f666">{{mineMsg.nickname}}</text> 
+					<text class="f666">{{userInfo.nickname}}</text> 
 				</template>
 			</uni-list-item>
-			<uni-list-item title="注册时间" :showArrow="false">
+			<uni-list-item title="身份" :showArrow="false">
 				<template v-slot:right="">
-					<text class="f666">{{mineMsg.created_at}}</text> 
-				</template>
-			</uni-list-item>
-			<uni-list-item title="所属小区" :showArrow="false">
-				<template v-slot:right="">
-					<text class="f666">{{mineMsg.cAddress}}</text>
+					<text class="f666">{{mineSF}}</text> 
 				</template>
 			</uni-list-item>
 		</uni-list>
@@ -26,20 +21,25 @@
 </template>
 
 <script>
+	import { mapState } from 'vuex';
 	export default {
 		data() {
 			return {
-				mineMsg:{
-					img:"xicg.png",
-					name:"张世通",
-					date:"2020-01-01",
-					address:"升龙又一城"
-				}
+				
 			};
 		},
+		computed:{
+			...mapState(['httpp','userInfo']),
+			mineSF(){
+				switch (this.userInfo.groupid){
+					case 0 :return '游客';break;
+					case 1 :return '会员';break;
+					case 2 :return 'vip会员';break;
+				}
+			}
+		},
 		mounted() {
-			console.log(uni.getStorageSync('userInfo'));
-			this.mineMsg = uni.getStorageSync('userInfo');
+			
 		}
 	}
 </script>

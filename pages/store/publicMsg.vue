@@ -3,17 +3,11 @@
 		<view class="icon_msg_sy">
 			<view class="iconfont iconselected"></view>
 			<view class="text">
-				感谢您的信息提交
-			</view>
-			<view class="text">
-				敬请关注
+				操作成功
 			</view>
 		</view>
 		<view class="re_mtop4">
-			<button class="btn  blue ms" @click="switchTab('../mine/mine')">返回上一级</button>
-		</view>
-		<view class="re_mtop4 mt10">
-			<button class="btn  blue_n ms" @click="switchTab('../home/home')">返回首页</button>
+			<button class="btn  blue ms" @click="switchTab('../home/home')">返回首页</button>
 		</view>
 	</view>
 </template>
@@ -26,6 +20,11 @@
 			};
 		}, 
 		methods:{
+			navigateTo(url){
+				uni.navigateTo({
+					url:url
+				})
+			},
 			switchTab(el){
 				uni.switchTab({
 				    url: el

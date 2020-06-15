@@ -3,7 +3,7 @@
 		<uni-list>
 			<uni-list-item title="提现金额" :showArrow="false">
 				<template v-slot:right="">
-					<input type="text" :value="money" placeholder="请填写提现金额" class="add_car_input" />
+					<input type="text" v-model="money" placeholder="请填写提现金额" class="add_car_input" />
 				</template>
 			</uni-list-item>
 			<view class="bg10_f"></view>
@@ -23,12 +23,12 @@
 			</uni-list-item>
 			<uni-list-item title="姓名" :showArrow="false">
 				<template v-slot:right="">
-					<input type="text" :value="name" placeholder="请填写您的真实姓名" class="add_car_input" />
+					<input type="text" v-model="name" placeholder="请填写您的真实姓名" class="add_car_input" />
 				</template>
 			</uni-list-item>
 			<uni-list-item title="账号" :showArrow="false">
 				<template v-slot:right="">
-					<input type="text" :value="admin" placeholder="请填写支付宝账号" class="add_car_input" />
+					<input type="text" v-model="account" :placeholder="'请填写'+items[current].name+'账号'" class="add_car_input" />
 				</template>
 			</uni-list-item>
 		</uni-list>
@@ -44,7 +44,6 @@
 			return {
 				money: "",
 				name: "",
-				admin: "",
 				items: [{
 						value: 'USA',
 						name: '微信',
@@ -57,7 +56,8 @@
 						checked: 'true'
 					}
 				],
-				current:1
+				current:1,
+				account:""
 			};
 		},
 		methods: {
@@ -70,9 +70,23 @@
 				}
 			},
 			next(){
-				uni.navigateTo({
-					url:"./withdrawMsg"
+				let dataL = {
+					payment:this.items[this.current].name,
+					money:this.money,
+					truename:this.name,
+					account:this.account
+					
+				}
+				console.log(dataL)
+				let this_ = this;
+				this.$getApi("/api/user/cash",dataL,res=>{
+					console.log(res)
+					uni.switchTab({
+						url:"./mine"
+					})	
+
 				})
+				
 			}
 		}
 	}

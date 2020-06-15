@@ -9,13 +9,29 @@
 					28元
 				</view>
 			</view>
-			<view class="msg" v-for="i in 6">
-				<view class="l_t">
-					车牌号:
-				</view>
-				<view class="r_c">
-					豫A668899
-				</view>
+			<view class="msg">
+				<view class="l_t"> 车牌号: </view>
+				<view class="r_c"> 豫A668899 </view>
+			</view>
+			<view class="msg">
+				<view class="l_t"> 时间: </view>
+				<view class="r_c"> 豫A668899 </view>
+			</view>
+			<view class="msg">
+				<view class="l_t"> 停车位: </view>
+				<view class="r_c"> 豫A668899 </view>
+			</view>
+			<view class="msg">
+				<view class="l_t"> 地址: </view>
+				<view class="r_c"> 豫A668899 </view>
+			</view>
+			<view class="msg">
+				<view class="l_t"> 联系人: </view>
+				<view class="r_c"> 豫A668899 </view>
+			</view>
+			<view class="msg">
+				<view class="l_t"> 订单编号: </view>
+				<view class="r_c"> 豫A668899 </view>
 			</view>
 		</view>
 		<uni-list class="od_t">
@@ -26,7 +42,7 @@
 			</uni-list-item>
 		</uni-list>
 		<uni-list class="od_t">
-			<uni-list-item title="优惠券" rightText="8折折扣券"></uni-list-item>
+			<uni-list-item title="优惠券" :rightText="oderQuan.name" @click="selQUan"></uni-list-item>
 		</uni-list>
 		<view class="pay_type">支付方式</view>
 		<radio-group class="block" @change="RadioChange">
@@ -69,13 +85,46 @@
 				radio: 'A',
 			};
 		},
+		computed:{
+			oderQuan(){
+				return this.$store.state.torderQuan
+			},
+			payType(){
+				
+				// #ifndef MP
+					switch (this.radio) {
+						case 'A' : return 'wepay' ;break;
+						case 'B' : return 'alipay' ;break;
+						case 'C' : return 'money' ;break;
+					}
+				// #endif
+				// #ifdef MP
+					return 'minipay'
+				// #endif
+			}
+		},
 		methods: {
 			RadioChange(e) {
 				this.radio = e.detail.value;
 			},
 			next() {
+				let dataL = {
+					order_no:1,
+					payment:this.payType
+				}
+				console.log(dataL)
+				this.$getApi("/api/user/order/pay",dataL,res=>{
+					console.log(res)
+					//this.itemsCarList = res.data
+					this.$store.commit('setQuan',{name:"请选择优惠券"})
+				})
+				// uni.navigateTo({
+				// 	url: './orderSuccess'
+				// })
+			},
+			selQUan(){
 				uni.navigateTo({
-					url: './orderSuccess'
+					url:'../store/coupon'
 				})
 			}
 		}
@@ -182,8 +231,8 @@
 
 		.msg {
 			display: flex;
-			font-size: 32upx;
-			font-weight: bold;
+			font-size: 28upx;
+			// font-weight: bold;
 			color: #999;
 			padding: 10upx 0;
 

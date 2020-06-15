@@ -1,6 +1,5 @@
 {
 	"pages": [
-		
 		{
 		    "path" : "pages/home/home",
 		    "style" : {
@@ -274,6 +273,12 @@
             "path" : "pages/mine/mineInfo",
             "style" : {
 				"navigationBarTitleText": "个人信息"
+			}
+        }
+        ,{
+            "path" : "pages/store/publicMsg",
+            "style" : {
+				"navigationBarTitleText": "操作成功"
 			}
         }
     ],

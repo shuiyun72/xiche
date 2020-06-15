@@ -1,29 +1,32 @@
 <template>
 	<view>
 		<view class="coupon">
-			<view class="item_card" v-for="item in juan1List" :key="item.id">
-				<image src="../../static/img/mine/zhekj.png" mode="widthFix" class="img"></image>
-				<view class="item_ab">
-					<view class="left">
-						<view class="p1">
-							<text class="t">{{item.num}}</text>
-							<text>折</text>
+			<view class="item_card" v-for="item in juan1List" :key="item.id" @click="selQ(item)">
+					<image src="../../static/img/mine/zhekj.png" mode="widthFix" class="img"></image>
+					<view class="item_ab">
+						<view class="left" >
+							<view class="p1">
+							<!-- 	{{item}} -->
+								<text class="t">{{Number(item.discount)}}</text>
+								<text>折</text>
+							</view>
+							<view class="p2">
+								折扣券
+							</view>
 						</view>
-						<view class="p2">
-							折扣券
-						</view>
-					</view>
-					<view class="right">
-						<view class="p3">
-							预约洗车{{item.zhe}}折优惠
-						</view>
-						<view class="p4">
-							有效期 {{item.date}}
+						<view class="right" >
+							<view class="p3">
+								{{item.title}}
+							</view>
+							<view class="p4">
+								有效期 {{item.created_at && item.created_at.split(" ")[0]}}
+									-
+									{{item.end_time && item.end_time.split(" ")[0]}}
+							</view>
 						</view>
 					</view>
 				</view>
 			</view>
-		</view>
 	</view>
 </template>
 
@@ -51,6 +54,19 @@
 					}
 				]
 			};
+		},
+		mounted() {
+			this.$getApi("/api/user/coupon/lists",{type:0},ress=>{
+				this.juan1List = ress.data.data
+				console.log(ress.data.data )
+			})
+		},
+		methods:{
+			selQ(item){
+				console.log(item)
+				this.$store.commit('setQuan',{name:item.title,id:item.id});
+				uni.navigateBack()
+			}
 		}
 	}
 </script>
