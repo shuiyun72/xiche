@@ -5,10 +5,10 @@
 			<image src="../../static/img/weizdcl.png" mode="widthFix" class="img"></image>
 		</view>
 		<view class="re_mtop4">
-			<button class="btn round orange ms" @click="tellPhone(phoneNum)">联系客户 ( 一键拨号 ) </button>
+			<button class="btn round orange ms" @click="tellPhone">联系客户 ( 一键拨号 ) </button>
 		</view>
 		<view class="re_mtop4">
-			<navigator :url="'./orderCancel?order=123'">
+			<navigator :url="'./orderCancel?item='+JSON.stringify(info)">
 				<button class="btn round orange_n ms">取消订单</button>
 			</navigator>
 		</view>
@@ -19,18 +19,18 @@
 	export default {
 		data() {
 			return {
-				phoneNum:""
+				info:{}
 			};
 		}, 
 		methods:{
-			tellPhone(phone){
+			tellPhone(){
 				uni.makePhoneCall({
-				    phoneNumber: phone 
+				    phoneNumber: this.info.phone
 				});
 			}
 		},
 		onLoad(option) {
-			this.phoneNum = option.phone;
+			this.info = JSON.parse(option.item);
 		},
 		
 	}

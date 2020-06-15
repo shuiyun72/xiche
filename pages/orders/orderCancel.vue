@@ -9,7 +9,7 @@
 				<block v-for="(image,index) in imageList" :key="index">
 					<view class="img_p">
 						<image class="img" :src="image" :data-src="image" @tap="previewImage" mode="widthFix"></image>
-						<view class="iconfont iconshanchu"  @click="deleteImg(index)"></view>
+						<view class="iconfont iconshanchu" @click="deleteImg(index)"></view>
 					</view>
 				</block>
 				<view class="img_p" @click="chooseImage">
@@ -20,8 +20,8 @@
 				<text class="t">取消说明</text>
 			</view>
 			<view class="t_textarea">
-				<textarea v-model="textareaText" placeholder="请输入取消说明" class="textarea"/>
-			</view>
+				<textarea v-model="textareaText" placeholder="请输入取消说明" class="textarea" />
+				</view>
 		</view>
 		<view class="o_d_submit">
 			<button class="btn round orange ms" @click="submitBtn">提交</button>
@@ -34,8 +34,15 @@
 		data() {
 			return {
 				imageList: [],
-				textareaText:""
+				upimageList: [],
+				textareaText:"",
+				orderInfo:{}
 			}
+		},
+		onLoad(ph) {
+			
+			this.orderInfo = JSON.parse(ph.item);
+			console.log(this.orderInfo)
 		},
 		methods: {
 			previewImage: function(e) {
@@ -45,32 +52,71 @@
 					urls: this.imageList
 				})
 			},
+			uploadFile(img,call){
+				let this_ = this;
+				var imgFiles = img;
+				let token = this_.$store.state.userInfo.remember_token || 
+				uni.getStorageSync('userInfo').remember_token ;
+				console.log(this_.$apiUrl + '/api/auth/upload')
+				uni.uploadFile({
+					// 需要上传的地址
+					url:this_.$apiUrl + '/api/auth/upload',
+					// filePath  需要上传的文件
+					filePath: imgFiles,
+					name: 'file',
+					formData: {  
+						token: token
+					  },
+					success(res1) {
+						// 显示上传信息
+						console.log(res1)
+						call instanceof Function && call(res1)
+					}
+				});
+			},
 			chooseImage(){
+				let this_ = this;
+				let token = this_.$store.state.userInfo.remember_token ||
+				uni.getStorageSync('userInfo').remember_token ;	
 				uni.chooseImage({
+					count: 1,
+					sizeType:['copressed'],
 				    success: (res) => {
-						console.log(res,res.tempFilePaths)
-				        this.imageList = this.imageList.concat(res.tempFilePaths);
+				        this.imageList = this.imageList.concat(res.tempFilePaths);				
+						console.log(this_.$apiUrl + '/api/auth/upload')
+						uni.uploadFile({
+							url:this_.$apiUrl + '/api/auth/upload',
+							filePath: res.tempFilePaths[0],
+							name: 'file',
+							formData: {  
+								token: token
+							  },
+							success(res1) {
+								// 显示上传信息
+								console.log(JSON.parse(res1.data).data.url)
+								this_.upimageList.push(JSON.parse(res1.data).data.url)
+							}
+						});
 				    }
 				});
 			},
 			submitBtn(){
-				// uni.uploadFile({
-				//     url: 'https://www.example.com/upload', //仅为示例，非真实的接口地址
-				//     filePath: tempFilePaths[0],
-				//     name: 'file',
-				//     formData: {
-				//         'user': 'test'
-				//     },
-				//     success: (uploadFileRes) => {
-				//         console.log(uploadFileRes.data);
-				//     }
-				// });
-				uni.navigateTo({
-					url:'./orderRejectSuccess'
+				console.log(JSON.stringify(this.upimageList))
+				this.$getApi("/api/operator/order/cancle",{
+					id:this.orderInfo.id,
+					type:2,
+					qxCase:this.textareaText,
+					qximglist:JSON.stringify(this.upimageList)
+				},res=>{
+					uni.reLaunch({
+						url:'./orderRejectSuccess'
+					})
 				})
+				
 			},
 			deleteImg(i){
-				this.imageList.splice(i,1)
+				this.imageList.splice(i,1);
+				this.upimageList.splice(i,1);
 			}
 		}
 	}

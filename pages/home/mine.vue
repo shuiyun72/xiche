@@ -3,7 +3,7 @@
 		<uni-list>
 			<uni-list-item title="头像" :showArrow="false">
 				<template v-slot:right="">
-					<image :src="$httpp+mineMsg.avatar" class="mine_img"></image>
+					<image :src="httpp+mineMsg.avatar" class="mine_img"></image>
 				</template>
 			</uni-list-item>
 			<uni-list-item title="姓名" :showArrow="false">
@@ -18,7 +18,7 @@
 			</uni-list-item>
 			<uni-list-item title="所属小区" :showArrow="false">
 				<template v-slot:right="">
-					<text class="f666">{{mineMsg.cAddress}}</text>
+					<text class="f666">{{mineMsg.house.name}}</text>
 				</template>
 			</uni-list-item>
 		</uni-list>
@@ -26,20 +26,33 @@
 </template>
 
 <script>
+	import {
+		mapState
+	} from 'vuex'
 	export default {
 		data() {
 			return {
-				mineMsg:{
-					img:"xicg.png",
-					name:"张世通",
-					date:"2020-01-01",
-					address:"升龙又一城"
-				}
+				// mineMsg:{
+				// 	img:"xicg.png",
+				// 	name:"张世通",
+				// 	date:"2020-01-01",
+				// 	address:"升龙又一城"
+				// }
 			};
 		},
+		computed:{
+			...mapState(['hasLogin', 'userInfo','homeInfo','httpp']),
+			mineMsg(){
+				if(this.userInfo){
+				return this.userInfo;
+				}else{
+					return {};
+				}
+			}
+		},
 		mounted() {
-			console.log(uni.getStorageSync('userInfo'));
-			this.mineMsg = uni.getStorageSync('userInfo');
+			// console.log(uni.getStorageSync('userInfo'));
+			// this.mineMsg = uni.getStorageSync('userInfo');
 		}
 	}
 </script>

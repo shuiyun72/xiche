@@ -11,9 +11,7 @@
 		</view>
 		<textarea class="t_textarea" v-model="tValue" :placeholder="tPlaceholder" />
 		<view class="re_mtop18">
-			<navigator url="./orderRejectSuccess">
-				<button class="btn round orange ms" >提交</button>
-			</navigator>
+			<button class="btn round orange ms" @click="next">提交</button>
 		</view>
 	</view>
 </template>
@@ -29,10 +27,28 @@
 				],
 				rejectIndex:-1,
 				tPlaceholder:"请输入拒绝原因",
-				tValue:""
+				tValue:"",
+				orderInfo:{}
 			}
 		},
+		onLoad(ph){
+			this.orderInfo = JSON.parse(ph.item);
+			console.log(this.orderInfo)
+		},
 		methods: {
+			next(){
+				let dataL = {
+					id:this.orderInfo.id,
+					type:1,
+					qxCase:this.tValue
+				}
+				this.$getApi("/api/operator/order/cancle", dataL, res => {
+					uni.reLaunch({
+						url:'./orderRejectSuccess'
+					})
+				})
+				
+			},
 			selectReject(el,index){
 				this.rejectIndex = index;
 				this.tValue = el.text;

@@ -29,7 +29,7 @@
 		},
 		methods:{
 			next(){
-				this.$getApi("operator/editPwd",{
+				this.$getApi("/api/operator/editPwd",{
 					password:this.oldPsd,
 					newpassword:this.newPsd,
 					repassword:this.tNewPsd

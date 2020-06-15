@@ -3,58 +3,60 @@
 		<view class="tab_list_sy">
 			<view class="item" v-for="(item,index) in tabList" :class="{'active':index == tabSel}" @click="selectTab(item,index)">{{item.text}}</view>
 		</view>
-
-		<view class="o_card_list" v-for="item in msgInfo">
+		<view class="no_order"  v-if="msgInfo.length == 0">
+			<image src="../../static/img/zanwdd.png" mode="widthFix"></image>
+		</view>
+		<view class="o_card_list" v-for="item in msgInfo" v-if="msgInfo.length > 0">
 			<view @click="toDetail(item)">
 				<view class="o_title">
-					<text>{{item.type}}</text>
-					<text>{{item.state}}</text>
+					<text>{{item.title}}</text>
+					<text>{{itemState(item.stateN)}}</text>
 				</view>
 				<view class="o_p1">
-					{{item.car}} {{item.carP}}
+					{{item.xing}} {{item.carNum}}
 				</view>
 				<view class="o_msg_info">
 					<text class="iconfont iconyonghuming"><text>{{item.name}}</text></text>
 				</view>
 				<view class="o_msg_info">
 					<text class="iconfont icondianhua"><text>{{item.phone | psd}}</text></text>
-					<text class="tell_phone" @click.stop="tellPhone(item.phone)" v-show="tabSel==1">拨打电话</text>
+					<text class="tell_phone" @click.stop="tellPhone(item.phone)" v-show="item.stateN==2 || item.stateN==3">拨打电话</text>
 				</view>
 				<view class="o_msg_info">
 					<text class="iconfont iconshijian"><text>{{item.time}}</text></text>
 				</view>
 				<view class="o_msg_info">
-					<text class="iconfont iconshijian"><text>{{item.p}}</text></text>
+					<text class="iconfont icontingche"><text>{{item.location}}</text></text>
 				</view>
 				<view class="o_msg_info">
-					<text class="iconfont iconlocation"><text>{{item.addr}}</text></text>
-					<text class="iconfont iconzhifeiji" v-show="tabSel==1" @click.stop="toPosition(item)"></text>
+					<text class="iconfont iconlocation"><text>{{item.address}}</text></text>
+					<text class="iconfont iconzhifeiji" v-show="item.stateN==2 || item.stateN==3" @click.stop="toPosition(item)"></text>
 				</view>
-				<view class="o_msg_info" v-show="item.ftime && tabSel==2">
-					<text class="iconfont iconxuanzhong"><text>{{item.ftime}}</text></text>
-				</view>
-				<view class="o_msg_info" v-show="tabSel==3">
-					<text class="iconfont iconcuowu"><text>{{item.ntime}}</text></text>
+				<view class="o_msg_info" v-show="item.stateN==4">
+					<text class="iconfont iconxuanzhong"><text>{{item.afterTime}}</text></text>
 				</view>
 				<view class="o_msg_info" v-show="tabSel==3">
-					<text class="iconfont iconwendang"><text>{{item.cause}}</text></text>
+					<text class="iconfont iconcuowu"><text>{{item.qxTime}}</text></text>
+				</view>
+				<view class="o_msg_info" v-show="tabSel==3">
+					<text class="iconfont iconwendang"><text>{{item.qxCase}}</text></text>
 				</view>
 			</view>
-			<view class="sub_btn" v-show="tabSel==0">
-				<navigator url="./orderReject" class="nav_to">
+			<view class="sub_btn" v-show="item.stateN==1">
+				<navigator :url="'./orderReject?item='+JSON.stringify(item)" class="nav_to">
 					<button class="btn round sm orange_n">拒绝接单</button>
 				</navigator>
-				<button class="btn round sm orange nav_to" @click="toosC('jd')">确认接单</button>
+				<button class="btn round sm orange nav_to" @click="toosC(item)">确认接单</button>
 			</view>
-			<view class="sub_btn" v-show="tabSel==1 && cState!=4">
-				<navigator :url="'./orderNoFind?phone='+item.phone" class="nav_to">
+			<view class="sub_btn" v-show="item.stateN==2">
+				<navigator :url="'./orderNoFind?item='+JSON.stringify(item)" class="nav_to">
 					<button class="btn round sm orange_n">未找到车辆</button>
 				</navigator>
-				<navigator url="../orders/orderWork" class="nav_to">
+				<navigator :url="'../orders/orderWork?item='+JSON.stringify(item)" class="nav_to">
 					<button class="btn round sm orange">开始洗车</button>
 				</navigator>
 			</view>
-			<view class="sub_btn" v-show="cState==4">
+			<view class="sub_btn" v-show="item.stateN==3">
 				<navigator :url="'../orders/orderWork?cState='+cState+'&item='+JSON.stringify(item)" class="nav_to">
 					<button class="btn round sm orange">确认完成</button>
 				</navigator>
@@ -67,44 +69,23 @@
 	export default {
 		data() {
 			return {
-				cState: 4,
+				cState: 40,
 				tabSel: 0,
 				tabList: [{
 						text: "待接单",
-						type: 0
+						type: 1
 					},
 					{
 						text: "待完成",
-						type: 1
+						type: 2
 					},
 					{
 						text: "已完成",
-						type: 2
+						type: 3
 					},
 					{
 						text: "特殊订单",
-						type: 3
-					}
-				],
-				person: {
-					name: "张世通",
-					star: 5,
-					address: "升龙又一城"
-				},
-				orderNum: [{
-						tNum: 12,
-						text: "今日单数",
-						type: 1
-					},
-					{
-						tNum: 88,
-						text: "今日单数",
-						type: 2
-					},
-					{
-						tNum: 590,
-						text: "今日单数",
-						type: 3
+						type: 4
 					}
 				],
 				msgInfo: [{
@@ -146,28 +127,38 @@
 			}
 		},
 		computed: {
-			starC() {
-				if (this.person.star == 5) {
-					return "五"
-				}
-			}
+			
 		},
 		onLoad() {
 			this.getOrder(1);
 		},
 		methods: {
+			//接单状态
+			itemState(n){
+				switch (n) {
+					case 1 : return "待接单" ;break;
+					case 2 : return "待完成" ;break;
+					case 3 : return "正在洗车" ;break;
+					case 4 : return "已完成" ;break;
+					case 5 : return "本人取消订单" ;break;
+					case 6 : return "本人拒绝订单" ;break;
+					case 7 : return "客户取消订单" ;break;
+				}
+			},
 			getOrder(type){
 				let orderData = {
 					type:type,
 					page:1,
 					paginate:100
 				}
-				this.$getApi('operator/orderList',orderData,res=>{
-					console.log(res)
+				this.$getApi('/api/operator/orderList',orderData,res=>{
+					console.log(res.data)
+					this.msgInfo = res.data.data
 				})
 			},
 			selectTab(el, i) {
 				this.tabSel = i;
+				this.getOrder(el.type);
 			},
 			tellPhone(phone) {
 				uni.makePhoneCall({
@@ -176,10 +167,10 @@
 			},
 			toPosition(item) {
 				uni.openLocation({
-					latitude: 34.775651, //要去的纬度-地址       
-					longitude: 113.674715, //要去的经度-地址
-					name: '东大街', //地址名称
-					address: '12号', //详细地址名称
+					longitude: item.lng, //要去的经度-地址
+					latitude: item.lat, //要去的纬度-地址       
+					name: 'item.address', //地址名称
+					address: item.address, //详细地址名称
 					success: function() {
 						console.log('导航成功');
 					},
@@ -190,14 +181,15 @@
 				})
 			},
 			toosC(el) {
-				if (el == 'jd') {
+				this.$getApi("/api/operator/order/confirm", {id:el.id}, res => {
 					uni.showToast({
 						title: '接单成功 , 请准时到达指定地点',
 						duration: 2000,
 						icon: "none",
 						mask: false
 					});
-				}
+					this.getOrder(1);
+				})
 			},
 			toDetail(item) {
 				uni.navigateTo({
@@ -444,5 +436,11 @@
 
 	.ml10p {
 		margin-left: 10upx;
+	}
+	.no_order{
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		height:70vh ;
 	}
 </style>

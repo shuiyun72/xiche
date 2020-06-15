@@ -2,7 +2,7 @@
 	<view class="orders">
 		<view class="o_c_body">
 			<view class="c_title">
-				<text class="t">请上传洗车前照片 (前后左右)</text>
+				<text class="t">请上传洗车{{stateTL}}照片 (前后左右)</text>
 				<text class="p">请上传照片</text>
 			</view>
 			<view class="photo_list">
@@ -21,8 +21,17 @@
 				<text class="t2">示例: 车辆前后左右照片</text>
 			</view>
 			<view class="for_ext">
-				<view class="item_img" v-for="(img,index) in carList" :key="index">
-					<image :src="'../../static/img/'+img"></image>
+				<view class="item_img">
+					<image :src="'../../static/img/qianb.png'"></image>
+				</view>
+				<view class="item_img">
+					<image :src="'../../static/img/houb.png'"></image>
+				</view>
+				<view class="item_img">
+					<image :src="'../../static/img/zuoc.png'"></image>
+				</view>
+				<view class="item_img">
+					<image :src="'../../static/img/youc.png'"></image>
 				</view>
 			</view>
 		</view>
@@ -37,15 +46,22 @@
 		data() {
 			return {
 				imageList: [],
+				upimageList: [],
 				textareaText:"",
 				carList:["qianb.png","houb.png","zuoc.png","youc.png"],
-				tabSel:0,
-				currentItem:{}
+				orderInfo:{},
+				stateTL:"前"
 			}
 		},
 		onLoad: function(option) { //option为object类型，会序列化上个页面传递的参数
-			this.tabSel = option.type;
-			this.currentItem = JSON.parse(option.item);
+			this.orderInfo = JSON.parse(option.item);
+			console.log(this.orderInfo)
+			if(this.orderInfo.stateN == 2){
+				this.stateTL = '前'
+			}else
+			if(this.orderInfo.stateN == 3){
+				this.stateTL = '后'
+			}
 		},
 		methods: {
 			previewImage: function(e) {
@@ -56,35 +72,57 @@
 				})
 			},
 			chooseImage(){
+				let this_ = this;
+				let token = this_.$store.state.userInfo.remember_token ||
+				uni.getStorageSync('userInfo').remember_token ;	
 				uni.chooseImage({
+					count: 1,
+					sizeType:['copressed'],
 				    success: (res) => {
-						console.log(res,res.tempFilePaths)
-				        this.imageList = this.imageList.concat(res.tempFilePaths);
+				        this.imageList = this.imageList.concat(res.tempFilePaths);				
+						console.log(this_.$apiUrl + '/api/auth/upload')
+						uni.uploadFile({
+							url:this_.$apiUrl + '/api/auth/upload',
+							filePath: res.tempFilePaths[0],
+							name: 'file',
+							formData: {  
+								token: token
+							  },
+							success(res1) {
+								// 显示上传信息
+								console.log(JSON.parse(res1.data).data.url)
+								this_.upimageList.push(JSON.parse(res1.data).data.url)
+							}
+						});
 				    }
 				});
 			},
 			submitBtn(){
-				// uni.uploadFile({
-				//     url: 'https://www.example.com/upload', //仅为示例，非真实的接口地址
-				//     filePath: tempFilePaths[0],
-				//     name: 'file',
-				//     formData: {
-				//         'user': 'test'
-				//     },
-				//     success: (uploadFileRes) => {
-				//         console.log(uploadFileRes.data);
-				//     }
-				// });
-				// uni.navigateTo({
-				// 	url:'../orders/orderRejectSuccess'
-				// })
-				console.log(JSON.stringify(this.imageList))
-				// uni.switchTab({
-				//     url: '../orders/orders'
-				// });
+				console.log(JSON.stringify(this.upimageList))
+				if(this.orderInfo.stateN == 2){
+					this.$getApi("/api/operator/order/begin",{
+						id:this.orderInfo.id,
+						beforeimglist:JSON.stringify(this.upimageList)
+					},res=>{
+						uni.switchTab({
+							url:'./orders'
+						})
+					})
+				}else
+				if(this.orderInfo.stateN == 3){
+					this.$getApi("/api/operator/order/end",{
+						id:this.orderInfo.id,
+						afterimglist:JSON.stringify(this.upimageList)
+					},res=>{
+						uni.switchTab({
+							url:'./orders'
+						})
+					})
+				}
 			},
 			deleteImg(i){
-				this.imageList.splice(i,1)
+				this.imageList.splice(i,1);
+				this.upimageList.splice(i,1);
 			},
 		}
 	}

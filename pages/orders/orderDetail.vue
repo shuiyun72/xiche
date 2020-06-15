@@ -2,7 +2,7 @@
 	<view class="detail">
 		<view class="d_box_sy">
 			<view class="d_title">
-				<text>订单编号{{infoMsg.code}}</text><text class="t_or">{{infoMsg.state}}</text>
+				<text>订单编号{{infoMsg.code}}</text><text class="t_or">{{itemState(infoMsg.stateN)}}</text>
 			</view>
 			<view class="d_title">
 				{{infoMsg.title}}
@@ -61,7 +61,7 @@
 			<view class="d_msg">
 				<view class="d_label">车辆照片:</view>
 				<view class="d_img">
-					<image :src="'../../static/img/'+infoMsg.img" mode="widthFix" class="img"></image>
+					<image :src="httpp+infoMsg.img" mode="widthFix" class="img"></image>
 				</view>
 			</view>
 		</view>
@@ -107,8 +107,8 @@
 					</view>
 				</view>
 				<view class="for_ext">
-					<view class="item_img" v-for="(img,index) in carList" :key="index">
-						<image :src="'../../static/img/'+img"></image>
+					<view class="item_img" v-for="(img,index) in infoMsg.beforeimglist" :key="index">
+						<image :src="httpp+img"></image>
 					</view>
 				</view>
 			</view>
@@ -125,8 +125,8 @@
 					</view>
 				</view>
 				<view class="for_ext">
-					<view class="item_img" v-for="(img,index) in carList" :key="index">
-						<image :src="'../../static/img/'+img"></image>
+					<view class="item_img" v-for="(img,index) in infoMsg.afterimglist" :key="index">
+						<image :src="httpp+img"></image>
 					</view>
 				</view>
 			</view>
@@ -152,6 +152,7 @@
 </template>
 
 <script>
+	import { mapState } from "vuex";
 	export default {
 		data() {
 			return {
@@ -176,18 +177,28 @@
 					qxCase: "到达指定位置未找到指定车辆",
 					qxTime: "2020-05-06 13:01"
 				},
-				tabSel: 0,
-				currentItem: {}
+				tabSel: 0
 			};
 		},
 		onLoad: function(option) { //option为object类型，会序列化上个页面传递的参数
 			this.tabSel = option.type;
-			this.currentItem = JSON.parse(option.item);
+			this.infoMsg = JSON.parse(option.item);
+		},
+		methods:{
+			itemState(n){
+				switch (n) {
+					case 1 : return "待接单" ;break;
+					case 2 : return "待完成" ;break;
+					case 3 : return "正在洗车" ;break;
+					case 4 : return "已完成" ;break;
+					case 5 : return "本人取消订单" ;break;
+					case 6 : return "本人拒绝订单" ;break;
+					case 7 : return "客户取消订单" ;break;
+				}
+			}
 		},
 		computed: {
-			// tabSel(){
-			// 	return 
-			// }
+			...mapState(['httpp'])
 		},
 		filters: {
 			psd: function(value) {

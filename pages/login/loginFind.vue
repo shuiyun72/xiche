@@ -41,7 +41,7 @@
 					phone:this.phone,
 					from: "login,forget"
 				}
-				this.$getApi('auth/sendmsg',data,res=>{
+				this.$getApi('/api/auth/sendmsg',data,res=>{
 					console.log(res)
 				},null,false)
 			},
@@ -53,7 +53,7 @@
 						password:this.psd,
 						code:this.yzm
 					}
-					this.$getApi('auth/forget/password',data,res=>{
+					this.$getApi('/api/auth/forget/password',data,res=>{
 						console.log(res)
 						if(res.code == 200){
 							uni.navigateTo({

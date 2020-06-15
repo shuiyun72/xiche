@@ -20,11 +20,17 @@
 </template>
 
 <script>
+	import {
+		mapState
+	} from 'vuex'
 	export default {
 		data() {
 			return {
 
 			};
+		},
+		computed:{
+			...mapState(['hasLogin', 'userInfo','homeInfo']),
 		},
 		methods: {
 			navigatorUrl(url) {
@@ -33,16 +39,17 @@
 				})
 			},
 			tellServe() {
+				let this_ = this;
 				uni.showModal({
 					title: "联系客服",
-					content: "客服电话: 0374-2935009",
+					content: "客服电话: "+this_.homeInfo.tel,
 					confirmText: "确定",
 					confirmColor: "#f00",
 					cancelText: "取消",
 					success: function(res) {
 						if (res.confirm) {
 							uni.makePhoneCall({
-								phoneNumber: '0374-2935009'
+								phoneNumber: this_.homeInfo.tel
 							});
 						}
 					}

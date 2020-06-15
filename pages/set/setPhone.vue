@@ -34,7 +34,7 @@
 				})
 			},
 			next(){
-				this.$getApi("user/my/editInfo",{
+				this.$getApi("/api/user/my/editInfo",{
 					phone:this.phone,
 					code:this.yzm
 				},res=>{

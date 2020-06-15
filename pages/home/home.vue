@@ -2,14 +2,14 @@
 	<view class="orders">
 		<view class="o_card_sy">
 			<view class="info">
-				<image src="../../static/img/my/xicg.png" mode="widthFix" class="img" @click="navigatorUrl('./mine')"></image>
+				<image :src="httpp+userInfo.avatar" mode="widthFix" class="img" @click="navigatorUrl('./mine')"></image>
 				<view class="msg" @click="navigatorUrl('./appraise')">
-					<text class="name">{{person.name}}</text>
+					<text class="name">{{homeInfo.nickname}}</text>
 					<view class="star_box">
-						<uni-rate :value="person.star" :margin="5" :size="12"  />
+						<uni-rate :value="homeInfo.star" :margin="5" :size="12"  />
 						<text class="star_n">{{starC}}星</text>
 					</view>
-					<text class="address">所属小区 : {{person.address}}</text>
+					<text class="address">所属小区 : {{userInfo.house && userInfo.house.name}}</text>
 
 				</view>
 				<view class="set" @click="navigatorUrl('../set/set')">
@@ -31,17 +31,17 @@
 			</view>
 		</view>
 		
-		<view class="o_title_sy" v-show="isOrder && msgInfo.length > 0">
+		<view class="o_title_sy" v-show="orderState && msgInfo.length > 0">
 			<text class="iconfont iconshouye_shugang_shijiantixing c_or"></text><text class="text">待接单</text>
 		</view>
 		
-		<view class="o_card_list" v-show="isOrder && msgInfo.length > 0" v-for="item in msgInfo">
+		<view class="o_card_list" v-for="item in msgInfo" :key="item.id" v-if="orderState && msgInfo.length > 0" >
 			<view class="o_title">
-				<text>单次外部清洗</text>
+				<text>{{item.title}}</text>
 				<text>待接单</text>
 			</view>
 			<view class="o_p1">
-				小型汽车 豫A668899
+				{{item.xing}} {{item.carNum}}
 			</view>
 			<view class="o_msg_info">
 				<text class="iconfont iconyonghuming"><text>{{item.name}}</text></text>
@@ -53,19 +53,18 @@
 				<text class="iconfont iconshijian"><text>{{item.time}}</text></text>
 			</view>
 			<view class="o_msg_info">
-				<text class="iconfont iconshijian"><text>{{item.p}}</text></text>
+				<text class="iconfont icontingche"><text>{{item.location}}</text></text>
 			</view>
 			<view class="o_msg_info">
-				<text class="iconfont iconlocation"><text>{{item.addr}}</text></text>
+				<text class="iconfont iconlocation"><text>{{item.address}}</text></text>
+				<!-- <text class="iconfont iconzhifeiji" v-show="item.stateN==2 || item.stateN==3" @click.stop="toPosition(item)"></text> -->
 			</view>
 			
 			<view class="sub_btn">
-				<navigator url="../orders/orderReject" class="nav_to">
+				<navigator :url="'../orders/orderReject?item='+JSON.stringify(item)" class="nav_to">
 					<button class="btn round sm orange_n">拒绝接单</button>
 				</navigator>
-				<navigator url="./orderReject" class="nav_to">
-					<button class="btn round sm orange" @click="toosC">确认接单</button>
-				</navigator>
+				<button class="btn round sm orange nav_to" @click="toosC(item)">确认接单</button>
 			</view>
 			<view class="o_stop">
 				<view @click="isOrderHandle(false)">
@@ -75,7 +74,7 @@
 				
 			</view>
 		</view>
-		<view class="o_start" v-show="!isOrder">
+		<view class="o_start" v-show="!orderState">
 			<view class="o_start_b">
 				<view @click="isOrderHandle(true)">
 					<text>开始</text>
@@ -83,7 +82,7 @@
 				</view>
 			</view>
 		</view>
-		<view class="o_start" v-show="isOrder && msgInfo.length == 0 ">
+		<view class="o_start" v-show="orderState && msgInfo.length == 0 ">
 			<view class="o_start_b">
 				<view @click="isOrderHandle(false)">
 					<text>停止</text>
@@ -95,78 +94,78 @@
 </template>
 
 <script>
+	import {
+		mapState
+	} from 'vuex'
 	export default {
 		data() {
 			return {
-				isOrder:false,
 				person:{
 					name: "张世通",
 					star: 5,
 					address: "升龙又一城"
 				},
-				orderNum:[
-					{tNum:12,text:"今日单数",type:1},
-					{tNum:88,text:"本月单数",type:2},
-					{tNum:590,text:"累计单数",type:3}
-				],
 				msgInfo: []
 			}
 		},
-		onLoad() {
-			let userInfo;
-			if(uni.getStorageSync('userInfo')){
-				userInfo = uni.getStorageSync('userInfo');
-			}else{
-				userInfo = ""
-			}
-			if(!userInfo){
-				uni.reLaunch({
-					url: '../login/login'
-				});
-				// uni.showModal({
-				// 	title: '未登录',
-				// 	content: '您未登录，需要登录后才能继续',
-				// 	success: (res) => {
-				// 		if (res.confirm) {
-				// 			uni.reLaunch({
-				// 				url: '../login/login'
-				// 			});
-				// 		}else{
-				// 			this.$msg("游客")
-				// 		}
-				// 	}
-				// });
-			}
-		},
 		mounted() {
-
+			this.getInit();
+			
 		},
 		computed: {
+			...mapState(['hasLogin','userInfo','homeInfo',"httpp",'orderState']),
 			starC() {
-				if (this.person.star == 5) {
-					return "五"
+				switch(this.homeInfo.star){
+					case 0:return "零";break;
+					case 1:return "一";break;
+					case 2:return "二";break;
+					case 3:return "三";break;
+					case 4:return "四";break;
+					case 5:return "五";break;
+				}
+			},
+			orderNum(){
+				if(this.homeInfo){
+					return [
+						{tNum:this.homeInfo.day_order,text:"今日单数",type:1},
+						{tNum:this.homeInfo.month_order,text:"本月单数",type:2},
+						{tNum:this.homeInfo.total_order,text:"累计单数",type:3}
+					]
+				}else{
+					return []
 				}
 			}
 		},
 		methods: {
+			getInit(){
+				this.$getApi("/api/operator/profile",{},res=>{
+					this.$store.commit('setHome',res.data);
+					console.log(res)
+				})
+				
+			},
 			isOrderHandle(el){
-				if(el){
-					this.$getApi('operator/start',{},res=>{
-						this.$msg(res.msg);
-						this.isOrder = true;
+				if(el){	
+					this.$getApi('/api/operator/start',{},res=>{		
 						let orderData = {
 							type:1,
 							page:1,
-							paginate:6
+							paginate:100
 						}
-						this.$getApi('operator/orderList',orderData,ress => {
+						this.$getApi('/api/operator/orderList',orderData,ress => {
 							console.log(ress)
+							if(ress.data.data.length > 0){
+								this.msgInfo = ress.data.data;
+								
+							}else{
+								this.msgInfo = []
+							}
+							this.$store.commit('setState',el)
 						})
 					})
 				}else{
-					this.$getApi('operator/stop',{},res=>{
-						this.$msg(res.msg);
-						this.isOrder = false;
+					this.$getApi('/api/operator/stop',{},res=>{
+						this.$store.commit('setState',el)
 					})
 				}
 			},
@@ -175,14 +174,16 @@
 					url:url
 				})
 			},
-			toosC(el){
-				if(el == 'jd'){
+			toosC(el) {
+				this.$getApi("/api/operator/order/confirm", {id:el.id}, res => {
 					uni.showToast({
 						title: '接单成功 , 请准时到达指定地点',
 						duration: 2000,
-						icon:""
+						icon: "none",
+						mask: false
 					});
-				}
+					this.getInit();
+				})
 			},
 			toClassify(item){
 				console.log(item)
@@ -194,13 +195,13 @@
 		}
 	}
 </script>
-<style lang="scss">
+<style lang="scss" scoped>
 	page{
 		background-color: $uni-def;
 	}
 	.orders{
 		background-color: $uni-def;
-		height: 70vh;
+		min-height: 90vh;
 		display: flex;
 		flex-direction: column;
 	}
@@ -230,11 +231,12 @@
 		background-color: #fff;
 		box-shadow: 2upx 0upx 4upx 4upx #eee;
 		width: 94%;
-		margin: 0 auto;
+		margin: 0 auto 26upx;
 		border-radius: 10upx;
 		box-sizing: border-box;
 		padding: 24upx 30upx;
 		position:relative;
+		
 		.o_stop{
 			position: absolute;
 			right: -16upx;

@@ -8,11 +8,11 @@
 			</view>
 		</view>
 		<view class="re_mtop4">
-			<button class="btn round orange ms" @click="switchTab('/pages/home/home')">返回首页</button>
+			<button class="btn round orange ms" @click="switchTab('../home/home')">返回首页</button>
 		</view>
 		<view class="re_mtop4">
 			<navigator url="../mine/addCar">
-				<button class="btn round orange_n ms" @click="switchTab('/pages/orders/orders')">返回订单</button>
+				<button class="btn round orange_n ms" @click="switchTab('../orders/orders')">返回订单</button>
 			</navigator>
 		</view>
 	</view>

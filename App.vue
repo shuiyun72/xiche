@@ -1,7 +1,12 @@
 <script>
 export default {
 	onLaunch: function() {
-			
+		console.log(this.$store.state.hasLogin)
+		if(!this.$store.state.hasLogin){
+			uni.reLaunch({
+				url:"./pages/login/login"
+			})
+		}
 	},
 	onShow: function() {
 		console.log('App Show');
