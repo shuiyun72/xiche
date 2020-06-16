@@ -1,49 +1,54 @@
 <template>
-	<view class="order_true">
+	<view class="ssss_b">
+		
+	
+	<view class="order_true"  v-for="item in cellItem">
 		<view class="order_info">
 			<view class="od_title">
 				<view class="t">
-					单次内部清洗、打蜡
+					{{item.title}}
 				</view>
 				<view class="money">
-					28元
+					{{item.total_amount}}元
 				</view>
 			</view>
 			<view class="msg">
 				<view class="l_t"> 车牌号: </view>
-				<view class="r_c"> 豫A668899 </view>
+				<view class="r_c"> {{item.carNum}} </view>
 			</view>
 			<view class="msg">
 				<view class="l_t"> 时间: </view>
-				<view class="r_c"> 豫A668899 </view>
+				<view class="r_c"> {{item.time}} </view>
 			</view>
 			<view class="msg">
 				<view class="l_t"> 停车位: </view>
-				<view class="r_c"> 豫A668899 </view>
+				<view class="r_c"> {{item.location}} (停车位)</view>
 			</view>
 			<view class="msg">
 				<view class="l_t"> 地址: </view>
-				<view class="r_c"> 豫A668899 </view>
+				<view class="r_c"> {{item.address}} </view>
 			</view>
 			<view class="msg">
 				<view class="l_t"> 联系人: </view>
-				<view class="r_c"> 豫A668899 </view>
+				<view class="r_c"> {{item.name}} </view>
 			</view>
 			<view class="msg">
 				<view class="l_t"> 订单编号: </view>
-				<view class="r_c"> 豫A668899 </view>
+				<view class="r_c"> {{item.code}} </view>
 			</view>
 		</view>
 		<uni-list class="od_t">
 			<uni-list-item title="洗车券" :showArrow="false">
 				<template v-slot:right="">
-					<text class="red">无</text>
+					<text class="red" v-if="!item.userticket">无</text>
+					<text class="red" v-else>{{item.userticket.title}}</text>
 				</template>
 			</uni-list-item>
 		</uni-list>
 		<uni-list class="od_t">
 			<uni-list-item title="优惠券" :rightText="oderQuan.name" @click="selQUan"></uni-list-item>
 		</uni-list>
+		</view>
 		<view class="pay_type">支付方式</view>
 		<radio-group class="block" @change="RadioChange">
 			<view class="cu-form-group">
@@ -71,11 +76,12 @@
 		</radio-group>
 		<view class="bottom_c">
 			<view class="pay-num">
-				实付款：<text class="red">￥22.4</text>
+				实付款：<text class="red">￥{{totalAmount}}.00</text>
 			</view>		
 			<view @click="next" class="btn">立即支付</view>	
 		</view>
 	</view>
+	
 </template>
 
 <script>
@@ -83,9 +89,23 @@
 		data() {
 			return {
 				radio: 'A',
+				cellItem:[]
 			};
 		},
+		onLoad(ph) {
+			this.cellItem = JSON.parse(ph.item)
+			console.log(this.cellItem)
+			
+			
+		},
 		computed:{
+			totalAmount(){
+				let mm = 0;
+				_.map(this.cellItem,item=>{
+					mm+=Number(item.total_amount)
+				})
+				return  mm
+			},
 			oderQuan(){
 				return this.$store.state.torderQuan
 			},
@@ -107,15 +127,30 @@
 			RadioChange(e) {
 				this.radio = e.detail.value;
 			},
+			// thisText
 			next() {
+				let ordernos;
+				if(this.cellItem.length>1){
+					ordernos=  _.map(this.cellItem,res=>{
+						return res.order_no
+					})[0];
+				}else{
+					ordernos=  _.map(this.cellItem,res=>{
+						return res.order_no
+					}).toString();
+				}
 				let dataL = {
-					order_no:1,
-					payment:this.payType
+					order_no:ordernos,
+					payment:this.payType,
+					user_coupon_id:this.oderQuan.id?this.oderQuan.id:""
 				}
 				console.log(dataL)
 				this.$getApi("/api/user/order/pay",dataL,res=>{
 					console.log(res)
 					//this.itemsCarList = res.data
+					uni.reLaunch({
+						url:'./orderSuccess'
+					})
 					this.$store.commit('setQuan',{name:"请选择优惠券"})
 				})
 				// uni.navigateTo({
@@ -132,6 +167,10 @@
 </script>
 
 <style lang="scss" scoped>
+	.ssss_b{
+		padding-bottom: 60upx;
+		background-color: #f0f0f0;
+	}
 	.bottom_c{
 		position: fixed;
 		bottom: 0;
@@ -218,7 +257,6 @@
 	.order_true {
 		border-top: 1upx solid #eee;
 		background-color: #f0f0f0;
-		min-height: 100vh;
 	}
 
 	.od_t {

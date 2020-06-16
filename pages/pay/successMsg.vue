@@ -6,12 +6,15 @@
 			<view class="text">
 				套餐购买成功
 			</view>
-			<view class="text">
+			<view class="text" v-if="userInfo.groupid == 0">
 				您还没有添加车辆和地址信息完善信息后才可下单
 			</view>
 		</view>
+		<view class="re_mtop4"  v-if="userInfo.groupid == 0">
+			<button class="btn  blue ms" @click="navigateTo('../mine/addCar?ws=1')">去完善信息</button>
+		</view>
 		<view class="re_mtop4">
-			<button class="btn  blue ms" @click="navigateTo('../mine/addCar')">去完善信息</button>
+			<button class="btn  blue_n ms" @click="switchTab('../home/home')">返回首页</button>
 		</view>
 	</view>
 </template>
@@ -23,6 +26,11 @@
 				
 			};
 		}, 
+		computed:{
+			userInfo(){
+				return this.$store.state.userInfo;
+			}
+		},
 		methods:{
 			navigateTo(url){
 				uni.navigateTo({

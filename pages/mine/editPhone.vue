@@ -38,8 +38,8 @@
 					code:this.yzm
 				}
 				this.$getApi("/api/user/my/editInfo",dataLl,res=>{
-					uni.switchTab({
-						url:"../mine/mine"
+					uni.reLaunch({
+						url:"../store/publicMsg"
 					})
 				})
 			}

@@ -4,20 +4,14 @@
 		<view class="icon_msg_sy">
 			<view class="iconfont iconselected"></view>
 			<view class="text">
-				信息提交成功
+				评价成功
 			</view>
 		</view>
 		<view class="re_mtop4">
-			<button class="btn  blue ms" @click="reLaunch('../orders/toOrder')">去下单</button>
+			<button class="btn  blue ms" @click="navigateTo('../mine/appraise')">查看我的订单</button>
 		</view>
-		<view class="re_mtop4">
-			<button class="btn  blue_n ms" @click="reLaunch('./addCar')">继续添加车辆</button>
-		</view>
-		<view class="re_mtop4">
-			<button class="btn  blue_n ms" @click="reLaunch('./addAddress')">继续添加地址</button>
-		</view>
-		<view class="re_mtop4">
-			<button class="btn  blue_n ms" @click="switchTab('../home/home')">返回首页</button>
+		<view class="re_mtop4 mt10">
+			<button class="btn  blue_n ms" @click="switchTab('../orders/orders')">返回订单</button>
 		</view>
 	</view>
 </template>
@@ -39,11 +33,6 @@
 				uni.switchTab({
 				    url: el
 				});
-			},
-			reLaunch(el){
-				uni.reLaunch({
-				    url: el
-				});
 			}
 		}
 	}
@@ -56,7 +45,10 @@
 	padding: 0 26upx;
 }
 .re_mtop4{
-	margin-top:60upx;
+	&.mt10{
+		margin-top: 60upx;
+	}
+	margin-top:2vh;
 	padding: 0 20upx;
 }
 .icon_msg_sy{

@@ -5,19 +5,21 @@
 		</view>
 		<view class="bg10_f"></view>
 		<view class="coupon">
-			<view class="item_card" v-for="item in juan1ListType" :key="item.id">
-				<image :src="'../../static/img/mine/'+item.bg" mode="widthFix" class="img"></image>
+			<view class="item_card" v-for="item in juan1List" :key="item.id">
+				
+				<image :src="'../../static/img/mine/juanxxc.png'"  class="img" v-if="tabSel == 0"></image>
+				<image :src="'../../static/img/mine/juanhs.png'"  class="img" v-else></image>
 				<view class="info_img">
-					<image src="../../static/img/mine/yisy.png" mode="widthFix" class="sm_img" v-show="tabSel == 1"></image>
+					<image src="../../static/img/mine/yisy.png"  class="sm_img" v-show="tabSel == 1"></image>
 				</view>
 				<view class="info_img">
-					<image src="../../static/img/mine/yigq.png" mode="widthFix" class="sm_img" v-show="tabSel == 2"></image>
+					<image src="../../static/img/mine/yigq.png"  class="sm_img" v-show="tabSel == 2"></image>
 				</view>
 				
 				<view class="item_ab">
 					<view class="left">
 						<view class="p1">
-							<text>{{item.type}}</text>
+							<text>{{item.chexing.name}}</text>
 						</view>
 						<view class="p2">
 							月套餐
@@ -25,16 +27,16 @@
 					</view>
 					<view class="right">
 						<view class="p3">
-							{{item.zhe}}
+							{{item.title}}
 						</view>
 						<view class="p3c" v-show="tabSel == 1">
 							订单编号: {{item.order}}
 						</view>
 						<view class="p4">
-							<text v-show="tabSel == 0">有效期: </text>
-							<text v-show="tabSel == 1">使用日期: </text>
-							<text v-show="tabSel == 2">过期日期: </text>
-							{{item.date}}
+							<text v-show="tabSel == 0">有效期: {{item.start_time.split(" ")[0]}}-{{item.end_time.split(" ")[0]}}</text>
+							<text v-show="tabSel == 1">使用日期: {{item.created_at.split(" ")[0]}}</text>
+							<text v-show="tabSel == 2">过期日期: {{item.end_time.split(" ")[0]}}</text>
+							
 						</view>
 					</view>
 				</view>
@@ -107,7 +109,8 @@
 						id: 993,
 						bg:"juanhs.png"
 					},
-				]
+				],
+				juan1List:[]
 			};
 		},
 		computed:{
@@ -123,9 +126,20 @@
 				}
 			}
 		},
+		mounted() {
+			this.getTicket(0)
+		},
 		methods:{
+			getTicket(type){
+				this.$getApi("/api/user/ticket/list",{type:type},res=>{
+					
+					this.juan1List = res.data.data;
+					console.log(this.juan1List)
+				})
+			},
 			selectTab(el, i) {
 				this.tabSel = i;
+				this.getTicket(this.tabSel);
 			},
 		}
 	}
@@ -168,6 +182,7 @@
 				z-index:2;
 				.sm_img{
 					width: 100%;
+					height: 70upx;
 				}
 			}
 			.item_ab {
@@ -216,6 +231,7 @@
 	
 			.img {
 				width: 100%;
+				height: 200upx;
 			}
 		}
 	

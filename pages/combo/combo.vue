@@ -6,7 +6,7 @@
 			</view>
 			<navigator :url="'./comboList?item='+JSON.stringify(item)">
 				<view class="car_box">
-					<image :src="$httpp+item.cover" mode="widthFix" class="img"></image>
+					<image :src="httpp+item.cover" mode="widthFix" class="img"></image>
 				</view>
 			</navigator>
 		</view>
@@ -22,6 +22,11 @@
 		},
 		mounted() {
 			this.init();
+		},
+		computed:{
+			httpp(){
+				return this.$store.state.httpp;
+			}
 		},
 		methods:{
 			init(){
@@ -43,6 +48,7 @@
 			font-weight: bold;
 			padding: 26upx 0 16upx;
 			color: #666;
+			font-size: 32upx;
 		}
 
 		.car_box {

@@ -78,6 +78,7 @@
 				carArrayXing: this.$store.state.carXing,
 				carArrayXingSelect: 0,
 				imageList: [],
+				upimageList:[],
 				carList: [{
 						img: "qianb.png",
 						id: 1210
@@ -95,8 +96,8 @@
 						id: 1213
 					}
 				],
-				carId:""
-
+				carId:"",
+				type:1
 			};
 		},
 		computed: {
@@ -107,6 +108,7 @@
 				uni.setNavigationBarTitle({
 					title:'编辑车辆信息'
 				})
+				this.type = 2;
 				let item = JSON.parse(ph.item);
 				console.log(item)
 				this.carArrayXingSelect = item.chexing.sort_order;
@@ -115,21 +117,17 @@
 				this.$store.commit('brand',item.chebrand);
 				this.rightTextCarColor = item.checolor.name;
 				this.carId = item.id;
-				// name:this.name,
-				// phone:this.phone,
-				// id:"",
-				// car_xing_id:this.carArrayXing[this.carArrayXingSelect].id,
-				// chepai:this.chepai,
-				// car_color_id:this.carColorList[this.selectColor].id,
-				// car_brand_id:this.brand.id,
-				// covers:"",
-				// type:1
+			}else
+			if(ph.ws){
+				this.type = 1;
+			}else{
+				this.type = 2;
 			}
+			this.$store.commit('brand',{name:"请选择车的品牌"})
 		},
 		methods: {
 			//提交订单
-			submitOrder(){
-				
+			submitOrder(){		
 				let data = {
 					name:this.name,
 					phone:this.phone,
@@ -138,12 +136,11 @@
 					chepai:this.chepai,
 					car_color_id:this.carColorList[this.selectColor].id,
 					car_brand_id:this.brand.id,
-					covers:"",
-					type:1
+					covers:JSON.stringify(this.upimageList),
+					type:this.type
 				}
-				
-				// console.log(this.carColorList[this.selectColor].id)
 				this.$getApi("/api/user/mine/addCar",data,res1=>{
+					this.$store.commit('brand',{name:"请选择车的品牌"})
 					uni.reLaunch({
 						url:"./addSuccess"
 					})
@@ -157,42 +154,35 @@
 				console.log('picker发送选择改变，携带值为：' + e.detail.value)
 				this.carArrayXingSelect = e.detail.value
 			},
-			chooseImage() {
-				let _self = this;
+			chooseImage(){
+				let this_ = this;
+				let token = this_.$store.state.userInfo.remember_token ||
+				uni.getStorageSync('userInfo').remember_token ;	
 				uni.chooseImage({
-					success: (res) => {
-						console.log(res, res.tempFilePaths)
-						this.imageList = this.imageList.concat(res.tempFilePaths);
-						console.log(this.imageList)
-						this.$getApi("/api/auth/upload",{
-							file:this.imageList,
-						},res1=>{
-							console.log(res1)
-						})
-						// var uper = uni.uploadFile({
-						// 	// 需要上传的地址
-						// 	url: _self.$httpp + '?token='+_self.$store.state.userInfo.remember_token,
-						// 	// filePath  需要上传的文件
-						// 	filePath: this.imageList,
-						// 	name: 'file',
-						// 	success(res1) {
-						// 		// 显示上传信息
-						// 		console.log(res1)
-						// 	}
-						// });
-						// onProgressUpdate 上传对象更新的方法
-						// uper.onProgressUpdate(function(res) {
-						// 	// 进度条等于 上传到的进度
-						// 	_self.percent = res.progress
-						// 	console.log('上传进度' + res.progress)
-						// 	console.log('已经上传的数据长度' + res.totalBytesSent)
-						// 	console.log('预期需要上传的数据总长度' + res.totalBytesExpectedToSend)
-						// })
-					}
+					count: 1,
+					sizeType:['copressed'],
+				    success: (res) => {
+				        this.imageList = this.imageList.concat(res.tempFilePaths);				
+						console.log(this_.$apiUrl + '/api/auth/upload')
+						uni.uploadFile({
+							url:this_.$apiUrl + '/api/auth/upload',
+							filePath: res.tempFilePaths[0],
+							name: 'file',
+							formData: {  
+								token: token
+							  },
+							success(res1) {
+								// 显示上传信息
+								console.log(JSON.parse(res1.data).data.url)
+								this_.upimageList.push(JSON.parse(res1.data).data.url)
+							}
+						});
+				    }
 				});
 			},
 			deleteImg(i) {
 				this.imageList.splice(i, 1)
+				this.upimageList.splice(i, 1)
 			},
 			previewImage: function(e) {
 				var current = e.target.dataset.src

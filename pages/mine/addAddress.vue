@@ -93,7 +93,7 @@
 			};
 		},
 		mounted(){
-			// this.getLocal(16,1,'shiList');
+			this.getLocal(16,1,'shiList');
 			let this_ = this;
 			uni.getLocation({
 			    type: 'wgs84',
@@ -121,7 +121,7 @@
 				this.inpNum3 = phItem.park[2] ? phItem.park[2].name :"";
 				this.inpNum4 = phItem.park[3] ? phItem.park[3].name :"";
 				this.id = phItem.id;
-			}else{Zz
+			}else{
 				this.getLocal(16,1,'shiList');
 			}
 		},
@@ -184,6 +184,7 @@
 				}
 				console.log(dataL)
 				this.$getApi("/api/user/address/add",dataL,res=>{
+					this.$store.commit("setGroupid")
 					uni.navigateTo({
 						url:'./addSuccess'
 					})

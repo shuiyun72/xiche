@@ -1,35 +1,30 @@
 <template>
 	<view class="detail">
-		<view class="d_box_sy">
+		<view class="d_box_sy d_flex">
 			<view class="d_title">
-				<text>订单编号{{infoMsg.code}}</text><text class="t_or">{{infoMsg.state}}</text>
+				<view class="l_t">
+					{{infoMsg.title}}
+				</view> 
+				<view class="r_t blue">
+					{{itemState(infoMsg.stateN,infoMsg.paystatus)}}
+				</view>
 			</view>
-			<view class="d_title">
-				{{infoMsg.title}}
-			</view>
-			<view class="d_msg">
-				<view class="d_text">
-					{{infoMsg.time}}
+			<view class="d_title small_tt">
+				<view class="l_t">
+					{{infoMsg.created_at}}
+				</view> 
+				<view class="r_t">
+					{{infoMsg.total_amount}}元
 				</view>
 			</view>
 		</view>
-		<view class="d_box_sy">
-			<view class="d_title">
-				联系信息
-			</view>
-			<view class="d_msg">
-				<view class="d_label">联系人:</view>
-				<view class="d_text">
-					{{infoMsg.name}}
-				</view>
-			</view>
-			<view class="d_msg">
-				<view class="d_label">联系电话:</view>
-				<view class="d_text">
-					{{infoMsg.phone | psd}}
-				</view>
-			</view>
-		</view>
+		<uni-list class="od_t_ss" v-if="infoMsg.userticket">
+			<uni-list-item title="洗车券" :showArrow="false">
+				<template v-slot:right="">
+					<text class="red">{{item.userticket.title}}</text>
+				</template>
+			</uni-list-item>
+		</uni-list>
 		<view class="d_box_sy">
 			<view class="d_title">
 				车辆信息
@@ -58,10 +53,10 @@
 					{{infoMsg.carBrand}}
 				</view>
 			</view>
-			<view class="d_msg">
+			<view class="d_msg" v-if="infoMsg.img">
 				<view class="d_label">车辆照片:</view>
 				<view class="d_img">
-					<image :src="'../../static/img/'+infoMsg.img" mode="widthFix" class="img"></image>
+					<image :src="httpp+infoMsg.img" mode="widthFix" class="img"></image>
 				</view>
 			</view>
 		</view>
@@ -78,7 +73,24 @@
 			<view class="d_msg">
 				<view class="d_label">停车位:</view>
 				<view class="d_text">
-					{{infoMsg.location}}
+					{{infoMsg.location}}停车位
+				</view>
+			</view>
+		</view>
+		<view class="d_box_sy" >
+			<view class="d_title">
+				联系信息
+			</view>
+			<view class="d_msg">
+				<view class="d_label">联系人:</view>
+				<view class="d_text">
+					{{infoMsg.operator.nickname}}
+				</view>
+			</view>
+			<view class="d_msg">
+				<view class="d_label">联系电话:</view>
+				<view class="d_text">
+					{{infoMsg.operator.phone}}
 				</view>
 			</view>
 		</view>
@@ -91,15 +103,60 @@
 			</view>
 		</view>
 		<view class="d_box_sy">
-			<view v-show="tabSel == 1 || tabSel == 2">
+			<view class="d_title">
+				订单信息
+			</view>
+			<view class="d_msg">
+				<view class="d_label">订单编号:</view>
+				<view class="d_text">
+					{{infoMsg.code}}
+				</view>
+			</view>
+			<view class="d_msg">
+				<view class="d_label">实付款:</view>
+				<view class="d_text">
+					{{infoMsg.amount}}元
+				</view>
+			</view>
+			<view class="d_msg">
+				<view class="d_label">付款时间:</view>
+				<view class="d_text">
+					{{infoMsg.paytime}}
+				</view>
+			</view>
+		</view>
+		<view class="d_box_sy" v-if="infoMsg.stateN>1">
+			<view class="d_title">
+				洗车人员信息
+			</view>
+			<view class="serve_info_msg">
+				<view class="left_img">
+					<image class="img" :src="httpp+infoMsg.operator.avatar" mode="widthFix"></image>
+				</view>
+				<view class="right_info">
+					<view class="ttl">
+						<view class="name_l">
+							{{infoMsg.operator.nickname}}
+						</view>
+						<view class="blue" @click="tellPhone(infoMsg.operator.phone)" v-if="infoMsg.stateN == 3">
+							联系他
+						</view>
+					</view>
+					<view class="star_box">
+						<uni-rate :value="infoMsg.operator.star" :margin="5" :size="12" :disabled="true"/>
+						<text class="star_n">{{starC(infoMsg.operator.star)}}星</text>
+					</view>
+					<view class="">
+						{{infoMsg.operator.intro}}
+					</view>
+				</view>
+			</view>
+		</view>
+		
+		<view class="d_box_sy" v-if="infoMsg.stateN == 4">
+			<view >
 				<view class="d_title">
 					洗车信息
-				</view>
-				<view class="d_msg">
-					<view class="d_label lang">开始洗车时间:</view>
-					<view class="d_text">
-						{{infoMsg.beforeTime}}
-					</view>
 				</view>
 				<view class="d_msg">
 					<view class="d_text">
@@ -107,31 +164,31 @@
 					</view>
 				</view>
 				<view class="for_ext">
-					<view class="item_img" v-for="(img,index) in carList" :key="index">
-						<image :src="'../../static/img/'+img"></image>
+					<view class="item_img" v-for="(img,index) in infoMsg.beforeimglist" :key="index">
+						<image :src="httpp+img"></image>
 					</view>
 				</view>
 			</view>
-			<view v-show="tabSel == 2">
-				<view class="d_msg">
-					<view class="d_label lang">洗车完成时间:</view>
-					<view class="d_text">
-						{{infoMsg.afterTime}}
-					</view>
-				</view>
+			<view>
 				<view class="d_msg">
 					<view class="d_text">
 						洗车后照片 (前后左右)
 					</view>
 				</view>
 				<view class="for_ext">
-					<view class="item_img" v-for="(img,index) in carList" :key="index">
-						<image :src="'../../static/img/'+img"></image>
+					<view class="item_img" v-for="(img,index) in infoMsg.afterimglist" :key="index">
+						<image :src="httpp+img"></image>
+					</view>
+				</view>
+				<view class="d_msg">
+					<view class="d_label lang">完成时间:</view>
+					<view class="d_text">
+						{{infoMsg.afterTime}}
 					</view>
 				</view>
 			</view>
 		</view>
-		<view class="d_box_sy" v-show="tabSel == 3">
+		<view class="d_box_sy" v-show="infoMsg.stateN > 4">
 			<view class="d_title">
 				取消信息
 			</view>
@@ -182,12 +239,47 @@
 		},
 		onLoad: function(option) { //option为object类型，会序列化上个页面传递的参数
 			this.tabSel = option.type;
-			this.currentItem = JSON.parse(option.item);
+			this.infoMsg = JSON.parse(option.item);
+			console.log(this.infoMsg)
 		},
 		computed: {
-			// tabSel(){
-			// 	return 
-			// }
+			httpp(){
+				return this.$store.state.httpp;
+			}
+		},
+		methods:{
+			itemState(n,p){
+				switch (n) {
+					case 1 : 
+						if(p == 0){
+							return "未支付成功" ;
+						}else{
+							return "订单已确认" ;
+						}
+					break;
+					case 2 : return "订单已确认" ;break;
+					case 3 : return "正在洗车中" ;break;
+					case 4 : return "已完成" ;break;
+					case 5 : return "洗车工已取消" ;break;
+					case 6 : return "洗车工已取消" ;break;
+					case 7 : return "本人取消订单" ;break;
+				}
+			},
+			starC(n) {
+				switch(n){
+					case 0:return "零";break;
+					case 1:return "一";break;
+					case 2:return "二";break;
+					case 3:return "三";break;
+					case 4:return "四";break;
+					case 5:return "五";break;
+				}
+			},
+			tellPhone(phone){
+				uni.makePhoneCall({
+					phoneNumber: phone
+				});
+			}
 		},
 		filters: {
 			psd: function(value) {
@@ -199,7 +291,43 @@
 	}
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
+	.od_t_ss{
+		margin-bottom: 20upx;
+	}
+	.star_box{
+		display: flex;
+		align-items:baseline;
+		position: relative;
+		left: -10upx;
+		.star_n{
+			font-size: 22upx;
+			padding-left: 10upx;
+		
+		}
+		
+	}
+	.serve_info_msg{
+		display: flex;
+		.left_img{
+			width: 160upx;
+			.img{
+				width: 100%;
+			}
+		}
+		.right_info{
+			flex:1;
+			padding-left: 10upx;
+			display: inline-flex;
+			flex-direction: column;
+			justify-content: space-between;
+			padding: 20upx 0;
+			.ttl{
+				display: flex;
+				justify-content: space-between;
+			}
+		}
+	}
 	.detail {
 		background-color: $uni-def;
 		padding: 20upx 0 60upx;
@@ -210,7 +338,10 @@
 		margin-bottom: 20upx;
 		padding: 26upx;
 		font-size: 34upx;
-
+		.small_tt{
+			font-size: 28upx;
+			color: #999;
+		}
 		.for_ext {
 			display: flex;
 			padding-bottom: 20upx;

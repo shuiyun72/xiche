@@ -17,57 +17,42 @@
 						{{item.xing}} {{item.carNum}}
 					</view> 
 					<view class="">
-						￥18元
+						￥{{item.total_amount}}
 					</view>
 				</view>
-				<!-- <view class="o_msg_info">
-					<text class="iconfont iconyonghuming"><text>{{item.name}}</text></text>
-				</view>
-				<view class="o_msg_info">
-					<text class="iconfont icondianhua"><text>{{item.phone | psd}}</text></text>
-					<text class="tell_phone" @click.stop="tellPhone(item.phone)" v-show="tabSel==1">拨打电话</text>
-				</view> -->
 				<view class="o_msg_info">
 					<text class="iconfont iconshijian"><text>{{item.time}}</text></text>
 				</view>
 				<view class="o_msg_info">
-					<text class="iconfont icontingche"><text>{{item.location}}</text></text>
+					<text class="iconfont icontingche"><text>{{item.location}}停车位</text></text>
 				</view>
 				<view class="o_msg_info">
 					<text class="iconfont iconlocation"><text>{{item.address}}</text></text>
-					<text class="iconfont iconzhifeiji" v-show="item.stateN==2 || item.stateN==3" @click.stop="toPosition(item)"></text>
 				</view>
-				<view class="o_msg_info" v-show="item.stateN==4">
-					<text class="iconfont iconxuanzhong"><text>{{item.afterTime}}</text></text>
-				</view>
-				<view class="o_msg_info" v-show="tabSel==3">
-					<text class="iconfont iconcuowu"><text>{{item.qxTime}}</text></text>
-				</view>
-				<view class="o_msg_info" v-show="tabSel==3">
-					<text class="iconfont iconwendang"><text>{{item.qxCase}}</text></text>
+				<view class="o_msg_info">
+					<text class="iconfont iconyonghuming"><text>洗车工{{item.operator ? item.operator.nickname :''}}</text></text>
 				</view>
 				<view class="o_msg_info flex_bot">
-					<text>订单编号 {{item.qxCase}}</text>
-					<text class="red_money">实付: ￥0元</text>
+					<text>订单编号 {{item.code}}</text>
+					<text class="red_money">实付: ￥{{item.total_amount}}</text>
+				</view>		
+			</view>
+			<view class="sub_btn info" v-show="item.stateN > 4">
+				<view class="blue">
+					{{stateMsgFor(item)}}
 				</view>
 			</view>
-			<view class="sub_btn" v-show="tabSel==0">
-				<navigator url="./orderReject" class="nav_to">
-					<button class="btn blue sm blue_n round">拒绝接单</button>
-				</navigator>
-				<button class="btn blue sm blue nav_to round" @click="toosC('jd')">确认接单</button>
+			<view class="sub_btn" v-show="tabSel==1">
+				<view class="nav_to">
+					<button class="btn blue sm blue_n round" @click="qxOrderL(item)">取消订单</button>
+				</view>
 			</view>
-			<view class="sub_btn" v-show="tabSel==1 && cState!=4">
-				<navigator :url="'./orderNoFind?phone='+item.phone" class="nav_to">
-					<button class="btn blue sm blue_n round">未找到车辆</button>
-				</navigator>
-				<navigator url="../orders/orderWork" class="nav_to">
-					<button class="btn blue sm blue round" >开始洗车</button>
-				</navigator>
-			</view>
-			<view class="sub_btn" v-show="cState==3">
-				<navigator :url="'../orders/orderWork?cState='+cState+'&item='+JSON.stringify(item)" class="nav_to">
-					<button class="btn blue sm blue round">确认完成</button>
+			<view class="sub_btn" v-show="tabSel==3">
+				<view class="nav_to">
+					<button class="btn blue sm blue_n round" @click="tellKf">联系客服</button>
+				</view>
+				<navigator :url="'../orders/appraise?item='+JSON.stringify(item)" class="nav_to">
+					<button class="btn blue sm blue round" >评价订单</button>
 				</navigator>
 			</view>
 		</view>
@@ -95,9 +80,12 @@
 		data() {
 			return {
 				state: 1,
-				cState: 4,
 				tabSel: 0,
-				tabList: [{
+				tabList: [
+					{
+						text: "待支付",
+						type: 0
+					},{
 						text: "已确定",
 						type: 1
 					},
@@ -170,7 +158,7 @@
 			if (this.state == 0) {
 				this.$refs['juan0'].open()
 			}
-			this.getOrder(1);
+			this.getOrder(0);
 		},
 		filters: {
 			psd: function(value) {
@@ -179,24 +167,56 @@
 				return value.slice(0, 3) + '******'
 			}
 		},
-
+		onLoad() {
+			 uni.startPullDownRefresh();
+		},
+		onPullDownRefresh() {
+			let this_ = this;
+			setTimeout(function () {
+				uni.stopPullDownRefresh();
+				this_.getOrder(this_.tabSel);
+			}, 300);
+		},
 		computed: {
 			starC() {
 				if (this.person.star == 5) {
 					return "五"
 				}
+			},
+			userInfo(){
+				return this.$store.state.userInfo;
 			}
 		},
 		methods: {
+			//显示状态
+			stateMsgFor(item){
+				// return "121212";
+				if(item.userticket && Number(item.total_amount) > 0){
+					return "洗车券和现金已退还至原账户"
+				}else
+				if(item.userticket){
+					return "洗车券已退还至原账户"
+				}else
+				if(Number(item.total_amount)>0){
+					return "现金已退还至原账户"
+				}
+			},
 			itemState(n){
 				switch (n) {
-					case 1 : return "待接单" ;break;
-					case 2 : return "待完成" ;break;
-					case 3 : return "正在洗车" ;break;
+					case 1 : 
+						if(this.tabSel == 0 ){
+							return "未支付成功" ;
+						}else
+						if(this.tabSel == 1){
+							return "订单已确认" ;
+						}
+					break;
+					case 2 : return "订单已确认" ;break;
+					case 3 : return "正在洗车中" ;break;
 					case 4 : return "已完成" ;break;
-					case 5 : return "本人取消订单" ;break;
-					case 6 : return "本人拒绝订单" ;break;
-					case 7 : return "客户取消订单" ;break;
+					case 5 : return "洗车工已取消" ;break;
+					case 6 : return "洗车工已取消" ;break;
+					case 7 : return "本人取消订单" ;break;
 				}
 			},
 			closeJuan(num) {
@@ -213,8 +233,40 @@
 					this.msgInfo = res.data.data
 				})
 			},
-			
-			
+			qxOrderL(item){
+				let this_ = this;
+				uni.showModal({
+				    title: '取消订单',
+				    content: '是否确定取消订单?取消订单后现金将退至余额账户',
+				    success: function (res) {
+				        if (res.confirm) {
+				            console.log('用户点击确定');
+							this_.$getApi('/api/user/order/cancle',{id:item.id},res=>{
+								history.go(0) 
+							})
+				        } else if (res.cancel) {
+				            console.log('用户点击取消');
+				        }
+				    }
+				});
+			},
+			tellKf(){
+				let this_ = this;
+				uni.showModal({
+					title: "联系客服",
+					content: "客服电话: " + this_.userInfo.service_tel,
+					confirmText: "确定",
+					confirmColor: "#208EFF",
+					cancelText: "取消",
+					success: function(res) {
+						if (res.confirm) {
+							uni.makePhoneCall({
+								phoneNumber: this_.userInfo.service_tel
+							});
+						}
+					}
+				})
+			},
 			reLaunch(url) {
 				uni.reLaunch({
 					url: url
@@ -395,7 +447,9 @@
 			padding-top: 30upx;
 			border-top: 1upx solid #eee;
 			margin-top: 20upx;
-
+			&.info{
+				text-align: left;
+			}
 			.nav_to {
 				width: 30%;
 				display: inline-block;
@@ -434,6 +488,7 @@
 		}
 
 		.o_msg_info {
+			padding: 8upx 0;
 			&.flex_bot{
 				display:flex;
 				justify-content: space-between;

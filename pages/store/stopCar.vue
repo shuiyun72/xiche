@@ -5,7 +5,7 @@
 				<view >
 					<radio :value="item.value" :checked="index === current" class="radio"/>
 					<text class="iconfont icontingche"></text>
-					<text>{{item.name}}</text>
+					<text>{{item.name}}停车位</text>
 				</view>
 				
 			</label>
@@ -23,31 +23,17 @@
 	export default {
 		data() {
 			return {
-				items: [{
-						value: '1',
-						name: '12号停车位',
-						checked: 'true',
-						id:1
-					},
-					{
-						value: '2',
-						name: '12号停车位',
-						id:2
-					},
-					{
-						value: '3',
-						name: '20号停车位',
-						id:3
-					},
-					{
-						value: '4',
-						name: '26号停车位',
-						id:4
-					},
-				],
+				items: [{}],
 				current: 0,
 				currItem:""
 			};
+		},
+		onLoad(ph) {
+			let phId = ph.id;
+			this.$getApi("/api/user/address/detail",{id:phId},res=>{
+				this.items = res.data.park;
+				this.currItem = this.items[0];
+			})
 		},
 		methods: {
 			radioChange: function(evt) {
@@ -62,7 +48,8 @@
 				this.currItem = item;
 			},
 			next(){
-				this.$store.commit('setP',{name:this.currItem.name,id:this.currItem.id})
+				let currItem = this.currItem;
+				this.$store.commit('setP',{name:currItem.name,id:currItem.id})
 				uni.navigateBack()
 			}
 		}

@@ -12,15 +12,34 @@ const store = new Vuex.Store({
 		carXing:uni.getStorageSync("carXing") || [],
 		carColor:uni.getStorageSync("carColor") || [],
 		carBrand:uni.getStorageSync("carBrand") || [],
+		carServe:uni.getStorageSync("carServe") || [],
 		httpp:"https://yuyue.wsstreet.net/uploads/",
 		brand:{name:"请选择车的品牌"},
 		orderCar:{name:"请选择车的品牌"},
 		orderAddress:{name:"请选择地址"},
 		orderP:{name:"请选择停车位"},
 		orderPhone:{name:"请选择手机号"},
-		torderQuan:{name:"请选择优惠券"}
+		torderQuan:{name:"请选择优惠券"},
+		selCity:"中原区"
 	},
 	mutations: {
+		//设置洗车券状态
+		setCoupon(state){
+			state.userInfo.is_take = 1
+			uni.setStorage({//缓存用户登陆状态
+			    key: 'userInfo',  
+			    data: state.userInfo 
+			}) 
+		},
+		setGroupid(state){
+			if(state.userInfo.groupid == 0){
+				state.userInfo.groupid = 1
+				uni.setStorage({//缓存用户登陆状态
+					key: 'userInfo',  
+					data: state.userInfo 
+				}) 
+			}
+		},
 		setQuan(state, data){
 			state.torderQuan = data
 		},
@@ -38,6 +57,10 @@ const store = new Vuex.Store({
 		},
 		brand(state, data){
 			state.brand = data;
+		},
+		setService(state, data){
+			state.carServe = data;
+			uni.setStorageSync('carServe',data);
 		},
 		setCarXing(state, data){
 			state.carXing = data;
@@ -66,7 +89,11 @@ const store = new Vuex.Store({
 			uni.removeStorage({  
                 key: 'userInfo'  
             })
-		}
+		},
+		setCity(state, data){
+			state.selCity = data;
+			uni.setStorageSync('carBrand',data);
+		},
 	},
 	actions: {
 		

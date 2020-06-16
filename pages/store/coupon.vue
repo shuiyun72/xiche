@@ -19,9 +19,9 @@
 								{{item.title}}
 							</view>
 							<view class="p4">
-								有效期 {{item.created_at && item.created_at.split(" ")[0]}}
+								有效期 {{calcDate(item.created_at)}}
 									-
-									{{item.end_time && item.end_time.split(" ")[0]}}
+									{{calcDate(item.end_time)}}
 							</view>
 						</view>
 					</view>
@@ -62,6 +62,11 @@
 			})
 		},
 		methods:{
+			calcDate(date){
+				 if(date){
+					 return date.split(" ")[0]
+				 }
+			},
 			selQ(item){
 				console.log(item)
 				this.$store.commit('setQuan',{name:item.title,id:item.id});

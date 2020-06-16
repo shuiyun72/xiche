@@ -2,7 +2,7 @@
 	<view class="msg">
 		<view class="msg_item" v-for="(item,index) in msgList">
 			<view class="time">
-				{{item.created_at | formatDate}}
+				{{item.created_at}}
 			</view>
 			<view class="m_box">
 				<view class="t_t">
@@ -25,6 +25,9 @@
 		},
 		mounted() {
 			this.getMsg();
+			setTimeout(function(){
+				uni.stopPullDownRefresh();//停止下拉刷新动画
+			},100);
 		},
 		filters:{
 			formatDate(value){//value需要过滤的数据

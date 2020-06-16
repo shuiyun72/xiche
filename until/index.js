@@ -2,6 +2,7 @@ import Vue from 'vue';
 import store from '../store';
 // let apiUrl = "http://39.100.62.29:9922";
 let apiUrl = 'https://yuyue.wsstreet.net';
+Vue.prototype.$apiUrl = 'https://yuyue.wsstreet.net';
 // import Qs from "qs";
 Vue.prototype.$getApi = function(url, data, callsuc, token) {
 	// url = 'System/Login?loginContent=admin&password=123456'
@@ -14,7 +15,10 @@ Vue.prototype.$getApi = function(url, data, callsuc, token) {
 		data.page = 1;
 		data.paginate = 200;
 	}
-	console.log("data", data)
+	// console.log("data", data)
+	uni.showLoading({
+	    title: '加载中'
+	});
 	uni.request({
 		// url: apiUrl +'/api/'+ url +'?'+Qs.stringify(data), //仅为示例，并非真实接口地址。
 		url: apiUrl + url,
@@ -24,10 +28,17 @@ Vue.prototype.$getApi = function(url, data, callsuc, token) {
 			'content-type': 'application/x-www-form-urlencoded'
 		},
 		success: (res) => {
-			// console.log(res)
+			uni.hideLoading();
+			// console.log(res)this.$msg("您输入的参数有误,请检查")
 			if (res.data.code == 200) {
-				this.$msg(res.data.msg)
+				// this.$msg(res.data.msg)
 				callsuc instanceof Function && callsuc(res.data)
+			} else
+			if (res.data.code == 201) {
+				this.$msg("您输入的参数有误,请检查")
+			} else
+			if (res.data.code == 202) {
+				this.$msg("请先绑定手机号")
 			} else
 			if (res.data.code == 401) {
 				this.$msg("登录已过期,请重新登录")
@@ -35,7 +46,7 @@ Vue.prototype.$getApi = function(url, data, callsuc, token) {
 					url: '../login/yLogin'
 				})
 			} else {
-				this.$msg(res.data.msg)
+				this.$msg(res.data.msg)	
 			}
 		},
 		fail: (err) => {

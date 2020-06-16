@@ -5,24 +5,23 @@
 				<view class="a_title">
 					<text class="ping">评</text>
 					<text class="ps">订单编号: </text>
-					<text class="ps"> 121542121212</text>
+					<text class="ps"> {{item.code}}</text>
 				</view>
 				<view class="info_img_name">
-					<image src="../../static/img/xicg.png" mode="widthFix" class="img"></image>
+					<image :src="httpp+item.operator.avatar" mode="widthFix" class="img"></image>
 					<text class="name">展示通</text>
 				</view>
 				<view class="star_box">
-					<uni-rate :value="item.star" :margin="5" :size="12" />
+					<uni-rate :value="item.star" :margin="5" :size="12" :disabled="true"/>
 					<text class="star_n">{{starC(item.star)}}星</text>
 				</view>
 				<view class="grow_btn_app">
-					<view class="item_btn" v-for="(itemC,index) in orderReject" :key="itemC.id">
-						<button class="btn default_n round sm" :class="{'activec':index == rejectIndex}">{{itemC.cause}}</button>
+					<view class="item_btn" v-for="(itemC,index) in item.tags" :key="index">
+						<button class="btn default_n round sm activec">{{itemC}}</button>
 					</view>
-					
 				</view>
 				<view class="a_raise">
-					{{item.text}}
+					{{item.content}}
 				</view>
 			</view>
 			
@@ -56,8 +55,16 @@
 				rejectIndex:0,
 			};
 		},
+		mounted() {
+			this.$getApi('/api/user/my/comment',{},res=>{
+				console.log(res.data.data)
+				this.myA = res.data.data;
+			})
+		},
 		computed:{
-			
+			httpp(){
+				return this.$store.state.httpp;
+			}
 		},
 		methods:{
 			starC(n){
@@ -107,6 +114,7 @@
 		padding-bottom: 10upx;
 		.img{
 			width: 66upx;
+			height: 66upx;
 			margin-right: 20upx;
 		}
 		.name{

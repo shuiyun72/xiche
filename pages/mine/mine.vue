@@ -13,7 +13,7 @@
 						<view class="t">
 							{{userInfo.nickname}}
 						</view>
-						<image :src="$httpp + userInfo.avatar" mode="widthFix" class="title_img"></image>
+						<image :src="httpp + userInfo.avatar" mode="widthFix" class="title_img"></image>
 					</view>
 					</navigator>
 					<view class="item" @click="topNativeTo(1)">
@@ -87,6 +87,9 @@
 		computed:{
 			userInfo(){
 				return this.$store.state.userInfo;
+			},
+			httpp(){
+				return this.$store.state.httpp
 			}
 		},
 		mounted() {

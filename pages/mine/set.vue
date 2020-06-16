@@ -10,7 +10,7 @@
 					V1.01
 				</template>
 			</uni-list-item>
-			<uni-list-item title="账号注销"></uni-list-item>
+			<uni-list-item title="账号注销" @click="delUser"></uni-list-item>
 		</uni-list>
 		<view class="login_out" @click="loginOut">
 			退出登录
@@ -25,23 +25,48 @@
 
 			};
 		},
+		computed:{
+			serviceTel(){
+				return this.$store.state.userInfo.service_tel;
+			}
+		},
 		methods: {
 			navigatorUrl(url) {
 				uni.navigateTo({
 					url: url
 				})
 			},
+			delUser(){
+				let this_ = this;
+				uni.showModal({
+					title: "账户注销",
+					content: "需要账户注销吗?注销后将无法使用此账号登陆,确定?",
+					confirmText: "确定",
+					confirmColor: "#ff0000",
+					cancelText: "取消",
+					success: function(res) {
+						if (res.confirm) {
+							this_.$getApi("/api/user/writeOff",{},res=>{
+								uni.reLaunch({
+									url:'../login/yLogin'
+								})
+							})
+						}
+					}
+				})
+			},
 			tellServe() {
+				let this_ = this;
 				uni.showModal({
 					title: "联系客服",
-					content: "客服电话: 0374-2935009",
+					content: "客服电话: " + this_.serviceTel,
 					confirmText: "确定",
 					confirmColor: "#208EFF",
 					cancelText: "取消",
 					success: function(res) {
 						if (res.confirm) {
 							uni.makePhoneCall({
-								phoneNumber: '0374-2935009'
+								phoneNumber: this_.serviceTel
 							});
 						}
 					}

@@ -35,7 +35,7 @@
 		<!-- <view @tap="next()" class="cu-bar foot" style="box-shadow: 0;"><button class="cu-btn bg-blue lg" style="width: 750rpx; height: 100rpx;" type="">确定</button></view> -->
 		<view class="bottom_c">
 			<view class="pay-num">
-				实付款：<text class="red">￥75.0</text>
+				实付款：<text class="red">￥{{money}}</text>
 			</view>		
 			<view @click="next" class="btn">确认支付</view>	
 		</view>
@@ -46,7 +46,7 @@
 	export default {
 		data() {
 			return {
-				radio: 'alipay',
+				radio: 'money',
 				money:0,
 				typeId:""
 			};
@@ -67,9 +67,9 @@
 				}
 				this.$getApi("/api/user/ticket/buy",dataL,res=>{
 					console.log(res)
-					uni.switchTab({
-						url:"../mine/mine"
-					})	
+					uni.reLaunch({
+						url:'./successMsg'
+					})
 				
 				})
 			}

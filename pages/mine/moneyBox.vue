@@ -44,18 +44,18 @@
 	export default {
 		data() {
 			return {
-				msg:[]
+				msg:[],
+				money:""
 			};
 		},
 		computed:{
-			money(){
-				return this.$store.state.userInfo.money;
-			}
+			
 		},
 		mounted() {
 			this.$getApi("/api/user/money",{},res1=>{
 				console.log(res1)
-				this.msg = res1.data.data
+				this.msg = res1.data.data;
+				this.money = res1.more.money;
 			})
 		}
 	}

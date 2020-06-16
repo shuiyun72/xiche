@@ -24,20 +24,20 @@
 			{{City.hot.title}}
 		</view>
 		<view class="adress_box">
-			<view class="btn" v-for="(t,i) in City.hot.lists" :key="i+1200" @tap="selectCity(t)">
+			<view class="btn" v-for="(t,i) in City.hot.lists"  @tap="selectCity(t)">
 				<view class="text">{{t}}</view>
 			</view>
 		</view>
-		<view v-for="(t,i) in City.city" :key="i+1300">
+		<view v-for="(t,i) in City.city" >
 			<view class="text_title_city" @tap="selectCityTitle">
 				{{t.title}}
 			</view>
-			<view class="city_title" v-for="(tc,ic) in t.lists" :key="i+1300+ic*20" @tap="selectCity(tc)">
+			<view class="city_title" v-for="(tc,ic) in t.lists"  @tap="selectCity(tc)">
 				{{tc}}
 			</view>
 		</view>
 		<view class="side_sear">
-			<view class="item" v-for="(t,i) in City.city" :key="i+1900" @click="showSear(i)">
+			<view class="item" v-for="(t,i) in City.city"  @click="showSear(i)">
 				{{t.title}}
 			</view>
 		</view>
@@ -61,10 +61,9 @@
 				console.log(el)
 			},
 			selectCity(el) {
-				console.log(el)
 				this.$store.commit('setCity', el);
 				uni.switchTab({
-					url: '/pages/home/home'
+					url: '../home/home'
 				});
 			},
 			showSear(num){

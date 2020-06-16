@@ -63,8 +63,9 @@
 					phone:this.phone,
 					from: "login"
 				}
-				this.$getApi('auth/sendmsg',data,res=>{
+				this.$getApi('/api/auth/sendmsg',data,res=>{
 					console.log(res)
+					this.$msg('请在短信中查看验证码')
 				},"false")
 			},
 			loginIn(){
@@ -96,6 +97,9 @@
 				})
 				await this.$getApi("/api/user/car/brand",{},res=>{
 					this.$store.commit("setCarBrand",res.data)
+				})
+				await this.$getApi("/api/user/car/service",{},res=>{
+					this.$store.commit("setService",res.data)
 				})
 				call instanceof Function && call()
 			}

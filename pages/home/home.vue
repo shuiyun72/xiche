@@ -5,7 +5,7 @@
 			<view class="get_s">
 				<view class="address">
 					<navigator url="./city">
-						<text>中原区</text>
+						<text>{{selCity}}</text>
 						<text class="iconfont iconai-arrow-down"></text>
 					</navigator>
 				</view>
@@ -22,16 +22,16 @@
 				</view>
 				<view class="user_s">
 					<text class="iconfont iconyonghuming"></text>
-					<text>游客</text>
+					<text>{{group}}</text>
 				</view>
 				<view class="libao_list">
 					<view class="libao" @click="getXCQ">
 						<view class="li_t">
-							我的洗车卷
+							我的洗车券
 						</view>
 						<view class="li_info">
 							<view class="l_l">
-								剩余12张
+								剩余{{isHaveQuan}}张
 							</view>
 							<image src="../../static/img/home/xicj.png" mode="widthFix" class="l_r"></image>
 
@@ -43,7 +43,7 @@
 						</view>
 						<view class="li_info">
 							<view class="l_l">
-								优惠多少
+								优惠多多
 							</view>
 							<image src="../../static/img/home/taoc.png" mode="widthFix" class="l_r"></image>
 						</view>
@@ -121,31 +121,13 @@
 	} from 'vuex'
 	export default {
 		data() {
-			return {
-				
-				juan1List: [{
-						num: 1,
-						zhe: 1,
-						date: "2020.05.12-2020.08.12",
-						id: 990
-					},
-					{
-						num: 5,
-						zhe: 5,
-						date: "2020.05.12-2020.08.12",
-						id: 991
-					},
-					{
-						num: 8,
-						zhe: 8,
-						date: "2020.05.12-2020.08.12",
-						id: 992
-					}
-				]
+			return {	
+				juan1List: [],
+				isHaveQuan:0
 			};
 		},
 		computed:{
-			...mapState(['hasLogin', 'userInfo']),
+			...mapState(['hasLogin', 'userInfo','selCity']),
 			group(){
 				if(this.userInfo){
 					switch (this.userInfo.groupid) {
@@ -156,10 +138,6 @@
 				}else{
 					return "游客"
 				}
-			},
-			state(){
-				// return this.userInfo && this.userInfo.groupid && 0;
-				return 1
 			}
 		},
 		mounted() {
@@ -168,43 +146,47 @@
 					url:'../login/yLogin'
 				})
 			}else{
-				this.getQList();
-				if (this.state == 0) {
-					this.getQList();
-					this.$refs['juan0'].open()
+				// if (this.userInfo && this.userInfo.groupid == 0) {
+				// 	this.getQList();
+				// 	this.$refs['juan0'].open()
+				// }
+				if (this.userInfo && this.userInfo.is_take == 0) {
+					this.getQList()
 				}
-				if (this.state == 1) {
-					this.$refs['juan1'].open()
-				}
-			}
-			
+			}	
+			this.$getApi("/api/user/ticket/list",{type:0},res=>{
+				this.isHaveQuan = res.data.data.length;
+			})	
 		},
 		methods: {
-			
 			//home弹窗优惠券
 			getQList(){
 				this.$getApi("/api/auth/coupon/list",{},res=>{
 					console.log(res.data)
-					this.juan1List = res.data
+					this.juan1List = res.data;
+					this.$refs['juan1'].open()
 				})
-				//  this.$getApi("/api/user/car/xing",{},res=>{
-				// 	 console.log(res)
-				// 	// this.$store.commit("setCarXing",res.data)
-				// })
 			},
 			//跳转洗车券
 			getXCQ(){
-				this.$refs['juan0'].open()
-				// if (this.state == 0) {
-				// 	this.$refs['juan0'].open()
-				// }else{
-				// 	// uni.switchTab({
-				// 	// 	url:'../combo/combo'
-				// 	// })
-				// }
+				if(this.isHaveQuan > 0){
+					uni.navigateTo({
+						url:'../store/coupon'
+					})
+				}else{
+					this.$refs['juan0'].open()
+				}
 			},
 			closeJuan(num) {
-				this.$refs['juan' + num].close()
+				console.log(num)
+				if(num == 1){
+					this.$getApi("/api/user/coupon/cancle",{},res=>{
+						this.$refs['juan1'].close()
+						this.$store.commit("setCoupon");
+					});
+				}else{
+					this.$refs['juan' + num].close()
+				}
 			},
 			switchTab(url) {
 				uni.switchTab({
@@ -212,9 +194,12 @@
 				})
 			},
 			getQuanSucc() {
-				this.$getApi("/api/user/coupon/take");
-				this.$refs['juan1'].close()
-				this.$msg('优惠券领取成功,可在个人中心中查看');
+				this.$getApi("/api/user/coupon/take",{},res=>{
+					this.$refs['juan1'].close()
+					this.$msg('优惠券领取成功,可在个人中心中查看');
+					this.$store.commit("setCoupon");
+				});
+				
 			}
 		}
 	}

@@ -11,7 +11,7 @@
 		<uni-list>
 			<uni-list-item-point title="车辆" point="true" :rightText="orderCar.name"  @click="navigateTo('../store/car?from=toorder')"></uni-list-item-point>
 			<uni-list-item-point title="洗车地址" point="true" :rightText="orderAddress.name" @click="navigateTo('../store/address?from=toorder')"></uni-list-item-point>
-			<uni-list-item-point title="停车位" point="true" :rightText="orderP.name" @click="navigateTo('../store/stopCar?from=toorder')"></uni-list-item-point>
+			<uni-list-item-point title="停车位" point="true" :rightText="orderP.name" @click="selStop"></uni-list-item-point>
 		</uni-list>
 		<uni-list class="mt10">
 			<uni-list-item-point title="洗车内容选择" point="true" :showArrow="false" rightText=""></uni-list-item-point>
@@ -23,15 +23,13 @@
 						<image src="../../static/img/jiag.png" mode="widthFix" class="img"></image>
 						<view class="item_b">
 							<view class="part1">
-								<radio :value="item.value" :checked="index === current" class="radio" />
+								<radio v-model="item.value" :checked="index === current" class="radio" />
 								<text class="t">{{item.title}}</text>
 							</view>
 							<view class="part2">
 								<image src="../../static/img/vip.png" mode="widthFix" class="vip_img"></image> 洗车券1张
 							</view>
 							<view class="p" v-for="ic in item.chexing">{{ic.chexing}}￥{{ic.price}}</view>
-							<!-- <view class="p">{{item.p2}}</view>
-							<view class="p">{{item.p3}}</view> -->
 						</view>
 					</view>
 				</label>
@@ -46,7 +44,7 @@
 					<view class="item">
 						<checkbox :value="item.value" :checked="item.checked" class="checkbox" />
 						<text>{{item.name}}</text>
-						<text class="red">￥{{item.money}}</text>
+						<text class="red">￥{{item.price}}</text>
 					</view>
 				</label>
 			</checkbox-group>
@@ -56,8 +54,8 @@
 				<template v-slot:right="">
 				<picker mode="multiSelector" @columnchange="rinseTimeChange" :value="rinseTimeSel" :range="rinseTimeList">
 					<view class="uni-input">
-						<text v-show="JSON.stringify(rinseTimeSel) == '[0,0]'">请选择时间</text>
-						<text v-show="JSON.stringify(rinseTimeSel) != '[0,0]'">{{rinseTimeList[0][rinseTimeSel[0]]}},{{rinseTimeList[1][rinseTimeSel[1]]}}</text>	
+						<!-- <text v-show="JSON.stringify(rinseTimeSel) == '[0,0]'">请选择时间</text> -->
+						<text >{{rinseTimeList[0][rinseTimeSel[0]]}},{{rinseTimeList[1][rinseTimeSel[1]]}}</text>	
 					</view>
 				</picker>
 				</template>
@@ -91,38 +89,8 @@
 		},
 		data() {
 			return {
-				itemsCarList: [{
-					name: 1,
-					value: "单次外部清洗",
-					title: "洗车券1张",
-					p1: "会员小型￥18元",
-					p2: "会员SUV￥22元",
-					p3: "会员MVP￥26元"
-				}, {
-					name: 2,
-					value: "单次外部+内部清洗",
-					title: "洗车券1张+8元",
-					p1: "会员小型￥26元",
-					p2: "会员SUV￥30元",
-					p3: "会员MVP￥34元"
-				}],
+				itemsCarList: [{}],
 				current: 0,
-				checkboxOther: [{
-						value: 'dl',
-						name: '打蜡',
-						money: 10
-					},
-					{
-						value: 'ns',
-						name: '内饰清洗',
-						money: 16
-					},
-					{
-						value: 'qt',
-						name: '其他服务',
-						money: 12
-					}
-				],
 				rinseTimeList: [
 					['10日', '11日', '12日', '13日', '14日'],
 					['上午0:00-8:00', '晚上20:00-24:00']
@@ -130,46 +98,77 @@
 				rinseTimeSel:[0,0],
 				vTextarea:"",
 				relationId:"",
-				lastData:[]
+				lastData:[],
+				checkboxOther:[{}],
+				otherC:[]
 			};
 		}, 
 		computed:{
-			...mapState(['orderCar','orderAddress','orderP','orderPhone']),
+			...mapState(['orderCar','orderAddress','orderP','orderPhone','carServe']),
 			a(){
 				return this.$store.state.initInfo.a || 123456
-			}
+			},
 		},
 		mounted() {
 			this.$getApi("/api/auth/mall/neirong",{},res=>{
-				console.log(res)
 				this.itemsCarList = res.data
 			})
+			this.checkboxOther = _.map(this.carServe,(ite,index)=>{
+				return {...ite,value:index+'s'}
+			})
+			this.init();
 		},
 		methods: {
 			...mapMutations(['setSelCar','setAddress','setP','setPhone']),
+			init(){
+				this.setSelCar({name:"请选择车的品牌"});
+				this.setAddress({name:"请选择地址"});
+				this.setP({name:"请选择停车位"});
+				this.setPhone({name:"请选择手机号"});
+				this.rinseTimeSel = [0,0];
+				this.vTextarea = "";
+			},
 			next(){
 				// navigateTo('./addAddress')
-				this.moreNext();
 				console.log(this.lastData);
-				let sssData = JSON.stringify(this.lastData)
-				// console.log(this.$store.state.userInfo.groupid)
-				uni.navigateTo({
-					url:'./orderTrue'
-				})
+				let itemsCarListId = this.itemsCarList.length > 0 ? this.itemsCarList[this.current].id : ""
+				let dataL = {
+					car_id: this.orderCar.id,
+					address_id: this.orderAddress.id,
+					park_id: this.orderP.id,
+					mall_id: itemsCarListId,
+					time: this.rinseTimeList[0][this.rinseTimeSel[0]]+' '+this.rinseTimeList[1][this.rinseTimeSel[1]] ,
+					relation_id: this.orderPhone.id,
+					remark: this.vTextarea,
+					service_ids:this.otherC
+				}
+				let lastDataL = this.lastData.concat(dataL);
+				let sssData = JSON.stringify(lastDataL)
+				console.log(sssData)
 				this.$getApi("/api/user/order/sure",{data:sssData},res=>{
-					//this.itemsCarList = res.data
-					this.setSelCar({name:"请选择车的品牌"});
-					this.setAddress({name:"请选择地址"});
-					this.setP({name:"请选择停车位"});
-					this.setPhone({name:"请选择手机号"});
+					// this.init();
+					console.log(res)
+					
 					if(this.$store.state.userInfo.groupid == 0){
 						uni.navigateTo({
-							url:'./addAddress'
+							url:'./addAddress?item='+JSON.stringify(res.data)
 						})
 					}else{
-						uni.navigateTo({
-							url:'./orderTrue'
-						})
+						let otherC = JSON.stringify(this.otherC) == "[]" ? false : true;
+						console.log(otherC);
+						let isSucc = _.filter(res.data,res=>{
+							return res.user_ticket_id == 0
+						}).length > 0 ? false : true ;
+						if(this.itemsCarList.length > 0 && !otherC && isSucc){
+							uni.reLaunch({
+								url:'./orderSuccess'
+							})
+						}else{
+							uni.navigateTo({
+								url:'./orderTrue?item='+JSON.stringify(res.data)
+							})
+						}
+						
 					}
 					
 				})
@@ -179,23 +178,19 @@
 				this.lastData.splice(el,1)
 			},
 			moreNext(){
+				let itemsCarListId = this.itemsCarList.length > 0 ? this.itemsCarList[this.current].id : "";
 				let dataL = {
 					car_id: this.orderCar.id,
 					address_id: this.orderAddress.id,
 					park_id: this.orderP.id,
-					mall_id: this.itemsCarList[this.current].id,
+					mall_id: itemsCarListId,
 					time: this.rinseTimeList[0][this.rinseTimeSel[0]]+' '+this.rinseTimeList[1][this.rinseTimeSel[1]] ,
-					relation_id: this.relationId,
+					relation_id: this.orderPhone.id,
 					remark: this.vTextarea,
-					service_ids:JSON.stringify([1,2]) 
+					service_ids:this.otherC
 				}
 				this.lastData.push(dataL);
-				this.setSelCar({name:"请选择车的品牌"});
-				this.setAddress({name:"请选择地址"});
-				this.setP({name:"请选择停车位"});
-				this.setPhone({name:"请选择手机号"});
-				this.rinseTimeSel = [0,0];
-				this.vTextarea = "";
+				this.init();
 			},
 			radioChange(e) {
 				console.log(e.detail.value)
@@ -203,6 +198,7 @@
 			checkboxChange(e) {
 				var items = this.checkboxOther,
 					values = e.detail.value;
+					console.log(e)
 				for (var i = 0, lenI = items.length; i < lenI; ++i) {
 					const item = items[i]
 					if (values.includes(item.value)) {
@@ -211,6 +207,11 @@
 						this.$set(item, 'checked', false)
 					}
 				}
+				this.otherC = _.map(_.filter(this.checkboxOther,resss=>{
+					return resss.checked
+				}),res=>{
+					return res.id
+				})
 			},
 			rinseTimeChange(e) {
 				console.log('修改的列为：' + e.detail.column + '，值为：' + e.detail.value)
@@ -234,6 +235,15 @@
 				uni.navigateTo({
 					url:url
 				})
+			},
+			selStop(){
+				if(this.orderAddress.id){
+					uni.navigateTo({
+							url:'../store/stopCar?id='+this.orderAddress.id
+					})
+				}else{
+					this.$msg('请选择洗车地址')
+				}
 			}
 		}
 	}

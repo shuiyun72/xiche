@@ -13,7 +13,7 @@
 			</uni-list-item-point>
 		</uni-list>
 		<view class="sub_btn">
-			<button class="btn blue" @click="next">提 交</button>
+			<button class="btn blue" @click.stop="next">提 交</button>
 		</view>
 	</view>
 </template>
@@ -49,8 +49,8 @@
 				},res=>{
 					console.log(res)
 					// uni.navigateBack()
-					uni.switchTab({
-						url:"../mine/mine"
+					uni.reLaunch({
+						url:"../store/publicMsg"
 					})
 				})
 				

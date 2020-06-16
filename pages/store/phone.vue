@@ -11,13 +11,11 @@
 					</view>
 				</view>
 				<view class="part2">
-					<view class="item2">
-						<navigator :url="'../store/addPhone?item='+JSON.stringify(item)">
-							<text class="iconfont icontianxiegongdan-kuozhan-hebing"></text>
-							<text>编辑</text>
-						</navigator>
+					<view class="item2" @click.stop="editP(item)">
+						<text class="iconfont icontianxiegongdan-kuozhan-hebing"></text>
+						<text>编辑</text>
 					</view>
-					<view class="item2" @click="deleteP(item)">
+					<view class="item2" @click.stop="deleteP(item)">
 						<text class="iconfont iconqingkongshanchu"></text>
 						<text>删除</text>
 					</view>
@@ -25,10 +23,10 @@
 			</view>
 		</view>
 		<navigator url="../store/addPhone">
-		<view class="add_car_btn">
-			<text class="iconfont icontianjia"></text>
-			<text>新建手机号</text>
-		</view>
+			<view class="add_car_btn">
+				<text class="iconfont icontianjia"></text>
+				<text>新建手机号</text>
+			</view>
 		</navigator>
 	</view>
 </template>
@@ -37,93 +35,111 @@
 	export default {
 		data() {
 			return {
-				phoneList:[]
+				phoneList: []
 			}
 		},
 		mounted() {
 			this.init();
 		},
 		methods: {
-			selPhone(item){
-				this.$store.commit('setPhone',{name:item.phone,id:item.id});
+			selPhone(item) {
+				this.$store.commit('setPhone', {
+					name: item.phone,
+					id: item.id
+				});
 				uni.navigateBack({
-					
+
 				})
 			},
-			init(){
-				this.$getApi("/api/user/user/list",{},res=>{
+			init() {
+				this.$getApi("/api/user/user/list", {}, res => {
 					console.log(res)
 					this.phoneList = res.data
 				})
 			},
-			deleteP(item){
+			deleteP(item) {
 				let this_ = this;
 				uni.showModal({
-				    title: '删除',
-				    content: '是否确认删除?',
-				    success: function (res) {
-				        if (res.confirm) {
-				            console.log('用户点击确定');
-							this_.$getApi("/api/user/user/del",{id:item.id},res=>{
+					title: '删除',
+					content: '是否确认删除?',
+					success: function(res) {
+						if (res.confirm) {
+							console.log('用户点击确定');
+							this_.$getApi("/api/user/user/del", {
+								id: item.id
+							}, res => {
 								this_.init();
 							})
-				        } else if (res.cancel) {
-				            console.log('用户点击取消');
-				        }
-				    }
+						} else if (res.cancel) {
+							console.log('用户点击取消');
+						}
+					}
 				});
+			},
+			editP(item) {
+				uni.navigateTo({
+					url: '../store/addPhone?item=' + JSON.stringify(item)
+				})
 			}
 		}
 	}
 </script>
 
 <style lang="scss" scoped>
-.add_car_btn{
-	position: fixed;
-	left: 0;
-	bottom: 0;
-	background-color: $uni-bl;
-	width: 750upx;
-	text-align: center;
-	color: #fff;
-	padding: 26upx 0;
-	font-size: 36upx;
-	.icontianjia{
-		margin-right: 20upx;
+	.add_car_btn {
+		position: fixed;
+		left: 0;
+		bottom: 0;
+		background-color: $uni-bl;
+		width: 750upx;
+		text-align: center;
+		color: #fff;
+		padding: 26upx 0;
+		font-size: 36upx;
+
+		.icontianjia {
+			margin-right: 20upx;
+		}
 	}
-}
-.car_list{
-	height: 100vh;
-	background-color: #f0f0f0;
-	border-top: 1upx solid #eee;
-	.item{
-		background-color:#fff;
-		padding: 30upx 26upx 20upx;
-		margin-bottom: 20upx;
-		.part2{
-			display: flex;		
-			color: #999;
-			padding: 24upx 0 16upx 360upx;
-			margin-top: 10upx;
-			border-top: 1upx solid #eee;
-			.item2{
-				margin-left: 40upx;
-				.iconfont{
-					margin-right: 20upx;
+
+	.car_list {
+		height: 100vh;
+		background-color: #f0f0f0;
+		border-top: 1upx solid #eee;
+
+		.item {
+			background-color: #fff;
+			padding: 30upx 26upx 20upx;
+			margin-bottom: 20upx;
+
+			.part2 {
+				display: flex;
+				color: #999;
+				padding: 24upx 0 16upx 360upx;
+				margin-top: 10upx;
+				border-top: 1upx solid #eee;
+
+				.item2 {
+					margin-left: 40upx;
+
+					.iconfont {
+						margin-right: 20upx;
+					}
+				}
+			}
+
+			.part0 {
+				.name {
+					font-size: 36upx;
+					font-weight: bold;
+					color: #666;
+				}
+
+				.phone {
+					padding: 10upx 0;
+					color: #999;
 				}
 			}
 		}
-		.part0{
-			.name{
-				font-size: 36upx;
-				font-weight: bold;
-				color: #666;
-			}
-			.phone{
-				padding: 10upx 0;
-				color: #999;
-			}
-		}
 	}
-}
 </style>
