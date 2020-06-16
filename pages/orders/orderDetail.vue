@@ -58,7 +58,7 @@
 					{{infoMsg.carBrand}}
 				</view>
 			</view>
-			<view class="d_msg">
+			<view class="d_msg" v-if="infoMsg.img">
 				<view class="d_label">车辆照片:</view>
 				<view class="d_img">
 					<image :src="httpp+infoMsg.img" mode="widthFix" class="img"></image>
@@ -183,6 +183,7 @@
 		onLoad: function(option) { //option为object类型，会序列化上个页面传递的参数
 			this.tabSel = option.type;
 			this.infoMsg = JSON.parse(option.item);
+			console.log(this.infoMsg )
 		},
 		methods:{
 			itemState(n){

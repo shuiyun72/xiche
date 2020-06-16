@@ -10,12 +10,20 @@ const store = new Vuex.Store({
 		hasLogin: hasLogin,
 		userInfo: uni.getStorageSync("userInfo") || {},
 		homeInfo: uni.getStorageSync("userInfo") || {},
-		httpp:"https://yuyue.wsstreet.net/uploads/",
-		orderState:false
+		httpp:"https://yuyue.wsstreet.net/uploads/"
+	},
+	getters:{
+		orderState: state => {
+		  return state.userInfo.is_work
+		}
 	},
 	mutations: {
 		setState(state, data){
-			state.orderState = data;
+			state.userInfo.is_work = data;
+			uni.setStorage({//缓存用户登陆状态
+			    key: 'userInfo',  
+			    data: state.userInfo  
+			})
 		},
 		brand(state, data){
 			state.brand = data;

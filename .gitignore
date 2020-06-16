@@ -1,8 +1,8 @@
 .DS_Store
 node_modules
 /dist
+/server/public
 /unpackage
-
 # backend ignore files
 bin
 obj

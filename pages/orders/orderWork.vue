@@ -115,7 +115,10 @@
 						afterimglist:JSON.stringify(this.upimageList)
 					},res=>{
 						uni.switchTab({
-							url:'./orders'
+							url:'./orders',
+							success() {
+								history.go(0) 
+							}
 						})
 					})
 				}

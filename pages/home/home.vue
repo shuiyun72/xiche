@@ -82,7 +82,7 @@
 				</view>
 			</view>
 		</view>
-		<view class="o_start" v-show="orderState && msgInfo.length == 0 ">
+		<view class="o_start" v-show="orderState && msgInfo.length == 0">
 			<view class="o_start_b">
 				<view @click="isOrderHandle(false)">
 					<text>停止</text>
@@ -113,7 +113,10 @@
 			
 		},
 		computed: {
-			...mapState(['hasLogin','userInfo','homeInfo',"httpp",'orderState']),
+			...mapState(['hasLogin','userInfo','homeInfo',"httpp"]),
+			orderState(){
+				return this.$store.getters.orderState
+			},
 			starC() {
 				switch(this.homeInfo.star){
 					case 0:return "零";break;
@@ -160,12 +163,12 @@
 							}else{
 								this.msgInfo = []
 							}
-							this.$store.commit('setState',el)
+							this.$store.commit('setState',1)
 						})
 					})
 				}else{
 					this.$getApi('/api/operator/stop',{},res=>{
-						this.$store.commit('setState',el)
+						this.$store.commit('setState',0)
 					})
 				}
 			},

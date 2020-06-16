@@ -15,6 +15,9 @@ Vue.prototype.$getApi = function(url, data, callsuc, token) {
 		data.paginate = 200;
 	}
 	console.log("data", data)
+	uni.showLoading({
+	    title: '加载中'
+	});
 	uni.request({
 		// url: apiUrl +'/api/'+ url +'?'+Qs.stringify(data), //仅为示例，并非真实接口地址。
 		url: apiUrl + url,
@@ -24,6 +27,7 @@ Vue.prototype.$getApi = function(url, data, callsuc, token) {
 			'content-type': 'application/x-www-form-urlencoded'
 		},
 		success: (res) => {
+			uni.hideLoading();
 			// console.log(res)
 			if (res.data.code == 200) {
 				this.$msg(res.data.msg)

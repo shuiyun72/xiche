@@ -116,7 +116,8 @@
 						ntime: "2020-05-06 13:58",
 						cause: "到达指定位置未找到指定车辆"
 					}
-				]
+				],
+				getInterval:undefined
 			}
 		},
 		filters: {
@@ -131,6 +132,14 @@
 		},
 		onLoad() {
 			this.getOrder(1);
+			uni.startPullDownRefresh();
+		},
+		onPullDownRefresh() {
+			let this_ = this;
+			setTimeout(function () {
+				uni.stopPullDownRefresh();
+				this_.getOrder(this_.tabSel+1);
+			}, 300);
 		},
 		methods: {
 			//接单状态
