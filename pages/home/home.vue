@@ -31,7 +31,7 @@
 						</view>
 						<view class="li_info">
 							<view class="l_l">
-								剩余{{isHaveQuan}}张
+								剩余{{userInfo ? userInfo.ticket_num : 0}}张
 							</view>
 							<image src="../../static/img/home/xicj.png" mode="widthFix" class="l_r"></image>
 
@@ -49,17 +49,15 @@
 						</view>
 					</view>
 				</view>
-				<navigator url="../orders/toOrder">
-					<view class="p_car">
+					<view class="p_car" @click="toOrder">
 						<text class="iconfont icon-"></text>
 						<text>预约洗车</text>
 					</view>
-				</navigator>
 			</view>
 		</view>
-		<uni-popup type="center" ref="juan0">
+		<uni-popup type="center" ref="juan2">
 			<view class="juan_body">
-				<view class="iconfont iconguanbi" @click="closeJuan(0)"></view>
+				<view class="iconfont iconguanbi" @click="closeJuan(2)"></view>
 				<view class="ju_title">
 					购买套餐
 				</view>
@@ -68,8 +66,23 @@
 					现在去购买套餐
 				</view>
 				<view class="t_btn">
-					<button class="round btn sm default" @click="closeJuan(0)">取消</button>
+					<button class="round btn sm default" @click="closeJuan(2)">取消</button>
 					<button class="round btn sm  blue" @click="switchTab('../combo/combo')">确定</button>
+				</view>
+			</view>
+		</uni-popup>
+		<uni-popup type="center" ref="juan0">
+			<view class="juan_body">
+				<view class="iconfont iconguanbi" @click="closeJuan(0)"></view>
+				<view class="ju_title">
+					去完善信息
+				</view>
+				<view class="t">
+					您还没有完善信息,需完善信息才能下单,现在去填写?
+				</view>
+				<view class="t_btn">
+					<button class="round btn sm default" @click="closeJuan(0)">取消</button>
+					<button class="round btn sm  blue" @click="addCarH">确定</button>
 				</view>
 			</view>
 		</uni-popup>
@@ -123,8 +136,62 @@
 		data() {
 			return {	
 				juan1List: [],
-				isHaveQuan:0
+				getQuan:undefined
 			};
+		},
+		onShow(){
+			this.$getApiTime("/api/user/userinfo",{},res=>{
+				this.$store.commit('login',res.data);
+			})
+			if(!this.hasLogin){
+				uni.reLaunch({
+					url:'../login/yLogin'
+				})
+			}else{
+				if (this.userInfo && this.userInfo.is_take == 0) {
+					this.getQList()
+				}
+			}
+			if(this.userInfo && this.userInfo.groupid != 0){
+				try{
+					this.$nextTick(()=>{
+						this.$refs['juan0'].close();
+					})
+				}catch(e){
+					//TODO handle the exception
+				}
+			}
+			console.log("sss")
+			let this_ = this;
+			// #ifdef MP
+			uni.login({
+			  provider: 'weixin',
+			  success: function (loginRes) {
+			    console.log(loginRes);
+				this_.$getApiTime("/api/auth/getopenid",{code:loginRes.code},res=>{
+					console.log(res)
+					if(res.is_bind == 0){
+						uni.getUserInfo({
+						  provider: 'weixin',
+						  success: function (infoRes) {
+							  console.log(infoRes)
+						    console.log('用户昵称为：' + infoRes.userInfo.nickName);
+							uni.navigateTo({
+								url:'./login?openid='+res.openid+'&nickname='+infoRes.userInfo.nickName
+							})
+						  }
+						});
+					}
+				})
+			    // 获取用户信息
+			    
+			  }
+			});
+			// #endif
+			
+		},
+		onHide(){
+			console.log("onHide1112121000")
 		},
 		computed:{
 			...mapState(['hasLogin', 'userInfo','selCity']),
@@ -141,24 +208,19 @@
 			}
 		},
 		mounted() {
-			if(!this.hasLogin){
-				uni.reLaunch({
-					url:'../login/yLogin'
-				})
-			}else{
-				// if (this.userInfo && this.userInfo.groupid == 0) {
-				// 	this.getQList();
-				// 	this.$refs['juan0'].open()
-				// }
-				if (this.userInfo && this.userInfo.is_take == 0) {
-					this.getQList()
-				}
-			}	
-			this.$getApi("/api/user/ticket/list",{type:0},res=>{
-				this.isHaveQuan = res.data.data.length;
-			})	
+			// uni.authorize({
+			//     scope: 'scope.userLocation',
+			//     success() {
+			//         uni.getLocation()
+			//     }
+			// })
 		},
 		methods: {
+			addCarH(){
+				uni.navigateTo({
+					url:'../mine/addCar?ws=1'
+				})
+			},
 			//home弹窗优惠券
 			getQList(){
 				this.$getApi("/api/auth/coupon/list",{},res=>{
@@ -169,12 +231,22 @@
 			},
 			//跳转洗车券
 			getXCQ(){
-				if(this.isHaveQuan > 0){
+				if(this.userInfo.ticket_num > 0){
 					uni.navigateTo({
-						url:'../store/coupon'
+						url:'../store/vouchersCar'
 					})
 				}else{
+					this.$refs['juan2'].open()
+				}
+			},
+			//预约洗车
+			toOrder(){			
+				if(this.userInfo && this.userInfo.groupid == 0){
 					this.$refs['juan0'].open()
+				}else{
+					uni.navigateTo({
+						url:'../orders/toOrder'
+					})
 				}
 			},
 			closeJuan(num) {

@@ -23,7 +23,7 @@
 	export default {
 		data() {
 			return {
-				items: [{}],
+				items: [],
 				current: 0,
 				currItem:""
 			};

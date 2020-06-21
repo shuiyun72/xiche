@@ -21,7 +21,7 @@
 		<uni-list class="od_t_ss" v-if="infoMsg.userticket">
 			<uni-list-item title="洗车券" :showArrow="false">
 				<template v-slot:right="">
-					<text class="red">{{item.userticket.title}}</text>
+					<text class="red">{{infoMsg.userticket.title}}</text>
 				</template>
 			</uni-list-item>
 		</uni-list>
@@ -94,7 +94,7 @@
 				</view>
 			</view>
 		</view>
-		<view class="d_box_sy">
+		<view class="d_box_sy" v-if="infoMsg.remark">
 			<view class="d_title">
 				备注信息
 			</view>
@@ -125,7 +125,7 @@
 				</view>
 			</view>
 		</view>
-		<view class="d_box_sy" v-if="infoMsg.stateN>1">
+		<view class="d_box_sy" v-if="infoMsg.stateN > 1 && infoMsg.operator.nickname">
 			<view class="d_title">
 				洗车人员信息
 			</view>
@@ -188,7 +188,7 @@
 				</view>
 			</view>
 		</view>
-		<view class="d_box_sy" v-show="infoMsg.stateN > 4">
+		<view class="d_box_sy" v-show="infoMsg.stateN > 4 && infoMsg.qxCase">
 			<view class="d_title">
 				取消信息
 			</view>
@@ -213,26 +213,7 @@
 		data() {
 			return {
 				carList: ["qianb.png", "houb.png", "zuoc.png", "youc.png"],
-				infoMsg: {
-					code: "12345782515",
-					state: "待接单",
-					title: "单次外部清洗",
-					time: "2020-05-06 13:00-14:00",
-					name: "张萌萌",
-					phone: "13233333333",
-					carNum: "豫A668899",
-					xing: "小型汽车",
-					color: "蓝色",
-					carBrand: "别克GLB",
-					img: "tu.png",
-					address: "郑州是郑州是郑州郑州是郑州是郑州是2号楼",
-					location: "12号停车位",
-					remark: "请清洗干净一些",
-					beforeTime: "2020-05-06 13:01",
-					afterTime: "2020-05-06 13:01",
-					qxCase: "到达指定位置未找到指定车辆",
-					qxTime: "2020-05-06 13:01"
-				},
+				infoMsg: {},
 				tabSel: 0,
 				currentItem: {}
 			};

@@ -7,11 +7,11 @@
 						<view class="left" >
 							<view class="p1">
 							<!-- 	{{item}} -->
-								<text class="t">{{Number(item.discount)}}</text>
-								<text>折</text>
+								<text class="t">{{Number(item.total)}}</text>
+								<text>元</text>
 							</view>
 							<view class="p2">
-								折扣券
+								满减券
 							</view>
 						</view>
 						<view class="right" >
@@ -34,32 +34,23 @@
 	export default {
 		data() {
 			return {
-				juan1List: [{
-						num: 1,
-						zhe: 1,
-						date: "2020.05.12-2020.08.12",
-						id: 990
-					},
-					{
-						num: 5,
-						zhe: 5,
-						date: "2020.05.12-2020.08.12",
-						id: 991
-					},
-					{
-						num: 8,
-						zhe: 8,
-						date: "2020.05.12-2020.08.12",
-						id: 992
-					}
-				]
+				juan1List: []
 			};
 		},
+		onLoad(ph) {
+			if(ph.userCoupon){
+				
+				this.userCoupon = JSON.parse(ph.userCoupon)
+				console.log(this.userCoupon)
+			}else{
+				this.$getApi("/api/user/coupon/lists",{type:0},ress=>{
+					this.juan1List = ress.data.data
+					console.log(ress.data.data )
+				})
+			}
+		},
 		mounted() {
-			this.$getApi("/api/user/coupon/lists",{type:0},ress=>{
-				this.juan1List = ress.data.data
-				console.log(ress.data.data )
-			})
+			
 		},
 		methods:{
 			calcDate(date){
@@ -69,7 +60,7 @@
 			},
 			selQ(item){
 				console.log(item)
-				this.$store.commit('setQuan',{name:item.title,id:item.id});
+				this.$store.commit('setQuan',{name:item.title,id:item.id,money:item.money});
 				uni.navigateBack()
 			}
 		}

@@ -1,6 +1,5 @@
 <template>
 	<view class="orders_reject_suc">
-		
 		<view class="icon_msg_sy">
 			<view class="iconfont iconselected"></view>
 			<view class="text">

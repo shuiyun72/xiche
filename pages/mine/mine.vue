@@ -52,7 +52,7 @@
 		
 		<uni-popup type="center" ref="juan0">
 			<view class="juan_body">
-				<view class="iconfont iconguanbi" @click="closeJuan(0)"></view>
+				<view class="iconfont iconguanbi" @click.stop="closeJuan(0)"></view>
 				<view class="ju_title">
 					去完善信息
 				</view>
@@ -61,8 +61,8 @@
 					才能查看,现在去填写?
 				</view>
 				<view class="t_btn">
-					<button class="round btn sm default" @click="closeJuan(0)">取消</button>
-					<button class="round btn sm  blue" @click="reLaunch('../mine/addCar')">确定</button>
+					<button class="round btn sm default" @click.stop="closeJuan(0)">取消</button>
+					<button class="round btn sm  blue" @click.stop="addCarH">确定</button>
 				</view>
 			</view>
 		</uni-popup>
@@ -90,17 +90,33 @@
 			},
 			httpp(){
 				return this.$store.state.httpp
+			},
+			groupid(){
+				return this.userInfo.groupid
 			}
 		},
-		mounted() {
-			if (this.state == 0) {
-				this.$refs['juan0'].open()
+		onShow() {
+			if (this.userInfo.groupid == 0) {
+				this.$nextTick(()=>{
+					this.$refs['juan0'].open()
+				})	
+			}else{
+				try{
+					this.$refs['juan0'].close()
+				}catch(e){
+					//TODO handle the exception
+				}
+				
 			}
-			
 		},
 		methods: {
-			closeJuan(num) {
-				this.$refs['juan' + num].close()
+			addCarH(){
+				uni.navigateTo({
+					url:'../mine/addCar?ws=1'
+				})
+			},
+			closeJuan() {
+				this.$refs['juan0'].close()
 			},
 			reLaunch(url){
 				uni.reLaunch({

@@ -18,11 +18,11 @@
 					<view class="left" :class="{'long':tabSel != 0}">
 						<view class="p1">
 						<!-- 	{{item}} -->
-							<text class="t">{{Number(item.discount)}}</text>
-							<text>折</text>
+							<text class="t">{{Number(item.total)}}</text>
+							<text>元</text>
 						</view>
 						<view class="p2">
-							折扣券
+							满减券
 						</view>
 					</view>
 					<view class="right" :class="{'long':tabSel != 0}">
@@ -59,66 +59,11 @@
 					}
 				],
 				tabSel:0,
-				juan1ListD: [{
-						num: "1",
-						zhe: "1",
-						date: "2020.05.12-2020.08.12",
-						id: 990,
-						bg:"juanxxc.png"
-					},
-					{
-						num: "2",
-						zhe: "1",
-						date: "2020.05.12-2020.08.12",
-						id: 993,
-						bg:"juansuv.png"
-					}
-				],
-				juan1ListY: [{
-						num: "1",
-						zhe: "1",
-						date: "2020.05.12-2020.08.12",
-						id: 990,
-						bg:"juanxxc.png"
-					},
-					{
-						num: "2",
-						zhe: "1",
-						date: "2020.05.12-2020.08.12",
-						id: 993,
-						bg:"juansuv.png"
-					}
-				],
-				juan1ListYY: [{
-						num: "1",
-						zhe: "1",
-						date: "2020.05.12-2020.08.12",
-						id: 990,
-						bg:"juanxxc.png"
-					},
-					{
-						num: "2",
-						zhe: "1",
-						date: "2020.05.12-2020.08.12",
-						id: 993,
-						bg:"juansuv.png"
-					}
-				],
 				juan1ListType :[]
 			};
 		},
 		computed:{
-			// juan1ListType(){
-			// 	if(this.tabSel == 0){
-			// 		return this.juan1ListD;
-			// 	}else
-			// 	if(this.tabSel == 1){
-			// 		return this.juan1ListY;
-			// 	}else
-			// 	if(this.tabSel == 2){
-			// 		return this.juan1ListYY;
-			// 	}
-			// }
+
 		},
 		mounted() {
 			this.getInit(0);

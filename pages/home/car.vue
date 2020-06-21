@@ -15,7 +15,7 @@
 			</view>
 		</view>
 		<view class="side_sear">
-			<view class="item" v-for="(t,i) in Car" :key="i+1900" @click="showSear(i)">
+			<view class="item" v-for="(t,i) in Car"  @click="showSear(i)">
 				{{t.title}}
 			</view>
 		</view>
@@ -57,7 +57,7 @@
 				console.log(el)
 			},
 			selectCity(el) {
-				this.$store.commit('brand',el)
+				this.$store.commit('setbrand',el)
 				// uni.navigateTo({
 				// 	url:'../mine/addCar?car='+el.id
 				// })

@@ -15,12 +15,12 @@ const store = new Vuex.Store({
 		carServe:uni.getStorageSync("carServe") || [],
 		httpp:"https://yuyue.wsstreet.net/uploads/",
 		brand:{name:"请选择车的品牌"},
-		orderCar:{name:"请选择车的品牌"},
-		orderAddress:{name:"请选择地址"},
-		orderP:{name:"请选择停车位"},
-		orderPhone:{name:"请选择手机号"},
+		orderCar:uni.getStorageSync("orderCar") || {name:"请选择车辆"},
+		orderAddress:uni.getStorageSync("orderAddress") || {name:"请选择地址"},
+		orderP:uni.getStorageSync("orderP") || {name:"请选择停车位"},
+		orderPhone:uni.getStorageSync("orderPhone") || {name:"请选择手机号"},
 		torderQuan:{name:"请选择优惠券"},
-		selCity:"中原区"
+		selCity:"郑州",
 	},
 	mutations: {
 		//设置洗车券状态
@@ -44,18 +44,34 @@ const store = new Vuex.Store({
 			state.torderQuan = data
 		},
 		setPhone(state, data){
-			state.orderPhone = data
+			state.orderPhone = data;
+			uni.setStorage({//缓存用户登陆状态
+				key: 'setPhone',  
+				data: data 
+			}) 
 		},
 		setP(state, data){
 			state.orderP = data
+			uni.setStorage({//缓存用户登陆状态
+				key: 'setP',  
+				data: data 
+			}) 
 		},
 		setSelCar(state, data){
 			state.orderCar = data
+			uni.setStorage({//缓存用户登陆状态
+				key: 'orderCar',  
+				data: data 
+			}) 
 		},
 		setAddress(state, data){
 			state.orderAddress = data
+			uni.setStorage({//缓存用户登陆状态
+				key: 'orderAddress',  
+				data: data 
+			})
 		},
-		brand(state, data){
+		setbrand(state, data){
 			state.brand = data;
 		},
 		setService(state, data){
@@ -75,13 +91,13 @@ const store = new Vuex.Store({
 			uni.setStorageSync('carBrand',data);
 		},
 		login(state, provider) {
+			console.log("change login")
 			state.hasLogin = true;
 			state.userInfo = provider;
 			uni.setStorage({//缓存用户登陆状态
 			    key: 'userInfo',  
 			    data: provider  
 			}) 
-			console.log(state.userInfo);
 		},
 		logout(state) {
 			state.hasLogin = false;
@@ -89,6 +105,15 @@ const store = new Vuex.Store({
 			uni.removeStorage({  
                 key: 'userInfo'  
             })
+		},
+		clearSe(state) {
+			state.brand = {name:"请选择车的品牌"};
+			state.orderCar = {name:"请选择车辆"};
+			state.orderAddress = {name:"请选择地址"};
+			state.orderP = {name:"请选择停车位"};
+			state.orderPhone = {name:"请选择手机号"};
+			state.torderQuan = {name:"请选择优惠券"};
+			state.selCity = "郑州";
 		},
 		setCity(state, data){
 			state.selCity = data;

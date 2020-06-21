@@ -1,12 +1,12 @@
 <template>
 	<view>
 		<uni-list>
-			<uni-list-item-point title="市"  point="true">
-				<template v-slot:right="">
+			<uni-list-item-point title="市"  point="true" rightText="郑州市" :showArrow="false">
+				<!-- <template v-slot:right="">
 				<picker @change="shiListC" :value="shiListSel" :range="shiList" range-key="name">
 					<view class="uni-input">{{shiList[shiListSel].name}}</view>
 				</picker>
-				</template>
+				</template> -->
 			</uni-list-item-point>
 			<uni-list-item-point title="县/区"  point="true">
 				<template v-slot:right="">
@@ -15,16 +15,16 @@
 				</picker>
 				</template>
 			</uni-list-item-point>
-			<uni-list-item-point title="街道"  point="true">
+			<uni-list-item-point title="街道"  point="true" @click="routeListCh">
 				<template v-slot:right="">
-				<picker @change="routeListC" :value="routeListSel" :range="routeList" range-key="name">
+				<picker @change.stop="routeListC" :value="routeListSel" :range="routeList" range-key="name" :disabled="disJiedao">
 					<view class="uni-input">{{routeList[routeListSel].name}}</view>
 				</picker>
 				</template>
 			</uni-list-item-point>
-			<uni-list-item-point title="小区"  point="true">
+			<uni-list-item-point title="小区"  point="true" @click="areaListCh">
 				<template v-slot:right="">
-				<picker @change="areaListC" :value="areaListSel" :range="areaList" range-key="name">
+				<picker @change="areaListC" :value="areaListSel" :range="areaList" range-key="name" :disabled="disJiedao">
 					<view class="uni-input">{{areaList[areaListSel].name}}</view>
 				</picker>
 				</template>
@@ -75,7 +75,7 @@
 			return {
 				shiList:[{name:'请选择小区'}],
 				shiListSel:0,
-				quList:[{name:'请选择小区'}],
+				quList:[{name:'请选择县/区'}],
 				quListSel:0,
 				routeList:[{name:'请选择街道'}],
 				routeListSel:0,
@@ -88,12 +88,14 @@
 				inpNum4:"",
 				id:"",
 				lng:113.33,
-				lat:33.03
+				lat:33.03,
+				disJiedao:true,
+				disArea:true
 				
 			};
 		},
 		mounted(){
-			this.getLocal(16,1,'shiList');
+			this.getLocal(151,2,'quList');
 			let this_ = this;
 			uni.getLocation({
 			    type: 'wgs84',
@@ -122,7 +124,7 @@
 				this.inpNum4 = phItem.park[3] ? phItem.park[3].name :"";
 				this.id = phItem.id;
 			}else{
-				this.getLocal(16,1,'shiList');
+				this.getLocal(151,2,'quList');
 			}
 		},
 		computed:{
@@ -149,13 +151,20 @@
 					this[event] = res.data;		
 				});
 			},
-			shiListC(e){
-				this.shiListSel = e.detail.value;
-				this.getLocal(this.shiList[this.shiListSel].id,2,'quList');
-			},
+			// shiListC(e){
+			// 	this.shiListSel = e.detail.value;
+			// 	this.getLocal(this.shiList[this.shiListSel].id,2,'quList');
+			// },
 			quListC(e){
 				this.quListSel = e.detail.value
 				this.getLocal(this.quList[this.quListSel].id,3,'routeList');
+				this.disJiedao = false;
+			},
+			routeListCh(){
+				console.log("routeListCh")
+				if(this.disJiedao == true){
+					this.$msg("请先选择县/区")
+				}
 			},
 			routeListC(e){
 				this.routeListSel = e.detail.value
@@ -164,8 +173,14 @@
 				this.$getApi("/api/auth/house",{pid:this.routeList[this.routeListSel].id},res=>{
 					console.log()
 					let resData = JSON.stringify(res.data) == "[]" ? [{name:'请选择小区'}] :res.data;
-					this.areaList = resData;	
+					this.areaList = resData;
+					this.disArea = false;
 				});
+			},
+			areaListCh(){
+				if(this.disArea == true){
+					this.$msg("请先选择街道")
+				}
 			},
 			areaListC(e){
 				this.areaListSel = e.detail.value
@@ -173,21 +188,24 @@
 			next(){
 				let dataL  = {
 					id:this.id,
-					city_id:this.shiList[this.shiListSel].id,
+					city_id:151,
 					area_id:this.quList[this.quListSel].id,
 					street_id:this.routeList[this.routeListSel].id,
-					house_id:20020,
+					house_id:this.areaList[this.areaListSel].id,
 					house_detail:this.xiaoquInp,
 					lng:this.lng,
 					lat:this.lat,
 					parks:this.parksList		
 				}
-				console.log(dataL)
 				this.$getApi("/api/user/address/add",dataL,res=>{
-					this.$store.commit("setGroupid")
-					uni.navigateTo({
-						url:'./addSuccess'
+					this.$store.commit("setGroupid");
+					this.$getApi("/api/user/userinfo",{},res=>{
+						this.$store.commit('login',res.data);
+						uni.navigateTo({
+							url:'./addSuccess'
+						})
 					})
+					
 				});
 				
 			},

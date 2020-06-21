@@ -1,53 +1,66 @@
 <template>
 	<view class="ssss_b">
-		
-	
-	<view class="order_true"  v-for="item in cellItem">
-		<view class="order_info">
-			<view class="od_title">
-				<view class="t">
-					{{item.title}}
+		<view class="order_true" v-for="item in cellItem">
+			
+			<view class="order_info">
+				<view class="od_title">
+					<view class="t">
+						{{item.title}}
+					</view>
+					<view class="money">
+						{{item.amount}}元
+					</view>
 				</view>
-				<view class="money">
-					{{item.total_amount}}元
+				<view class="other_order" v-if="item.service.length > 0">
+					<view class="item_ot" v-for="iC in item.service">
+						<text>{{iC.name}}</text>
+						<text class="red">￥{{iC.price}}</text>
+					</view>
+					<view class="item_ot" v-if="Number(item.ticket_money) > 0">
+						<text>单次清洗</text>
+						<text class="red">￥{{item.ticket_money}}</text>
+					</view>
+					<view class="item_ot" v-if="Number(item.more_money) > 0">
+						<text>额外费用</text>
+						<text class="red">￥{{item.more_money}}</text>
+					</view>
+				</view>
+				<view class="msg">
+					<view class="l_t"> 车牌号: </view>
+					<view class="r_c"> {{item.carNum}} </view>
+				</view>
+				<view class="msg">
+					<view class="l_t"> 时间: </view>
+					<view class="r_c"> {{item.time}} </view>
+				</view>
+				<view class="msg">
+					<view class="l_t"> 停车位: </view>
+					<view class="r_c"> {{item.location}} (停车位)</view>
+				</view>
+				<view class="msg">
+					<view class="l_t"> 地址: </view>
+					<view class="r_c"> {{item.address}} </view>
+				</view>
+				<view class="msg">
+					<view class="l_t"> 联系人: </view>
+					<view class="r_c"> {{item.name}} </view>
+				</view>
+				<view class="msg">
+					<view class="l_t"> 订单编号: </view>
+					<view class="r_c"> {{item.code}} </view>
 				</view>
 			</view>
-			<view class="msg">
-				<view class="l_t"> 车牌号: </view>
-				<view class="r_c"> {{item.carNum}} </view>
-			</view>
-			<view class="msg">
-				<view class="l_t"> 时间: </view>
-				<view class="r_c"> {{item.time}} </view>
-			</view>
-			<view class="msg">
-				<view class="l_t"> 停车位: </view>
-				<view class="r_c"> {{item.location}} (停车位)</view>
-			</view>
-			<view class="msg">
-				<view class="l_t"> 地址: </view>
-				<view class="r_c"> {{item.address}} </view>
-			</view>
-			<view class="msg">
-				<view class="l_t"> 联系人: </view>
-				<view class="r_c"> {{item.name}} </view>
-			</view>
-			<view class="msg">
-				<view class="l_t"> 订单编号: </view>
-				<view class="r_c"> {{item.code}} </view>
-			</view>
-		</view>
-		<uni-list class="od_t">
-			<uni-list-item title="洗车券" :showArrow="false">
-				<template v-slot:right="">
-					<text class="red" v-if="!item.userticket">无</text>
-					<text class="red" v-else>{{item.userticket.title}}</text>
-				</template>
-			</uni-list-item>
-		</uni-list>
-		<uni-list class="od_t">
-			<uni-list-item title="优惠券" :rightText="oderQuan.name" @click="selQUan"></uni-list-item>
-		</uni-list>
+			<uni-list class="od_t">
+				<uni-list-item title="洗车券" :showArrow="false">
+					<template v-slot:right="">
+						<text class="red" v-if="!item.userticket">无</text>
+						<text class="red" v-else>{{item.userticket.title}}</text>
+					</template>
+				</uni-list-item>
+			</uni-list>
+			<uni-list class="od_t" v-if="isNc">
+				<uni-list-item title="优惠券" :rightText="oderQuan.name" @click="selQUan"></uni-list-item>
+			</uni-list>
 		</view>
 		<view class="pay_type">支付方式</view>
 		<radio-group class="block" @change="RadioChange">
@@ -75,51 +88,71 @@
 			<!-- #endif -->
 		</radio-group>
 		<view class="bottom_c">
+			<view @click="next" class="btn">立即支付</view>
 			<view class="pay-num">
 				实付款：<text class="red">￥{{totalAmount}}.00</text>
-			</view>		
-			<view @click="next" class="btn">立即支付</view>	
+			</view>
 		</view>
 	</view>
-	
+
 </template>
 
 <script>
 	export default {
 		data() {
 			return {
-				radio: 'A',
-				cellItem:[]
+				radio: 'C',
+				cellItem: [],
+				isNc: true,
+				userCoupon:"",
+				isUserCoupon:true
 			};
 		},
 		onLoad(ph) {
+			if (ph.nc) {
+				this.isNc = false
+			} else {
+				this.isNc = true
+			}
 			this.cellItem = JSON.parse(ph.item)
 			console.log(this.cellItem)
-			
-			
+			this.userCoupon = ph.user_coupon;
+			console.log(this.userCoupon)
+			this.isUserCoupon = this.userCoupon == "[]" ? false :true;
+
 		},
-		computed:{
-			totalAmount(){
+
+		computed: {
+			totalAmount() {
 				let mm = 0;
-				_.map(this.cellItem,item=>{
-					mm+=Number(item.total_amount)
+				_.map(this.cellItem, item => {
+					mm += Number(item.amount)
 				})
-				return  mm
+				if(this.oderQuan.money){
+					mm = mm - this.oderQuan.money
+				}
+				return mm
 			},
-			oderQuan(){
+			oderQuan() {
 				return this.$store.state.torderQuan
 			},
-			payType(){
-				
+			payType() {
+
 				// #ifndef MP
-					switch (this.radio) {
-						case 'A' : return 'wepay' ;break;
-						case 'B' : return 'alipay' ;break;
-						case 'C' : return 'money' ;break;
-					}
+				switch (this.radio) {
+					case 'A':
+						return 'wepay';
+						break;
+					case 'B':
+						return 'alipay';
+						break;
+					case 'C':
+						return 'money';
+						break;
+				}
 				// #endif
 				// #ifdef MP
-					return 'minipay'
+				return 'minipay'
 				// #endif
 			}
 		},
@@ -130,74 +163,145 @@
 			// thisText
 			next() {
 				let ordernos;
-				if(this.cellItem.length>1){
-					ordernos=  _.map(this.cellItem,res=>{
+				let this_ = this;
+				if (this.cellItem.length > 1) {
+					ordernos = _.map(this.cellItem, res => {
 						return res.order_no
 					})[0];
-				}else{
-					ordernos=  _.map(this.cellItem,res=>{
+				} else {
+					ordernos = _.map(this.cellItem, res => {
 						return res.order_no
 					}).toString();
 				}
 				let dataL = {
-					order_no:ordernos,
-					payment:this.payType,
-					user_coupon_id:this.oderQuan.id?this.oderQuan.id:""
+					order_no: ordernos,
+					payment: this.payType,
+
+					// payment:"minipay",
+					user_coupon_id: this.oderQuan.id ? this.oderQuan.id : ""
 				}
 				console.log(dataL)
-				this.$getApi("/api/user/order/pay",dataL,res=>{
+				this.$getApi("/api/user/order/pay", dataL, res => {
 					console.log(res)
+					
 					//this.itemsCarList = res.data
-					uni.reLaunch({
-						url:'./orderSuccess'
-					})
-					this.$store.commit('setQuan',{name:"请选择优惠券"})
+					if (this.payType == "wepay") {
+						uni.requestPayment({
+						    provider: 'wxpay',
+						    orderInfo: JSON.parse(res.data.payinfo), //微信、支付宝订单数据
+						    success: function (res) {
+								this_.$store.commit('setQuan', {
+									name: "请选择优惠券"
+								})
+								uni.reLaunch({
+									url:'./orderSuccess'
+								})
+								console.log(res)
+						        console.log('success:' + JSON.stringify(res));
+						    },
+						    fail: function (err) {
+						        console.log('fail:' + JSON.stringify(err));
+						    }
+						});
+					} else
+					if (this.payType == "alipay") {
+						uni.requestPayment({
+						    provider: 'alipay',
+						    orderInfo: res.data.payinfo, //微信、支付宝订单数据
+						    success: function (res) {
+								this_.$store.commit('setQuan', {
+									name: "请选择优惠券"
+								})
+								uni.reLaunch({
+									url:'./orderSuccess'
+								})
+								console.log(res)
+						        console.log('success:' + JSON.stringify(res));
+						    },
+						    fail: function (err) {
+						        console.log('fail:' + JSON.stringify(err));
+						    }
+						});
+					} else
+					if (this.payType == "money") {
+						this_.$store.commit('setQuan', {
+							name: "请选择优惠券"
+						})
+						uni.reLaunch({
+							url:'./orderSuccess'
+						})
+					}
+					
+					
 				})
 				// uni.navigateTo({
 				// 	url: './orderSuccess'
 				// })
 			},
-			selQUan(){
-				uni.navigateTo({
-					url:'../store/coupon'
-				})
+			selQUan() {
+				if(this.isUserCoupon){
+					uni.navigateTo({
+						url: '../store/coupon?userCoupon'+this.userCoupon
+					})
+				}else{
+					this.$msg("无优惠券")
+				}
 			}
 		}
 	}
 </script>
 
 <style lang="scss" scoped>
-	.ssss_b{
+	.other_order{
+		display: flex;
+		background-color: #fff;
+		padding: 20upx 0;
+		color: #666;
+		flex-wrap: wrap;
+		.item_ot{
+			margin-right: 40upx;
+			min-width: 300upx;
+			.red{
+				margin-left: 10upx;
+			}
+		}
+	}
+	.ssss_b {
 		padding-bottom: 60upx;
 		background-color: #f0f0f0;
+		padding-bottom: 200upx;
 	}
-	.bottom_c{
+
+	.bottom_c {
 		position: fixed;
 		bottom: 0;
 		left: 0;
 		display: flex;
 		width: 750upx;
 		font-size: 26upx;
-		
-		.pay-num{
-			width: 70%;
+		background-color: #fff;
+		flex-direction: row-reverse;
+
+		.pay-num {
 			background-color: #fff;
-			padding: 30upx 0;
+			padding: 30upx 30upx 30upx 0;
 			box-sizing: border-box;
-			padding-left: 280upx;
 			color: #333;
-			.red{
+
+			.red {
 				color: #f00;
 			}
 		}
-		.btn{
-			width: 30%;
+
+		.btn {
+			width: 260upx;
 			background-color: $uni-bl;
 			color: #fff;
 			text-align: center;
 			padding: 30upx 0;
 		}
 	}
+
 	.cu-form-group {
 		display: flex;
 		justify-content: space-between;

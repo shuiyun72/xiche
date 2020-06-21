@@ -1,6 +1,5 @@
 <template>
-	<view class="orders_reject_suc">
-		
+	<view class="orders_reject_suc">	
 		<view class="icon_msg_sy">
 			<view class="iconfont iconselected"></view>
 			<view class="text">
@@ -8,13 +7,13 @@
 			</view>
 		</view>
 		<view class="re_mtop4">
-			<button class="btn  blue ms" @click="reLaunch('../orders/toOrder')">去下单</button>
+			<button class="btn  blue ms" @click="navigateTo('../orders/toOrder')">去下单</button>
 		</view>
 		<view class="re_mtop4">
-			<button class="btn  blue_n ms" @click="reLaunch('./addCar')">继续添加车辆</button>
+			<button class="btn  blue_n ms" @click="navigateTo('./addCar')">继续添加车辆</button>
 		</view>
 		<view class="re_mtop4">
-			<button class="btn  blue_n ms" @click="reLaunch('./addAddress')">继续添加地址</button>
+			<button class="btn  blue_n ms" @click="navigateTo('./addAddress')">继续添加地址</button>
 		</view>
 		<view class="re_mtop4">
 			<button class="btn  blue_n ms" @click="switchTab('../home/home')">返回首页</button>

@@ -15,14 +15,12 @@
 		data() {
 			return {
 				addressList:[
-					{text:"郑州高频新区郑州高频新区2号楼"},
-					{text:"郑州高频新区郑州高频新区3号楼"},
-					{text:"郑州高频新区郑州高频新区4号楼"}
+					{}
 				],
 				sIndex:-1
 			};
 		},
-		mounted() {
+		onShow(){
 			this.$getApi("/api/user/address/list",{},res=>{
 				this.addressList = res.data
 			})

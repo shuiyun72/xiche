@@ -29,6 +29,21 @@
 				<text>新建地址</text>
 			</view>
 		</navigator>
+		<uni-popup type="center" ref="juan0">
+			<view class="juan_body">
+				<view class="iconfont iconguanbi" @click="closeJuan"></view>
+				<view class="ju_title">
+					删除
+				</view>
+				<view class="t">
+					是否确认删除?
+				</view>
+				<view class="t_btn">
+					<button class="round btn sm default" @click="closeJuan">取消</button>
+					<button class="round btn sm  blue" @click="deleteBtn">确定</button>
+				</view>
+			</view>
+		</uni-popup>
 	</view>
 </template>
 
@@ -36,13 +51,23 @@
 	export default {
 		data() {
 			return {
-				dataList: [{}]
+				dataList: [],
+				item:{}
 			}
 		},
 		mounted() {
 			this.addressInit();
 		},
 		methods: {
+			closeJuan(){
+				this.$refs['juan0'].close();
+			},
+			deleteBtn(){
+				this.$getApi("/api/user/address/del",{id:this.item.id},resl=>{
+					this.$refs['juan0'].close();
+					this.addressInit()
+				})
+			},
 			addressInit(){
 				this.$getApi("/api/user/address/list",{},res=>{
 					console.log(res)
@@ -53,30 +78,50 @@
 				});
 			},
 			deleteP(item){
-				let this_ = this;
-				uni.showModal({
-				    title: '删除',
-				    content: '是否确认删除?',
-				    success: function (res) {
-				        if (res.confirm) {
-				            console.log('用户点击确定');
-							this_.$getApi("/api/user/address/del",{id:item.id},res=>{
-								this_.addressInit();
-								// uni.navigateTo({
-								// 	url:'../mine/addAddress'
-								// })
-							});
-				        } else if (res.cancel) {
-				            console.log('用户点击取消');
-				        }
-				    }
-				});
+				this.$refs['juan0'].open();
+				this.item = item;
 			}
 		}
 	}
 </script>
 
 <style lang="scss" scoped>
+	.juan_body {
+		background-color: #fff;
+		position: relative;
+		padding: 26upx 36upx;
+		width: 440upx;
+		border-radius: 26upx;
+	
+		.iconguanbi {
+			position: absolute;
+			top: 20upx;
+			right: 16upx;
+			font-size: 26upx;
+		}
+	
+		.ju_title {
+			text-align: center;
+			font-size: 36upx;
+			margin-bottom: 30upx;
+		}
+	
+		.t {
+			text-align: center;
+			font-size: 26upx;
+			color: #666;
+			line-height: 46upx;
+			margin-bottom: 20upx;
+		}
+	
+		.t_btn {
+			display: flex;
+	
+			.btn {
+				width: 40%;
+			}
+		}
+	}
 	.add_car_btn{
 		position: fixed;
 		left: 0;

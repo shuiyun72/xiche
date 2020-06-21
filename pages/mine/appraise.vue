@@ -35,16 +35,7 @@
 			return {
 				myA:[
 					{
-						star:4,
-						type:1,
-						text:"这个师傅很专业 , 很认真 , 给我清洗的很干净",
-						id:6
-					},
-					{
-						star:5,
-						type:1,
-						text:"这个师傅很专业,很认真,给我清洗的很干净",
-						id:7
+						operator:{}
 					}
 				],
 				orderReject:[
@@ -55,7 +46,7 @@
 				rejectIndex:0,
 			};
 		},
-		mounted() {
+		onShow() {
 			this.$getApi('/api/user/my/comment',{},res=>{
 				console.log(res.data.data)
 				this.myA = res.data.data;
@@ -67,6 +58,9 @@
 			}
 		},
 		methods:{
+			gitData(){
+				
+			},
 			starC(n){
 				switch(n){
 				    case 1 : return "一"; 

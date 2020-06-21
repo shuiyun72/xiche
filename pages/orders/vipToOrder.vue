@@ -103,38 +103,9 @@
 	export default {
 		data() {
 			return {
-				itemsCarList: [{
-					name: 1,
-					value: "单次外部清洗",
-					title: "洗车券1张",
-					p1: "会员小型￥18元",
-					p2: "会员SUV￥22元",
-					p3: "会员MVP￥26元"
-				}, {
-					name: 2,
-					value: "单次外部+内部清洗",
-					title: "洗车券1张+8元",
-					p1: "会员小型￥26元",
-					p2: "会员SUV￥30元",
-					p3: "会员MVP￥34元"
-				}],
+				itemsCarList: [],
 				current: 1,
-				checkboxOther: [{
-						value: 'dl',
-						name: '打蜡',
-						money: 10
-					},
-					{
-						value: 'ns',
-						name: '内饰清洗',
-						money: 16
-					},
-					{
-						value: 'qt',
-						name: '其他服务',
-						money: 12
-					}
-				],
+				checkboxOther: [],
 				rinseTimeList: [
 					['10日', '11日', '12日', '13日', '14日'],
 					['上午0:00-8:00', '晚上20:00-24:00']

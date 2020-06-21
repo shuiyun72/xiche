@@ -26,7 +26,8 @@
 				title:"",
 				name:"",
 				phone:"",
-				id:""
+				id:"",
+				fromL:""
 			};
 		},
 		onLoad(ph) {
@@ -38,10 +39,14 @@
 				this.name = itemL.name;
 				this.phone = itemL.phone;
 				this.id = itemL.id;
+			}else
+			if(ph.from){
+				this.fromL = ph.from
 			}
 		},
 		methods:{
 			next(){
+				let this_ = this;
 				this.$getApi("/api/user/user/add",{
 					name:this.name,
 					phone:this.phone,
@@ -49,9 +54,16 @@
 				},res=>{
 					console.log(res)
 					// uni.navigateBack()
-					uni.reLaunch({
-						url:"../store/publicMsg"
-					})
+					if(this_.fromL){
+						uni.navigateBack({
+							delta:2
+						})
+					}else{
+						uni.reLaunch({
+							url:"./phone"
+						})
+					}
+					
 				})
 				
 			}

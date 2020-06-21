@@ -22,12 +22,25 @@
 				</view>
 			</view>
 		</view>
-		<navigator url="../store/addPhone">
-			<view class="add_car_btn">
-				<text class="iconfont icontianjia"></text>
-				<text>新建手机号</text>
+		<view class="add_car_btn" @click="addItem">
+			<text class="iconfont icontianjia"></text>
+			<text>新建手机号</text>
+		</view>
+		<uni-popup type="center" ref="juan0">
+			<view class="juan_body">
+				<view class="iconfont iconguanbi" @click="closeJuan"></view>
+				<view class="ju_title">
+					删除
+				</view>
+				<view class="t">
+					是否确认删除?
+				</view>
+				<view class="t_btn">
+					<button class="round btn sm default" @click="closeJuan">取消</button>
+					<button class="round btn sm  blue" @click="deleteBtn">确定</button>
+				</view>
 			</view>
-		</navigator>
+		</uni-popup>
 	</view>
 </template>
 
@@ -35,21 +48,48 @@
 	export default {
 		data() {
 			return {
-				phoneList: []
+				phoneList: [],
+				pathL:"",
+				item:{}
 			}
 		},
-		mounted() {
+		onShow() {
 			this.init();
 		},
+		onLoad(ph) {
+			this.pathL = ph.from;
+		},
 		methods: {
-			selPhone(item) {
-				this.$store.commit('setPhone', {
-					name: item.phone,
-					id: item.id
-				});
-				uni.navigateBack({
-
+			closeJuan(){
+				this.$refs['juan0'].close();
+			},
+			deleteBtn(){
+				this.$getApi("/api/user/user/del",{id:this.item.id},resl=>{
+					this.$refs['juan0'].close();
+					this.init()
 				})
+			},
+			addItem(){
+				if(this.pathL){
+					uni.navigateTo({
+						url:"../store/addPhone?from=toOrder"
+					})
+				}else{
+					uni.navigateTo({
+						url:"../store/addPhone"
+					})
+				}
+			},
+			selPhone(item) {
+				if(this.pathL){
+					this.$store.commit('setPhone', {
+						name: item.phone,
+						id: item.id
+					});
+					uni.navigateBack({
+
+					})
+				}
 			},
 			init() {
 				this.$getApi("/api/user/user/list", {}, res => {
@@ -58,23 +98,8 @@
 				})
 			},
 			deleteP(item) {
-				let this_ = this;
-				uni.showModal({
-					title: '删除',
-					content: '是否确认删除?',
-					success: function(res) {
-						if (res.confirm) {
-							console.log('用户点击确定');
-							this_.$getApi("/api/user/user/del", {
-								id: item.id
-							}, res => {
-								this_.init();
-							})
-						} else if (res.cancel) {
-							console.log('用户点击取消');
-						}
-					}
-				});
+				this.$refs['juan0'].open();
+				this.item = item;
 			},
 			editP(item) {
 				uni.navigateTo({
@@ -86,6 +111,42 @@
 </script>
 
 <style lang="scss" scoped>
+	.juan_body {
+		background-color: #fff;
+		position: relative;
+		padding: 26upx 36upx;
+		width: 440upx;
+		border-radius: 26upx;
+	
+		.iconguanbi {
+			position: absolute;
+			top: 20upx;
+			right: 16upx;
+			font-size: 26upx;
+		}
+	
+		.ju_title {
+			text-align: center;
+			font-size: 36upx;
+			margin-bottom: 30upx;
+		}
+	
+		.t {
+			text-align: center;
+			font-size: 26upx;
+			color: #666;
+			line-height: 46upx;
+			margin-bottom: 20upx;
+		}
+	
+		.t_btn {
+			display: flex;
+	
+			.btn {
+				width: 40%;
+			}
+		}
+	}
 	.add_car_btn {
 		position: fixed;
 		left: 0;

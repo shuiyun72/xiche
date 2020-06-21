@@ -21,8 +21,15 @@
 		data() {
 			return {
 				phone:"",
-				yzm:""
+				yzm:"",
+				openid:"",
+				nickname:""
 			};
+		},
+		onLoad(ph) {
+			console.log(ph)
+			this.openid = ph.openid;
+			this.nickname = ph.nickname;
 		},
 		methods:{
 			//获取验证码
@@ -39,21 +46,27 @@
 				if(this.phone && this.yzm){
 					let data = {
 						phone:this.phone,
-						code:this.yzm
+						code:this.yzm,
+						openid:this.openid,
+						nickname:this.nickname
 					}
-					this.$getApi('auth/phone/login',data,res=>{
-						uni.setStorageSync('userInfo', res.data);
+					this.$getApi('/api/auth/bindPhone',data,res=>{
 						console.log(res)
-						uni.switchTab({
-							url:'../home/home'
-						})
-						
+						this.$store.commit('login',res.data);
+						this.getInit();				
+						setTimeout(()=>{
+							this.getInit(()=>{
+								uni.switchTab({
+									url:'../home/home'
+								})			
+							});	
+						},500)
 					},"false")
 				}else{
 					
 				}
 			},
-			getInit(){
+			getInit(call){
 				this.$getApi("/api/user/car/xing",{},res=>{
 					uni.setStorageSync('carXing',res.data);
 				})
@@ -63,6 +76,7 @@
 				this.$getApi("/api/user/car/brand",{},res=>{
 					uni.setStorageSync('carBrand',res.data);
 				})
+				call instanceof Function && call()
 			}
 		}
 	}

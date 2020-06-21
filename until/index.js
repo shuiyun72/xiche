@@ -16,9 +16,9 @@ Vue.prototype.$getApi = function(url, data, callsuc, token) {
 		data.paginate = 200;
 	}
 	// console.log("data", data)
-	uni.showLoading({
-	    title: '加载中'
-	});
+	// uni.showLoading({
+	//     title: '加载中'
+	// });
 	uni.request({
 		// url: apiUrl +'/api/'+ url +'?'+Qs.stringify(data), //仅为示例，并非真实接口地址。
 		url: apiUrl + url,
@@ -28,17 +28,17 @@ Vue.prototype.$getApi = function(url, data, callsuc, token) {
 			'content-type': 'application/x-www-form-urlencoded'
 		},
 		success: (res) => {
-			uni.hideLoading();
+			// uni.hideLoading();
 			// console.log(res)this.$msg("您输入的参数有误,请检查")
 			if (res.data.code == 200) {
 				// this.$msg(res.data.msg)
 				callsuc instanceof Function && callsuc(res.data)
 			} else
 			if (res.data.code == 201) {
-				this.$msg("您输入的参数有误,请检查")
+				this.$msg(res.data.msg)
 			} else
 			if (res.data.code == 202) {
-				this.$msg("请先绑定手机号")
+				this.$msg(res.data.msg)
 			} else
 			if (res.data.code == 401) {
 				this.$msg("登录已过期,请重新登录")
@@ -50,10 +50,61 @@ Vue.prototype.$getApi = function(url, data, callsuc, token) {
 			}
 		},
 		fail: (err) => {
-			callerr instanceof Function && callerr(err)
+			this.$msg("网络错误,请联系管理员")
 		}
 	});
 }
+
+Vue.prototype.$getApiTime = function(url, data, callsuc, token) {
+	// url = 'System/Login?loginContent=admin&password=123456'
+	token = token == "false" ? false : true;
+	data = data ? data : {};
+	console.log("token", token);
+	let userInfo = uni.getStorageSync('userInfo');
+	if (token && userInfo) {
+		data.token = userInfo.remember_token;
+		data.page = 1;
+		data.paginate = 200;
+	}
+	// console.log("data", data)
+	uni.request({
+		// url: apiUrl +'/api/'+ url +'?'+Qs.stringify(data), //仅为示例，并非真实接口地址。
+		url: apiUrl + url,
+		method: 'post',
+		data: data,
+		header: {
+			'content-type': 'application/x-www-form-urlencoded'
+		},
+		success: (res) => {
+			// console.log(res)this.$msg("您输入的参数有误,请检查")
+			if (res.data.code == 200) {
+				// this.$msg(res.data.msg)
+				callsuc instanceof Function && callsuc(res.data)
+			} else
+			if (res.data.code == 201) {
+				this.$msg(res.data.msg)
+			} else
+			if (res.data.code == 202) {
+				this.$msg(res.data.msg)
+			} else
+			if (res.data.code == 401) {
+				this.$msg("登录已过期,请重新登录")
+				uni.reLaunch({
+					url: '../login/yLogin',
+					success(){
+						location.reload()
+					}
+				})
+			} else {
+				this.$msg(res.data.msg)	
+			}
+		},
+		fail: (err) => {
+			this.$msg("网络错误,请联系管理员")
+		}
+	});
+}
+
 Vue.prototype.$store = store;
 
 const msg = (title, duration = 1500, mask = false, icon = 'none') => {

@@ -37,7 +37,7 @@
 			<view class="pay-num">
 				实付款：<text class="red">￥{{money}}</text>
 			</view>		
-			<view @click="next" class="btn">确认支付</view>	
+			<view @click.stop="next" class="btn">确认支付</view>	
 		</view>
 	</view>
 </template>
@@ -64,12 +64,23 @@
 				let dataL = {
 					id:this.typeId,
 					payment:this.radio
-				}
+				};
 				this.$getApi("/api/user/ticket/buy",dataL,res=>{
 					console.log(res)
-					uni.reLaunch({
-						url:'./successMsg'
+					this.$getApi("/api/user/userinfo",{},res=>{
+						this.$store.commit('login',res.data);
 					})
+					if(this.$store.state.userInfo.groupid != 0){
+						uni.navigateTo({
+							url:'./successMsg'
+						})
+					}else{
+						setTimeout(()=>{
+							uni.navigateTo({
+								url:'../mine/addCar?ws=1'
+							})
+						},600)
+					}
 				
 				})
 			}

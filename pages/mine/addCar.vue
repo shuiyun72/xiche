@@ -33,8 +33,8 @@
 					</view>
 				</view>
 			</view>
-			<uni-list-item-point title="车品牌" :rightText="brand.name" @click="navigateTo('../home/car')" :showArrow="brand.name == '请选择车的品牌' ? true : false"></uni-list-item-point>
-			<uni-list-item-point title="车辆照片" rightText="请上传照片" :showArrow="false"></uni-list-item-point>
+			<uni-list-item-point title="车品牌" point="true" :rightText="brand.name" @click="navigateTo('../home/car')" :showArrow="brand.name == '请选择车的品牌' ? true : false"></uni-list-item-point>
+			<uni-list-item-point title="车辆照片" point="true" rightText="请上传照片" :showArrow="false"></uni-list-item-point>
 			<view class="photo_list">
 				<view class="img_p" @click="chooseImage">
 					<image src="../../static/img/shangczp.png" mode="widthFix" class="img"></image>
@@ -97,7 +97,8 @@
 					}
 				],
 				carId:"",
-				type:1
+				type:2,
+				fromL:""
 			};
 		},
 		computed: {
@@ -113,17 +114,15 @@
 				console.log(item)
 				this.carArrayXingSelect = item.chexing.sort_order;
 				this.chepai = item.chepai;
-				this.selectColor = item.checolor.sort_order || 0
-				this.$store.commit('brand',item.chebrand);
+				this.selectColor = item.checolor.sort_order || 0;
+				this.$store.commit('setbrand',{name:item.chebrand.name,id:item.chebrand.id});
 				this.rightTextCarColor = item.checolor.name;
 				this.carId = item.id;
-			}else
-			if(ph.ws){
-				this.type = 1;
 			}else{
-				this.type = 2;
+				this.$store.commit('setbrand',{name:"请选择车的品牌"})
 			}
-			this.$store.commit('brand',{name:"请选择车的品牌"})
+			this.type = ph.ws ? 1 : 2;
+			this.fromL = ph.from ? ph.from : "";		
 		},
 		methods: {
 			//提交订单
@@ -140,10 +139,30 @@
 					type:this.type
 				}
 				this.$getApi("/api/user/mine/addCar",data,res1=>{
-					this.$store.commit('brand',{name:"请选择车的品牌"})
-					uni.reLaunch({
-						url:"./addSuccess"
-					})
+					this.$store.commit('setbrand',{name:"请选择车的品牌"});
+					
+					// ph.from
+					
+					if(this.type == 1){
+						this.$getApi("/api/user/userinfo",{},res=>{
+							this.$store.commit('login',res.data);
+						})
+						uni.navigateTo({
+							url:'../mine/addAddress'
+						})
+					}else{
+						if(this.fromL){
+							uni.navigateBack({
+								delta:2
+							})
+						}else{
+							uni.reLaunch({
+								url:"./addSuccess"
+							})
+						}
+					}
+					
+					
 				})
 			},
 			selColor(item, index) {

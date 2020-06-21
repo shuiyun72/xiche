@@ -12,7 +12,8 @@
 			<view class="iconfont iconyanzhengma2"></view>
 			<input class="input" type="text" v-model="yzm" placeholder="请输入验证码" />
 			<text class="iconfont iconshouye_shugang_shijiantixing"></text>
-			<text class="yzm" @click="getYZM">发送验证码</text>
+			<text class="yzm" @click="getYZM" v-if="timeout<0">发送验证码</text>
+			<text class="yzm" v-if="timeout>=0">{{timeout}}s 重新获取</text>
 		</view>
 		<view class="sub_top">
 			<button class="btn blue ms" @click="loginIn">确定</button>
@@ -32,30 +33,59 @@
 			return {
 				phone: "",
 				yzm: "",
-				psd: ""
+				psd: "",
+				timeout:-1
 			};
 		},
-		onLoad() {
-			// this.getInit();
+		onShow() {
 			
 		},
 		methods: {
 			oauthC(){
-				uni.getProvider({
-				    service: 'oauth',
-				    success: function (res) {
-						console.log(res)
-				        console.log(res.provider)
-				        if (~res.provider.indexOf('qq')) {
-				            uni.login({
-				                provider: 'qq',
-				                success: function (loginRes) {
-				                    console.log(JSON.stringify(loginRes));
-				                }
-				            });
-				        }
-				    }
+				let this_ = this;
+				uni.login({
+				  provider: 'weixin',
+				  success: function (loginRes) {
+				    console.log(loginRes.authResult);
+					
+					// let wxData = {
+						
+					// }
+					// this_.$getApiTime("/api/auth/getopenid",{code:loginRes.code},res=>{
+					// 	console.log(res)
+					// 	uni.navigateTo({
+					// 		url:'./login?openid='+loginRes.authResult.openid+'&nickname='+infoRes.userInfo.nickName
+					// 	})
+					// })
+				    // 获取用户信息
+				    uni.getUserInfo({
+				      provider: 'weixin',
+				      success: function (infoRes) {
+						  console.log(infoRes)
+				        console.log('用户昵称为：' + infoRes.userInfo.nickName);
+						uni.navigateTo({
+							url:'./login?openid='+loginRes.authResult.openid+'&nickname='+infoRes.userInfo.nickName
+						})
+					
+				      }
+				    });
+				  }
 				});
+				// uni.getProvider({
+				//     service: 'oauth',
+				//     success: function (res) {
+				// 		console.log(res)
+				//         console.log(res.provider)
+				//         if (~res.provider.indexOf('qq')) {
+				//             uni.login({
+				//                 provider: 'qq',
+				//                 success: function (loginRes) {
+				//                     console.log(JSON.stringify(loginRes));
+				//                 }
+				//             });
+				//         }
+				//     }
+				// });
 			},
 			//获取验证码
 			getYZM(){
@@ -63,10 +93,18 @@
 					phone:this.phone,
 					from: "login"
 				}
+				this.timeout = 60;
+				let interL = setInterval(()=>{
+					this.timeout--
+					if(this.timeout<0){
+						clearInterval(interL)
+					}
+				},1000)
 				this.$getApi('/api/auth/sendmsg',data,res=>{
 					console.log(res)
 					this.$msg('请在短信中查看验证码')
 				},"false")
+				
 			},
 			loginIn(){
 				if(this.phone && this.yzm){

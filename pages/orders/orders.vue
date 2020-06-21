@@ -42,9 +42,12 @@
 					{{stateMsgFor(item)}}
 				</view>
 			</view>
-			<view class="sub_btn" v-show="tabSel==1">
+			<view class="sub_btn" v-show="tabSel==1 || tabSel==0">
 				<view class="nav_to">
 					<button class="btn blue sm blue_n round" @click="qxOrderL(item)">取消订单</button>
+				</view>
+				<view class="nav_to" v-show="tabSel==0">
+					<button class="btn blue sm blue round" @click="payTrue(item)">立即付款</button>
 				</view>
 			</view>
 			<view class="sub_btn" v-show="tabSel==3">
@@ -58,7 +61,7 @@
 		</view>
 		<uni-popup type="center" ref="juan0">
 			<view class="juan_body">
-				<view class="iconfont iconguanbi" @click="closeJuan(0)"></view>
+				<view class="iconfont iconguanbi" @click.stop="closeJuan(0)"></view>
 				<view class="ju_title">
 					去完善信息
 				</view>
@@ -67,8 +70,8 @@
 					才能查看,现在去填写?
 				</view>
 				<view class="t_btn">
-					<button class="round btn sm default" @click="closeJuan(0)">取消</button>
-					<button class="round btn sm  blue" @click="reLaunch('../mine/addCar')">确定</button>
+					<button class="round btn sm default" @click.stop="closeJuan(0)">取消</button>
+					<button class="round btn sm  blue" @click.stop="addCarH">确定</button>
 				</view>
 			</view>
 		</uni-popup>
@@ -80,7 +83,7 @@
 		data() {
 			return {
 				state: 1,
-				tabSel: 0,
+				tabSel: 1,
 				tabList: [
 					{
 						text: "待支付",
@@ -123,42 +126,39 @@
 						type: 3
 					}
 				],
-				msgInfo: [{
-						type: "单次外部清洗",
-						state: "待接单",
-						car: "小型汽车",
-						carP: "豫A668899",
-						name: "张倩倩",
-						phone: "13233333333",
-						time: "2020-05-06 13:00-14:00",
-						p: "12号停车位",
-						addr: "郑州市中关区郑州市中关区郑州市",
-						ftime: "2020-05-06 13:58",
-						ntime: "2020-05-06 13:58",
-						cause: "到达指定位置未找到指定车辆"
-					},
-					{
-						type: "单次外部清洗",
-						state: "待接单",
-						car: "小型汽车",
-						carP: "豫A668899",
-						name: "张倩倩",
-						phone: "13233333333",
-						time: "2020-05-06 13:00-14:00",
-						p: "12号停车位",
-						addr: "郑州市中关区郑州市中关区郑州市",
-						ftime: "2020-05-06 13:58",
-						ntime: "2020-05-06 13:58",
-						cause: "到达指定位置未找到指定车辆"
-					}
-				]
+				msgInfo: [{}],
+				timersL:undefined
 			}
 		},
 		mounted() {
-			if (this.state == 0) {
-				this.$refs['juan0'].open()
+			
+		},
+		onShow() {
+			console.log("ssss")
+			if (this.userInfo.groupid == 0) {
+				this.$nextTick(()=>{
+					this.$refs['juan0'].open()
+				})
+				
+			}else{
+				try{
+					this.$refs['juan0'].close()	
+				}catch(e){
+					//TODO handle the exception
+				}
 			}
-			this.getOrder(0);
+			let this_ = this;
+			this.timersL = setInterval(()=>{
+				this_.getOrder(this_.tabSel);
+			},1000)
+			console.log(this)
+		},
+		onHide() {
+			console.log(this)
+			console.log("ssscc")
+			let this_ = this;
+			clearInterval(this_.timersL);
+			this.timersL = undefined;
 		},
 		filters: {
 			psd: function(value) {
@@ -188,6 +188,17 @@
 			}
 		},
 		methods: {
+			payTrue(item){
+				let itemS = [].concat(item);
+				uni.navigateTo({
+					url:"./orderTrue?nc=1&item="+JSON.stringify(itemS)
+				})
+			},
+			addCarH(){
+				uni.navigateTo({
+					url:'../mine/addCar?ws=1'
+				})
+			},
 			//显示状态
 			stateMsgFor(item){
 				// return "121212";
@@ -219,8 +230,10 @@
 					case 7 : return "本人取消订单" ;break;
 				}
 			},
-			closeJuan(num) {
-				this.$refs['juan' + num].close()
+			closeJuan() {
+				uni.switchTab({
+					url:'../home/home'
+				})
 			},
 			getOrder(type){
 				let orderData = {
@@ -228,7 +241,7 @@
 					page:1,
 					paginate:100
 				}
-				this.$getApi('/api/user/order/list',orderData,res=>{
+				this.$getApiTime('/api/user/order/list',orderData,res=>{
 					console.log(res.data)
 					this.msgInfo = res.data.data
 				})
@@ -242,7 +255,7 @@
 				        if (res.confirm) {
 				            console.log('用户点击确定');
 							this_.$getApi('/api/user/order/cancle',{id:item.id},res=>{
-								history.go(0) 
+								this_.getOrder(this_.tabSel);
 							})
 				        } else if (res.cancel) {
 				            console.log('用户点击取消');

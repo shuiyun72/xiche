@@ -28,12 +28,25 @@
 				</view>
 			</view>
 		</view>
-		<navigator url="../mine/addCar">
-			<view class="add_car_btn">
+			<view class="add_car_btn"  @click="addItem">
 				<text class="iconfont icontianjia"></text>
 				<text>新建车辆</text>
 			</view>
-		</navigator>
+		<uni-popup type="center" ref="juan0">
+			<view class="juan_body">
+				<view class="iconfont iconguanbi" @click="closeJuan"></view>
+				<view class="ju_title">
+					删除
+				</view>
+				<view class="t">
+					是否确认删除?
+				</view>
+				<view class="t_btn">
+					<button class="round btn sm default" @click="closeJuan">取消</button>
+					<button class="round btn sm  blue" @click="deleteBtn">确定</button>
+				</view>
+			</view>
+		</uni-popup>
 	</view>
 </template>
 
@@ -42,10 +55,11 @@
 		data() {
 			return {
 				swMsg: [],
-				from: ""
+				from: "",
+				item:{}
 			}
 		},
-		mounted() {
+		onShow() {
 			this.$getApi("/api/user/car/list", {}, res => {
 				this.swMsg = res.data
 			})
@@ -57,6 +71,28 @@
 			}
 		},
 		methods: {
+			addItem(){
+				if(this.from){
+					uni.navigateTo({
+						url:"../mine/addCar?from=toOrder"
+					})
+				}else{
+					uni.navigateTo({
+						url:"../mine/addCar"
+					})
+				}
+			},
+			closeJuan(){
+				this.$refs['juan0'].close();
+			},
+			deleteBtn(){
+				this.$getApi("/api/user/car/del",{id:this.item.id},resl=>{
+					this.$refs['juan0'].close();
+					this.$getApi("/api/user/car/list", {}, res => {
+						this.swMsg = res.data
+					})
+				})
+			},
 			selectCar(e) {
 				console.log(e)
 				if (this.from) {
@@ -64,8 +100,8 @@
 						name: e.chepai,
 						id: e.id
 					})
-				}
-				uni.navigateBack();
+					uni.navigateBack();
+				}	
 			},
 			editCar(el) {
 				console.log(el)
@@ -74,30 +110,50 @@
 				})
 			},
 			deletePs(item) {
-				let this_ = this;
-				console.log(item)
-				uni.showModal({
-				    title: '删除',
-				    content: '是否确认删除?',
-				    success: function (res) {
-				        if (res.confirm) {
-				            console.log('用户点击确定');
-							this_.$getApi("/api/user/car/del",{id:item.id},resl=>{
-								uni.reLaunch({
-									url:'./publicMsg'
-								})
-							})
-				        } else if (res.cancel) {
-				            console.log('用户点击取消');
-				        }
-				    }
-				});
+				this.$refs['juan0'].open();
+				this.item = item;
 			}
 		}
 	}
 </script>
 
 <style lang="scss" scoped>
+	.juan_body {
+		background-color: #fff;
+		position: relative;
+		padding: 26upx 36upx;
+		width: 440upx;
+		border-radius: 26upx;
+	
+		.iconguanbi {
+			position: absolute;
+			top: 20upx;
+			right: 16upx;
+			font-size: 26upx;
+		}
+	
+		.ju_title {
+			text-align: center;
+			font-size: 36upx;
+			margin-bottom: 30upx;
+		}
+	
+		.t {
+			text-align: center;
+			font-size: 26upx;
+			color: #666;
+			line-height: 46upx;
+			margin-bottom: 20upx;
+		}
+	
+		.t_btn {
+			display: flex;
+	
+			.btn {
+				width: 40%;
+			}
+		}
+	}
 	.add_car_btn {
 		position: fixed;
 		left: 0;

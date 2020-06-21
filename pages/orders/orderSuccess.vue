@@ -13,8 +13,11 @@
 		<view class="re_mtop4">
 			<button class="btn  blue ms" @click="switchTab('./orders')">查看我的订单</button>
 		</view>
-		<view class="re_mtop4 mt10">
-			<button class="btn  blue_n ms" @click="switchTab('../home/home')">购买VIP套餐,洗车更优惠</button>
+		<view class="re_mtop4 mt10" v-if="userInfo.groupid == 1">
+			<button class="btn  blue_n ms" @click="switchTab('../combo/combo')">购买VIP套餐,洗车更优惠</button>
+		</view>
+		<view class="re_mtop4 mt10" v-if="userInfo.groupid == 2">
+			<button class="btn  blue_n ms" @click="switchTab('../home/home')">返回首页</button>
 		</view>
 	</view>
 </template>
@@ -26,6 +29,16 @@
 				
 			};
 		}, 
+		onShow() {
+			this.$getApiTime("/api/user/userinfo",{},res=>{
+				this.$store.commit('login',res.data);
+			})
+		},
+		computed:{
+			userInfo(){
+				return this.$store.state.userInfo;
+			}
+		},
 		methods:{
 			navigateTo(url){
 				uni.navigateTo({
