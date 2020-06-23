@@ -81,9 +81,21 @@
 				let this_ = this;
 				this.$getApi("/api/user/cash",dataL,res=>{
 					console.log(res)
-					uni.switchTab({
-						url:"./mine"
-					})	
+					uni.showModal({
+					    title: '提示',
+					    content: '提现成功,是否跳转到我的信息,确认?',
+					    success: function (res) {
+					        if (res.confirm) {
+					            uni.switchTab({
+					            	url:"./mine"
+					            })
+					        } else if (res.cancel) {
+					            console.log('用户点击取消');
+					        }
+					    }
+					});
+					
+						
 
 				})
 				

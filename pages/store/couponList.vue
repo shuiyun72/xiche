@@ -18,7 +18,7 @@
 					<view class="left" :class="{'long':tabSel != 0}">
 						<view class="p1">
 						<!-- 	{{item}} -->
-							<text class="t">{{Number(item.total)}}</text>
+							<text class="t">{{Number(item.money)}}</text>
 							<text>元</text>
 						</view>
 						<view class="p2">

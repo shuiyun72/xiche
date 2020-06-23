@@ -98,7 +98,7 @@
         ,{
             "path" : "pages/home/car",
             "style" : {
-				"navigationBarTitleText": "添加车辆信息"
+				"navigationBarTitleText": "添加车品牌"
 			}
         }
 		,{
@@ -154,12 +154,6 @@
             "path" : "pages/store/phone",
             "style" : {
 				"navigationBarTitleText": "手机号库"
-			}
-        }
-        ,{
-            "path" : "pages/orders/vipToOrder",
-            "style" : {
-				"navigationBarTitleText": "会员预约洗车"
 			}
         }
         ,{

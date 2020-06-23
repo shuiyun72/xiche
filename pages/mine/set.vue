@@ -47,9 +47,18 @@
 					success: function(res) {
 						if (res.confirm) {
 							this_.$getApi("/api/user/writeOff",{},res=>{
+								this_.$store.commit("logout")
+								// #ifdef MP
+								uni.switchTab({
+									url:'../home/home'
+								})
+								// #endif
+								// #ifndef MP
 								uni.reLaunch({
 									url:'../login/yLogin'
 								})
+								// #endif
+								
 							})
 						}
 					}
@@ -84,9 +93,17 @@
 				} catch (e) {
 				    // error
 				}
+				// #ifdef MP
+				uni.switchTab({
+					url:'../home/home'
+				})
+				// #endif
+				// #ifndef MP
 				uni.reLaunch({
 					url: '../login/yLogin'
 				})
+				// #endif
+				
 			}
 		}
 	}

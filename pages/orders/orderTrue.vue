@@ -50,7 +50,7 @@
 					<view class="r_c"> {{item.code}} </view>
 				</view>
 			</view>
-			<uni-list class="od_t">
+			<uni-list class="od_t xc">
 				<uni-list-item title="洗车券" :showArrow="false">
 					<template v-slot:right="">
 						<text class="red" v-if="!item.userticket">无</text>
@@ -58,10 +58,12 @@
 					</template>
 				</uni-list-item>
 			</uni-list>
-			<uni-list class="od_t" v-if="isNc">
-				<uni-list-item title="优惠券" :rightText="oderQuan.name" @click="selQUan"></uni-list-item>
-			</uni-list>
+			
 		</view>
+		<uni-list class="od_t" v-if="isNc">
+			<uni-list-item title="优惠券" :rightText="oderQuan.name" @click="selQUan"></uni-list-item>
+		</uni-list>
+		<!-- #ifndef MP -->
 		<view class="pay_type">支付方式</view>
 		<radio-group class="block" @change="RadioChange">
 			<view class="cu-form-group">
@@ -70,7 +72,7 @@
 				</view>
 				<radio :class="radio=='A'?'checked':''" :checked="radio=='A'?true:false" value="A" class="radio"></radio>
 			</view>
-			<!-- #ifndef MP-ALIPAY -->
+			
 			<view class="cu-form-group">
 				<view class="item">
 					<image style="width: 44rpx;height: 44rpx;" src="../../static/img/zhifb.png" mode=""></image><text class="margin-left-xs">支付宝支付</text>
@@ -85,8 +87,8 @@
 					<radio :class="radio=='C'?'checked':''" :checked="radio=='C'?true:false" value="C" class="radio"></radio>
 				</view>
 			</view>
-			<!-- #endif -->
 		</radio-group>
+		<!-- #endif -->
 		<view class="bottom_c">
 			<view @click="next" class="btn">立即支付</view>
 			<view class="pay-num">
@@ -121,7 +123,14 @@
 			this.isUserCoupon = this.userCoupon == "[]" ? false :true;
 
 		},
-
+		onShow() {
+			// #ifdef MP
+				this.radio = 'minipay'
+			// #endif
+			// #ifndef MP
+				this.radio = 'C'
+			// #endif
+		},
 		computed: {
 			totalAmount() {
 				let mm = 0;
@@ -137,7 +146,6 @@
 				return this.$store.state.torderQuan
 			},
 			payType() {
-
 				// #ifndef MP
 				switch (this.radio) {
 					case 'A':
@@ -181,14 +189,14 @@
 					user_coupon_id: this.oderQuan.id ? this.oderQuan.id : ""
 				}
 				console.log(dataL)
-				this.$getApi("/api/user/order/pay", dataL, res => {
-					console.log(res)
-					
-					//this.itemsCarList = res.data
-					if (this.payType == "wepay") {
-						uni.requestPayment({
+				this.$getApi("/api/user/order/pay", dataL, resbuy => {
+					console.log(resbuy)
+					console.log(this_.payType)
+					if(this_.payType == "wepay") {
+						console.log("wepay")
+						uni.requestPayment({ 
 						    provider: 'wxpay',
-						    orderInfo: JSON.parse(res.data.payinfo), //微信、支付宝订单数据
+						    orderInfo: JSON.parse(resbuy.data.payinfo), //微信、支付宝订单数据
 						    success: function (res) {
 								this_.$store.commit('setQuan', {
 									name: "请选择优惠券"
@@ -204,10 +212,10 @@
 						    }
 						});
 					} else
-					if (this.payType == "alipay") {
+					if(this_.payType == "alipay") {
 						uni.requestPayment({
 						    provider: 'alipay',
-						    orderInfo: res.data.payinfo, //微信、支付宝订单数据
+						    orderInfo: resbuy.data.payinfo, //微信、支付宝订单数据
 						    success: function (res) {
 								this_.$store.commit('setQuan', {
 									name: "请选择优惠券"
@@ -223,13 +231,41 @@
 						    }
 						});
 					} else
-					if (this.payType == "money") {
+					if (this_.payType == "money") {
 						this_.$store.commit('setQuan', {
 							name: "请选择优惠券"
 						})
 						uni.reLaunch({
 							url:'./orderSuccess'
 						})
+					}else{
+						uni.requestPayment({
+							provider: 'wxpay',
+							timeStamp: resbuy.data.payinfo.timeStamp,
+							nonceStr: resbuy.data.payinfo.nonceStr,
+							package: resbuy.data.payinfo.package,
+							signType: resbuy.data.payinfo.signType,
+							paySign: resbuy.data.payinfo.paySign,
+							success: function (res) {
+								this_.$getApi("/api/user/userinfo",{},resss=>{
+									this_.$store.commit('login',resss.data);
+								})
+								if(this_.$store.state.userInfo.groupid != 0){
+									uni.navigateTo({
+										url:'../pay/successMsg'
+									})
+								}else{
+									setTimeout(()=>{
+										uni.navigateTo({
+											url:'../pay/successMsg'
+										})
+									},600)
+								}
+							},
+							fail: function (err) {
+								console.log('fail:' + JSON.stringify(err));
+							}
+						});
 					}
 					
 					
@@ -270,6 +306,7 @@
 		padding-bottom: 60upx;
 		background-color: #f0f0f0;
 		padding-bottom: 200upx;
+		min-height: 100vh;
 	}
 
 	.bottom_c {
@@ -361,10 +398,15 @@
 	.order_true {
 		border-top: 1upx solid #eee;
 		background-color: #f0f0f0;
+		margin-top: 20upx;
 	}
 
 	.od_t {
 		margin-top: 20upx;
+		&.xc{
+			margin-top: 0;
+			padding-top: 20upx;
+		}
 	}
 
 	.order_info {

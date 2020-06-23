@@ -40,6 +40,15 @@
 		onShow() {
 			
 		},
+		onLoad(ph) {
+			console.log(ph)
+		},
+		
+		beforeRouteEnter(from,to,next) {
+			
+				console.log(from,to)
+			
+		},
 		methods: {
 			oauthC(){
 				let this_ = this;
@@ -47,45 +56,36 @@
 				  provider: 'weixin',
 				  success: function (loginRes) {
 				    console.log(loginRes.authResult);
-					
-					// let wxData = {
-						
-					// }
-					// this_.$getApiTime("/api/auth/getopenid",{code:loginRes.code},res=>{
-					// 	console.log(res)
-					// 	uni.navigateTo({
-					// 		url:'./login?openid='+loginRes.authResult.openid+'&nickname='+infoRes.userInfo.nickName
-					// 	})
-					// })
-				    // 获取用户信息
-				    uni.getUserInfo({
-				      provider: 'weixin',
-				      success: function (infoRes) {
-						  console.log(infoRes)
-				        console.log('用户昵称为：' + infoRes.userInfo.nickName);
-						uni.navigateTo({
-							url:'./login?openid='+loginRes.authResult.openid+'&nickname='+infoRes.userInfo.nickName
-						})
-					
-				      }
-				    });
+					this_.$getApi("/api/auth/weixinLogin",{
+						access_token:loginRes.authResult.access_token,
+						openid:loginRes.authResult.openid
+					},res=>{
+						console.log(res.data)
+						if(res.data.is_bind == 0){
+							uni.getUserInfo({
+							  provider: 'weixin',
+							  success: function (infoRes) {
+								  console.log(infoRes)
+							    console.log('用户昵称为：' + infoRes.userInfo.nickName);
+								uni.navigateTo({
+									url:'./login?openid='+loginRes.authResult.openid+'&accessToken='+loginRes.authResult.access_token+"&dsf=1"
+								})
+							  }
+							});
+						}else{
+							this_.$store.commit('login',res.data);
+							setTimeout(()=>{
+								this_.getInit(()=>{
+									uni.switchTab({
+										url:'../home/home'
+									})			
+								});	
+							},200)
+						}
+					})
+				    
 				  }
 				});
-				// uni.getProvider({
-				//     service: 'oauth',
-				//     success: function (res) {
-				// 		console.log(res)
-				//         console.log(res.provider)
-				//         if (~res.provider.indexOf('qq')) {
-				//             uni.login({
-				//                 provider: 'qq',
-				//                 success: function (loginRes) {
-				//                     console.log(JSON.stringify(loginRes));
-				//                 }
-				//             });
-				//         }
-				//     }
-				// });
 			},
 			//获取验证码
 			getYZM(){

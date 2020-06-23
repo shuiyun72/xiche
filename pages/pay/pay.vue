@@ -7,6 +7,9 @@
 			</view>
 
 		</view>
+		<!-- #ifndef MP -->
+		
+		
 		<view class="pay_type">支付方式</view>
 		<radio-group class="block" @change="RadioChange">
 			<view class="cu-form-group">
@@ -15,7 +18,6 @@
 				</view>
 				<radio :class="radio=='wepay'?'checked':''" :checked="radio=='wepay'?true:false" value="wepay" class="radio"></radio>
 			</view>
-			<!-- #ifndef MP-ALIPAY -->
 			<view class="cu-form-group">
 				<view class="item">
 					<image style="width: 44rpx;height: 44rpx;" src="../../static/img/zhifb.png" mode=""></image><text class="margin-left-xs">支付宝支付</text>
@@ -30,8 +32,8 @@
 					<radio :class="radio=='money'?'checked':''" :checked="radio=='money'?true:false" value="money"  class="radio"></radio>
 				</view>
 			</view>
-			<!-- #endif -->
 		</radio-group>
+		<!-- #endif -->
 		<!-- <view @tap="next()" class="cu-bar foot" style="box-shadow: 0;"><button class="cu-btn bg-blue lg" style="width: 750rpx; height: 100rpx;" type="">确定</button></view> -->
 		<view class="bottom_c">
 			<view class="pay-num">
@@ -46,16 +48,43 @@
 	export default {
 		data() {
 			return {
-				radio: 'money',
+				radio: '',
 				money:0,
 				typeId:""
 			};
+		},
+		onShow() {
+			// #ifdef MP
+				this.radio = 'minipay'
+			// #endif
+			// #ifndef MP
+				this.radio = 'money'
+			// #endif
 		},
 		onLoad(op) {
 			this.money = JSON.parse(op.item).current_price;
 			this.typeId = JSON.parse(op.item).cate_id;
 		},
-
+		computed:{
+			payType() {
+				// #ifndef MP
+				switch (this.radio) {
+					case 'wepay':
+						return 'wepay';
+						break;
+					case 'alipay':
+						return 'alipay';
+						break;
+					case 'money':
+						return 'money';
+						break;
+				}
+				// #endif
+				// #ifdef MP
+				return 'minipay'
+				// #endif
+			}
+		},
 		methods: {
 			RadioChange(e) {
 				this.radio = e.detail.value;
@@ -63,25 +92,106 @@
 			next() {
 				let dataL = {
 					id:this.typeId,
-					payment:this.radio
+					payment:this.payType
 				};
-				this.$getApi("/api/user/ticket/buy",dataL,res=>{
-					console.log(res)
-					this.$getApi("/api/user/userinfo",{},res=>{
-						this.$store.commit('login',res.data);
-					})
-					if(this.$store.state.userInfo.groupid != 0){
-						uni.navigateTo({
-							url:'./successMsg'
+				let this_ = this;
+				this.$getApi("/api/user/ticket/buy",dataL,resbuy=>{
+					console.log(resbuy)
+					console.log(this_.payType)
+					if(this_.payType == "wepay"){
+						uni.requestPayment({
+						    provider: 'wxpay',
+						    orderInfo: JSON.parse(resbuy.data.payinfo), //微信、支付宝订单数据
+						    success: function (res) {
+								this_.$getApi("/api/user/userinfo",{},resss=>{
+									this_.$store.commit('login',resss.data);
+								})
+								if(this_.$store.state.userInfo.groupid != 0){
+									uni.navigateTo({
+										url:'./successMsg'
+									})
+								}else{
+									setTimeout(()=>{
+										uni.navigateTo({
+											url:'../mine/addCar?ws=1'
+										})
+									},600)
+								}
+						    },
+						    fail: function (err) {
+						        console.log('fail:' + JSON.stringify(err));
+						    }
+						});
+					}else
+					if(this_.payType == "alipay"){
+						uni.requestPayment({
+						    provider: 'alipay',
+						    orderInfo: resbuy.data.payinfo, //微信、支付宝订单数据
+						    success: function (res) {
+								this_.$getApi("/api/user/userinfo",{},resss=>{
+									this_.$store.commit('login',resss.data);
+								})
+								if(this_.$store.state.userInfo.groupid != 0){
+									uni.navigateTo({
+										url:'./successMsg'
+									})
+								}else{
+									setTimeout(()=>{
+										uni.navigateTo({
+											url:'../mine/addCar?ws=1'
+										})
+									},600)
+								}
+						    },
+						    fail: function (err) {
+						        console.log('fail:' + JSON.stringify(err));
+						    }
+						});
+					}else
+					if(this_.payType == "money"){
+						this_.$getApi("/api/user/userinfo",{},resss=>{
+							this_.$store.commit('login',resss.data);
 						})
-					}else{
-						setTimeout(()=>{
+						if(this_.$store.state.userInfo.groupid != 0){
 							uni.navigateTo({
-								url:'../mine/addCar?ws=1'
+								url:'./successMsg'
 							})
-						},600)
-					}
-				
+						}else{
+							setTimeout(()=>{
+								uni.navigateTo({
+									url:'../mine/addCar?ws=1'
+								})
+							},600)
+						}
+					}else{
+						uni.requestPayment({
+							provider: 'wxpay',
+							timeStamp: resbuy.data.payinfo.timeStamp,
+							nonceStr: resbuy.data.payinfo.nonceStr,
+							package: resbuy.data.payinfo.package,
+							signType: resbuy.data.payinfo.signType,
+							paySign: resbuy.data.payinfo.paySign,
+							success: function (res) {
+								this_.$getApi("/api/user/userinfo",{},resss=>{
+									this_.$store.commit('login',resss.data);
+								})
+								if(this_.$store.state.userInfo.groupid != 0){
+									uni.navigateTo({
+										url:'./successMsg'
+									})
+								}else{
+									setTimeout(()=>{
+										uni.navigateTo({
+											url:'../mine/addCar?ws=1'
+										})
+									},600)
+								}
+							},
+							fail: function (err) {
+								console.log('fail:' + JSON.stringify(err));
+							}
+						});
+					}			
 				})
 			}
 		}

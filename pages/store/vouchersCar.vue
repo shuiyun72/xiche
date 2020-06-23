@@ -22,7 +22,7 @@
 							<text>{{item.chexing.name}}</text>
 						</view>
 						<view class="p2">
-							月套餐
+							{{toDataN(item.day)}}套餐
 						</view>
 					</view>
 					<view class="right">
@@ -63,73 +63,29 @@
 					}
 				],
 				tabSel:0,
-				juan1ListD: [{
-						type: "小轿车",
-						zhe: "外部洗车券",
-						date: "2020.05.12-2020.08.12",
-						id: 990,
-						bg:"juanxxc.png"
-					},
-					{
-						type: "SUV",
-						zhe: "外部洗车券",
-						date: "2020.05.12-2020.08.12",
-						id: 993,
-						bg:"juansuv.png"
-					},
-				],
-				juan1ListY: [{
-						type: "小轿车",
-						zhe: "外部洗车券",
-						order:"12345678911",
-						date: "2020.05.12",
-						id: 990,
-						bg:"juanhs.png"
-					},
-					{
-						type: "SUV",
-						zhe: "外部洗车券",
-						order:"12345678911",
-						date: "2020.05.12",
-						id: 993,
-						bg:"juanhs.png"
-					},
-				],
-				juan1ListYY: [{
-						type: "小轿车",
-						zhe: "外部洗车券",
-						date: "2020.05.12",
-						id: 990,
-						bg:"juanhs.png"
-					},
-					{
-						type: "SUV",
-						zhe: "外部洗车券",
-						date: "2020.05.12",
-						id: 993,
-						bg:"juanhs.png"
-					},
-				],
 				juan1List:[]
 			};
 		},
 		computed:{
-			juan1ListType(){
-				if(this.tabSel == 0){
-					return this.juan1ListD;
-				}else
-				if(this.tabSel == 1){
-					return this.juan1ListY;
-				}else
-				if(this.tabSel == 2){
-					return this.juan1ListYY;
-				}
-			}
+			
 		},
 		mounted() {
 			this.getTicket(0)
 		},
 		methods:{
+			toDataN(num){
+				if(num == 30){
+					return "月"
+				}else
+				if(num == 90){
+					return "季"
+				}else
+				if(num == 365){
+					return "年"
+				}else{
+					return "季"
+				}
+			},
 			getTicket(type){
 				this.$getApi("/api/user/ticket/list",{type:type},res=>{
 					

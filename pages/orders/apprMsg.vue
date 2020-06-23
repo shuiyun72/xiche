@@ -8,7 +8,7 @@
 			</view>
 		</view>
 		<view class="re_mtop4">
-			<button class="btn  blue ms" @click="navigateTo('../mine/appraise')">查看我的订单</button>
+			<button class="btn  blue ms" @click="navigateTo('../mine/appraise')">查看我的评价</button>
 		</view>
 		<view class="re_mtop4 mt10">
 			<button class="btn  blue_n ms" @click="switchTab('../orders/orders')">返回订单</button>

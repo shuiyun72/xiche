@@ -91,7 +91,7 @@
 			payC(){
 				uni.navigateTo({
 					url:'../pay/pay?item='+JSON.stringify(this.corrItem) 
-				})
+				})	
 			}
 		}
 	}

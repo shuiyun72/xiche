@@ -30,7 +30,7 @@
 			};
 		}, 
 		onShow() {
-			this.$getApiTime("/api/user/userinfo",{},res=>{
+			this.$getApi("/api/user/userinfo",{},res=>{
 				this.$store.commit('login',res.data);
 			})
 		},

@@ -9,8 +9,8 @@
         "nvueCompiler" : "uni-app",
         "compilerVersion" : 3,
         "modules" : {
-            "OAuth" : {},
             "Maps" : {},
+            "OAuth" : {},
             "Payment" : {}
         },
         "distribute" : {
@@ -49,7 +49,7 @@
                 "oauth" : {
                     "weixin" : {
                         "appid" : "wxecd3f91ea27efd64",
-                        "appsecret" : "99b4d10e752eef9dd433b1d5c4d79e28",
+                        "appsecret" : "1d72fe69ca2eb020fc78a99477e449ca",
                         "UniversalLinks" : "https://yuyue.wsstreet.net/ulink"
                     }
                 },
@@ -57,8 +57,7 @@
                     "weixin" : {
                         "appid" : "wxecd3f91ea27efd64",
                         "UniversalLinks" : "https://yuyue.wsstreet.net/ulink"
-                    },
-                    "alipay" : {}
+                    }
                 },
                 "push" : {}
             },
@@ -105,17 +104,22 @@
     },
     "quickapp" : {},
     "mp-weixin" : {
-        "appid" : "wxecd3f91ea27efd64",
+        "appid" : "wxcf9906b7862bda41",
         "setting" : {
-            "urlCheck" : true,
-            "es6" : true
+            "urlCheck" : false,
+            "es6" : true,
+            "minified" : true
         },
-        "permission" : {}
+        "permission" : {
+            "scope.userLocation" : {
+                "desc" : "需要创建地址信息,获取当前位置"
+            }
+        }
     },
     "mp-alipay" : {
         "appid" : ""
     },
     "mp-toutiao" : {
-        "appid" : "wxecd3f91ea27efd64"
+        "appid" : "wxcf9906b7862bda41"
     }
 }

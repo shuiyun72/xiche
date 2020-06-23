@@ -125,7 +125,7 @@
 					return {
 						type: 'contact',
 						color: '#000000',
-						size: 20
+						size: 26
 					}
 				}
 			}

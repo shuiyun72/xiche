@@ -17,7 +17,7 @@
 						{{item.xing}} {{item.carNum}}
 					</view> 
 					<view class="">
-						￥{{item.total_amount}}
+						￥{{item.amount}}
 					</view>
 				</view>
 				<view class="o_msg_info">
@@ -34,23 +34,23 @@
 				</view>
 				<view class="o_msg_info flex_bot">
 					<text>订单编号 {{item.code}}</text>
-					<text class="red_money">实付: ￥{{item.total_amount}}</text>
+					<text class="red_money">实付: ￥{{item.amount}}</text>
 				</view>		
 			</view>
-			<view class="sub_btn info" v-show="item.stateN > 4">
+			<view class="sub_btn info" v-if="item.stateN > 4">
 				<view class="blue">
 					{{stateMsgFor(item)}}
 				</view>
 			</view>
-			<view class="sub_btn" v-show="tabSel==1 || tabSel==0">
+			<view class="sub_btn" v-if="tabSel==1 || tabSel==0">
 				<view class="nav_to">
 					<button class="btn blue sm blue_n round" @click="qxOrderL(item)">取消订单</button>
 				</view>
-				<view class="nav_to" v-show="tabSel==0">
+				<view class="nav_to" v-if="tabSel==0">
 					<button class="btn blue sm blue round" @click="payTrue(item)">立即付款</button>
 				</view>
 			</view>
-			<view class="sub_btn" v-show="tabSel==3">
+			<view class="sub_btn" v-if="tabSel==3">
 				<view class="nav_to">
 					<button class="btn blue sm blue_n round" @click="tellKf">联系客服</button>
 				</view>
@@ -126,7 +126,7 @@
 						type: 3
 					}
 				],
-				msgInfo: [{}],
+				msgInfo: [],
 				timersL:undefined
 			}
 		},
@@ -135,7 +135,7 @@
 		},
 		onShow() {
 			console.log("ssss")
-			if (this.userInfo.groupid == 0) {
+			if (!this.userInfo || this.userInfo.groupid == 0) {
 				this.$nextTick(()=>{
 					this.$refs['juan0'].open()
 				})
@@ -148,9 +148,11 @@
 				}
 			}
 			let this_ = this;
-			this.timersL = setInterval(()=>{
-				this_.getOrder(this_.tabSel);
-			},1000)
+			if(this.hasLogin){
+				this.timersL = setInterval(()=>{
+					this_.getOrder(this_.tabSel);
+				},1000)
+			}
 			console.log(this)
 		},
 		onHide() {
@@ -174,7 +176,9 @@
 			let this_ = this;
 			setTimeout(function () {
 				uni.stopPullDownRefresh();
-				this_.getOrder(this_.tabSel);
+				if(this_.hasLogin){
+					this_.getOrder(this_.tabSel);
+				}
 			}, 300);
 		},
 		computed: {
@@ -185,30 +189,74 @@
 			},
 			userInfo(){
 				return this.$store.state.userInfo;
+			},
+			hasLogin(){
+				return this.$store.state.hasLogin
 			}
 		},
 		methods: {
+			getUserInfoWX() {
+				let this_ = this;
+				if (!this.$store.state.hasLogin) {
+					uni.login({
+						provider: 'weixin',
+						success: function(loginRes) {
+							console.log(loginRes);
+							this_.$getApiTime("/api/auth/getopenid", {
+								code: loginRes.code
+							}, res => {
+								console.log(res)
+								if (res.data.is_bind == 0) {
+									console.log("11")
+									uni.getUserInfo({
+										provider: 'weixin',
+										success: function(infoRes) {
+											console.log(infoRes)
+											console.log('用户昵称为：' + infoRes.userInfo.nickName);
+											uni.navigateTo({
+												url: '../login/login?xcx=ws&openid=' + res.data.openid + '&nickname=' + infoRes.userInfo.nickName
+											})
+										} 
+									});
+								} else
+								if (res.data.is_bind == 1){
+									console.log(res)
+									this_.$store.commit('login', res.data);
+									setTimeout(() => {
+										this_.getInit(() => {
+											uni.navigateTo({
+												url:'../mine/addCar?ws=1&xcx=ws'
+											})
+										});
+									}, 500)
+								}
+							}, "false")
+							// 获取用户信息
+						}
+					});
+				}else{
+					uni.navigateTo({
+						url:'../mine/addCar?xcx=ws&ws=1'
+					})
+				}
+			},
 			payTrue(item){
 				let itemS = [].concat(item);
 				uni.navigateTo({
 					url:"./orderTrue?nc=1&item="+JSON.stringify(itemS)
 				})
 			},
-			addCarH(){
-				uni.navigateTo({
-					url:'../mine/addCar?ws=1'
-				})
-			},
+			
 			//显示状态
 			stateMsgFor(item){
 				// return "121212";
-				if(item.userticket && Number(item.total_amount) > 0){
+				if(item.userticket && Number(item.amount) > 0){
 					return "洗车券和现金已退还至原账户"
 				}else
 				if(item.userticket){
 					return "洗车券已退还至原账户"
 				}else
-				if(Number(item.total_amount)>0){
+				if(Number(item.amount)>0){
 					return "现金已退还至原账户"
 				}
 			},
@@ -235,13 +283,23 @@
 					url:'../home/home'
 				})
 			},
+			addCarH(){
+				// #ifdef MP
+				this.getUserInfoWX();
+				// #endif
+				// #ifndef MP
+				uni.navigateTo({
+					url:'../mine/addCar?ws=1'
+				})
+				// #endif
+			},
 			getOrder(type){
 				let orderData = {
 					type:type,
 					page:1,
 					paginate:100
 				}
-				this.$getApiTime('/api/user/order/list',orderData,res=>{
+				this.$getApi('/api/user/order/list',orderData,res=>{
 					console.log(res.data)
 					this.msgInfo = res.data.data
 				})
@@ -296,7 +354,7 @@
 			},
 			toPosition(item) {
 				uni.openLocation({
-					latitude: 34.775651, //要去的纬度-地址       
+					latitude: 34.775651, //要去的纬度-地址       
 					longitude: 113.674715, //要去的经度-地址
 					name: '东大街', //地址名称
 					address: '12号', //详细地址名称

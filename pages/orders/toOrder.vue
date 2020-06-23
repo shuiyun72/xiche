@@ -6,7 +6,7 @@
 					预约订单{{index+1}}
 				</view>
 				<view class="r">
-					<text class="iconfont iconqingkongshanchu more_btn_del" @click.stop="deleteAdd(itemC,index)">删除</text>
+					<text class="iconfont iconqingkongshanchu more_btn_del" @click.stop="deleteAdd(itemC,index)" v-if="index != 0">删除</text>
 					<uni-icons :type="indexI == index?'arrowdown':'arrowright'"  size="16" color="#eeeeee"/>
 				</view>
 			</view>
@@ -124,7 +124,7 @@
 				</checkbox-group>
 			</view>
 			<uni-list class="time_pick">
-				<uni-list-item-point title="清洗时间" point="true">
+				<uni-list-item-point title="清洗时间" point="true" @click="showChangeTime">
 					<template v-slot:right="">
 						<picker mode="multiSelector" @columnchange="rinseTimeChange" :value="rinseTimeSel" :range="rinseTimeList">
 							<view class="uni-input">
@@ -266,8 +266,12 @@
 					this.indexI = index
 				}
 			},
+			hasDuplicates(a) {
+			  return _.uniq(a).length !== a.length; 
+			},
 			next(){
 				console.log(this.lastData);
+				let nnLastData = _.cloneDeep(this.lastData);
 				let itemsCarListId = this.itemsCarList.length > 0 ? this.itemsCarList[this.current].id : ""
 				let dataL = {
 					car_id: this.orderCar.id,
@@ -279,8 +283,8 @@
 					remark: this.vTextarea,
 					service_ids:this.otherC
 				}
-				console.log(this.lastData);
-				this.lastData = _.map(this.lastData,resL=>{
+				console.log(nnLastData);
+				nnLastData = _.map(nnLastData,resL=>{
 					return {
 						car_id: resL.car_id.id,
 						address_id: resL.address_id.id,
@@ -292,12 +296,32 @@
 						service_ids:JSON.stringify(resL.service_ids)
 					}
 				})
-				console.log(this.lastData);
+				console.log(nnLastData);
 				let lastDataL;
 				if(this.isCellDelete){
-					lastDataL = this.lastData.concat(dataL);
+					if(dataL.car_id && dataL.address_id && dataL.park_id && dataL.relation_id){
+						lastDataL = nnLastData.concat(dataL);
+					}else{
+						this.$msg('信息不完善,请完善信息');
+						return false;
+					}
 				}else{
-					lastDataL = this.lastData
+					lastDataL = nnLastData
+				}
+				
+				let newlastDataL = _.cloneDeep(lastDataL)
+				console.log(newlastDataL)
+				if(newlastDataL.length > 0){
+					console.log(newlastDataL)
+					let isF = _.map(newlastDataL,irts=>{
+						return irts.car_id
+					})
+					console.log(isF)
+					console.log(this.hasDuplicates(isF))
+					if(isF.length > 0 && this.hasDuplicates(isF)){
+						this.$msg("车牌号重复");
+						return false;
+					}
 				}
 				let sssData = JSON.stringify(lastDataL)
 				console.log(sssData)
@@ -311,10 +335,11 @@
 					}else{
 						let otherC = JSON.stringify(this.otherC) == "[]" ? false : true;
 						console.log(otherC);
-						let isSucc = _.filter(res.data,res=>{
-							return res.user_ticket_id == 0
+						let isSucc = _.filter(res.data.orderList,resccc=>{
+							return resccc.user_ticket_id == 0
 						}).length > 0 ? false : true ;
-						if(this.itemsCarList.length > 0 && !otherC && isSucc){
+						console.log(isSucc)
+						if(this.itemsCarList.length > 0 && !otherC && isSucc && res.data.is_pay > 0){
 							uni.reLaunch({
 								url:'./orderSuccess'
 							})
@@ -355,7 +380,13 @@
 					remark: this.vTextarea,
 					service_ids:this.otherC
 				}
-				this.lastData.push(dataL);
+				if(dataL.car_id.id && dataL.address_id.id && dataL.park_id.id && dataL.relation_id.id){
+					this.lastData.push(dataL);
+				}else{
+					this.$msg('信息不完善,请完善信息');
+					return false;
+				}
+				
 				let this_ = this;
 				for(let i=0;i<this.lastData.length;i++){
 					this_.$nextTick(()=>{
@@ -363,7 +394,7 @@
 					})
 				}
 				
-				this.init();
+				// this.init();
 			},
 			radioChange(e) {
 				console.log(e.detail)

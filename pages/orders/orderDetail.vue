@@ -14,7 +14,7 @@
 					{{infoMsg.created_at}}
 				</view> 
 				<view class="r_t">
-					{{infoMsg.total_amount}}元
+					{{infoMsg.amount}}元
 				</view>
 			</view>
 		</view>
@@ -77,7 +77,7 @@
 				</view>
 			</view>
 		</view>
-		<view class="d_box_sy" >
+		<view class="d_box_sy" v-if="infoMsg.operator">
 			<view class="d_title">
 				联系信息
 			</view>
@@ -125,7 +125,7 @@
 				</view>
 			</view>
 		</view>
-		<view class="d_box_sy" v-if="infoMsg.stateN > 1 && infoMsg.operator.nickname">
+		<view class="d_box_sy" v-if="infoMsg.stateN > 1 && infoMsg.operator">
 			<view class="d_title">
 				洗车人员信息
 			</view>
@@ -329,7 +329,7 @@
 
 			.item_img {
 				width: 140upx;
-				height: 140upx;
+				min-height: 140upx;
 				margin-right: 30upx;
 
 				image {
@@ -370,7 +370,7 @@
 
 			.d_img {
 				width: 250upx;
-				height: 250upx;
+				min-height: 250upx;
 
 				.img {
 					width: 100%;

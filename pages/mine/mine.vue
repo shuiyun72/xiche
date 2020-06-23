@@ -8,14 +8,12 @@
 					</view>	
 				
 				<view class="header_top_mine">
-					<navigator url="./mineInfo">
-					<view class="name_img">
+					<view class="name_img" @click="toImginfo">
 						<view class="t">
-							{{userInfo.nickname}}
+							{{userInfo.nickname?userInfo.nickname:"游客"}}
 						</view>
 						<image :src="httpp + userInfo.avatar" mode="widthFix" class="title_img"></image>
 					</view>
-					</navigator>
 					<view class="item" @click="topNativeTo(1)">
 						<image src="../../static/img/mine/wodtc.png" mode="widthFix" class="img"></image>
 						<view class="text">
@@ -70,6 +68,7 @@
 </template>
 
 <script>
+	import { mapState } from "vuex";
 	export default {
 		data() {
 			return {
@@ -85,18 +84,18 @@
 			};
 		},
 		computed:{
-			userInfo(){
-				return this.$store.state.userInfo;
-			},
-			httpp(){
-				return this.$store.state.httpp
-			},
+			...mapState(["userInfo","httpp","hasLogin"]),
 			groupid(){
-				return this.userInfo.groupid
+				if(this.userInfo && this.userInfo.groupid){
+					return this.userInfo.groupid
+				}else{
+					return 0
+				}
 			}
 		},
 		onShow() {
-			if (this.userInfo.groupid == 0) {
+			console.log(this.userInfo,!this.userInfo)
+			if (!this.userInfo || this.userInfo.groupid == 0) {
 				this.$nextTick(()=>{
 					this.$refs['juan0'].open()
 				})	
@@ -110,44 +109,106 @@
 			}
 		},
 		methods: {
+			getUserInfoWX() {
+				let this_ = this;
+				if (!this.$store.state.hasLogin) {
+					uni.login({
+						provider: 'weixin',
+						success: function(loginRes) {
+							console.log(loginRes);
+							this_.$getApiTime("/api/auth/getopenid", {
+								code: loginRes.code
+							}, res => {
+								console.log(res)
+								if (res.data.is_bind == 0) {
+									console.log("11")
+									uni.getUserInfo({
+										provider: 'weixin',
+										success: function(infoRes) {
+											console.log(infoRes)
+											console.log('用户昵称为：' + infoRes.userInfo.nickName);
+											uni.navigateTo({
+												url: '../login/login?xcx=ws&openid=' + res.data.openid + '&nickname=' + infoRes.userInfo.nickName
+											})
+										} 
+									});
+								} else
+								if (res.data.is_bind == 1){
+									console.log(res)
+									this_.$store.commit('login', res.data);
+									setTimeout(() => {
+										this_.getInit(() => {
+											uni.navigateTo({
+												url:'../mine/addCar?ws=1&xcx=ws'
+											})
+										});
+									}, 500)
+								}
+							}, "false")
+							// 获取用户信息
+						}
+					});
+				}else{
+					uni.navigateTo({
+						url:'../mine/addCar?xcx=ws&ws=1'
+					})
+				}
+			},
 			addCarH(){
+				// #ifdef MP
+				this.getUserInfoWX();
+				// #endif
+				// #ifndef MP
 				uni.navigateTo({
 					url:'../mine/addCar?ws=1'
 				})
+				// #endif
 			},
 			closeJuan() {
 				this.$refs['juan0'].close()
 			},
-			reLaunch(url){
-				uni.reLaunch({
-					url:url
-				})
-			},
 			topNativeTo(type){
-				let urlL;
-				switch(type){
-					case 1: urlL = '../store/vouchersCar'; break;
-					case 2: urlL = '../store/car'; break;
-					case 3: urlL = '../store/addressList'; break;
-					case 4: urlL = '../store/phone'; break;
+				if(!this.hasLogin){
+					this.$refs['juan0'].open()
+				}else{
+					let urlL;
+					switch(type){
+						case 1: urlL = '../store/vouchersCar'; break;
+						case 2: urlL = '../store/car'; break;
+						case 3: urlL = '../store/addressList'; break;
+						case 4: urlL = '../store/phone'; break;
+					}
+					uni.navigateTo({
+						url:urlL
+					})
 				}
-				uni.navigateTo({
-					url:urlL
-				})
 			},
 			nativeTo(type){
-				let url;
-				switch(type){
-					case 1: url = './moneyBox'; break; 
-					case 2: url = '../store/couponList'; break; 
-					case 3: url = './appraise'; break; 
-					case 4: url = './teamworkSW'; break;
-					case 5: url = './aboutMine'; break;
-					case 6: url = './set'; break;
+				if(!this.hasLogin){
+					this.$refs['juan0'].open()
+				}else{
+					let url;
+					switch(type){
+						case 1: url = './moneyBox'; break; 
+						case 2: url = '../store/couponList'; break; 
+						case 3: url = './appraise'; break; 
+						case 4: url = './teamworkSW'; break;
+						case 5: url = './aboutMine'; break;
+						case 6: url = './set'; break;
+					}
+					uni.navigateTo({
+						url:url
+					})
 				}
-				uni.navigateTo({
-					url:url
-				})
+			},
+			toImginfo(){
+				if(!this.hasLogin){
+					this.$refs['juan0'].open()
+				}else{
+					uni.navigateTo({
+						url:'./mineInfo'
+					})
+				}
 			}
 		}
 	}
@@ -191,7 +252,8 @@
 					color: #fff;
 				}
 				.title_img{
-					width: 90%;
+					width: 160upx;
+					height: 160upx;
 					border: 6upx solid #fff;
 					box-shadow: 0 0 6upx 1upx $uni-bl;
 					border-radius: 50%;

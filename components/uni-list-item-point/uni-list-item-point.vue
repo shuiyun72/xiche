@@ -15,10 +15,10 @@
 					<text class="uni-list-item__content-title"><text v-show="point" class="point_red">*</text>{{ title }}</text>
 					<text v-if="note" class="uni-list-item__content-note">{{ note }}</text>
 				</view>
-				<view class="uni-list-item__extra">
+				<view class="uni-list-item__extra" @change="onSwitchChange">
 					<text v-if="rightText" class="uni-list-item__extra-text">{{rightText}}</text>
 					<uni-badge v-if="showBadge" :type="badgeType" :text="badgeText" />
-					<switch v-if="showSwitch" :disabled="disabled" :checked="switchChecked" @change="onSwitchChange" />
+					<switch v-if="showSwitch" :disabled="disabled" :checked="switchChecked"  />
 					<slot name="right"></slot>
 					<uni-icons v-if="showArrow" :size="16" class="uni-icon-wrapper" color="#bbb" type="arrowright" />
 				</view>
@@ -130,7 +130,7 @@
 					return {
 						type: 'contact',
 						color: '#000000',
-						size: 20
+						size: 26
 					}
 				}
 			}

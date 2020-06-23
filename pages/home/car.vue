@@ -6,7 +6,7 @@
 			</view>
 			<view class="city_title" v-for="(tc,ic) in t.lists" :key="tc.id" @tap="selectCity(tc)">
 				<view class="img_car">
-					<image :src="$httpp+tc.cover" mode="widthFix" class="img"></image>
+					<image :src="httpp+tc.cover" mode="widthFix" class="img"></image>
 				</view>
 				<view class="t_t">
 					{{tc.name}}
@@ -32,6 +32,11 @@
 			return {
 				seaText: "",
 				Car: []
+			}
+		},
+		computed:{
+			httpp(){
+				return this.$store.state.httpp;
 			}
 		},
 		mounted() {

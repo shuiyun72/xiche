@@ -171,10 +171,10 @@
 	}
 
 	.car_list {
-		height: 100vh;
+		min-height: 100vh;
 		background-color: #f0f0f0;
 		border-top: 1upx solid #eee;
-
+		padding-bottom: 200upx;
 		.item {
 			background-color: #fff;
 			padding: 30upx 26upx 20upx;

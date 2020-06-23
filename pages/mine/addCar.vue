@@ -27,7 +27,7 @@
 			<view class="car_color_list">
 				<view class="item" v-for="(item,index) in carColorList" :class="{'active':index == selectColor}" @click="selColor(item,index)">
 					<text class="moren" v-show="index == 0">默认</text>
-					<image :src="$httpp+item.cover" mode="widthFix" class="img"></image>
+					<image :src="httpp+item.cover" mode="widthFix" class="img"></image>
 					<view class="text">
 						{{item.name}}
 					</view>
@@ -45,6 +45,9 @@
 						<view class="iconfont iconshanchu" @click="deleteImg(index)"></view>
 					</view>
 				</block>
+				<view class="img_p" v-if="oldImg">
+					<image class="img" :src="httpp+oldImg"  mode="widthFix"></image>
+				</view>
 			</view>
 			<view class="sm_title">
 				示例: 前后左右
@@ -56,7 +59,7 @@
 			</view>
 		</uni-list>
 		<view class="sub_btn">
-			<button class="btn blue" @click="submitOrder">下一步</button>
+			<button class="btn blue" @click="submitOrder">{{type == 1 ? '下一步' : '确认提交'}}</button>
 		</view>
 	</view>
 </template>
@@ -74,7 +77,7 @@
 				chepai:"",
 				carColorList: this.$store.state.carColor,
 				selectColor: 0,
-				rightTextCarColor: "请选择车辆颜色",
+				rightTextCarColor: "白色",
 				carArrayXing: this.$store.state.carXing,
 				carArrayXingSelect: 0,
 				imageList: [],
@@ -98,11 +101,12 @@
 				],
 				carId:"",
 				type:2,
-				fromL:""
+				fromL:"",
+				oldImg:""
 			};
 		},
 		computed: {
-			...mapState(["brand"])
+			...mapState(["brand",'httpp'])
 		},
 		onLoad(ph) {
 			if(ph.item){
@@ -118,15 +122,28 @@
 				this.$store.commit('setbrand',{name:item.chebrand.name,id:item.chebrand.id});
 				this.rightTextCarColor = item.checolor.name;
 				this.carId = item.id;
+				this.oldImg = item.img;
+			}else
+			if(ph.ws){
+				uni.setNavigationBarTitle({
+					title:'完善信息'
+				})
 			}else{
 				this.$store.commit('setbrand',{name:"请选择车的品牌"})
 			}
+			
 			this.type = ph.ws ? 1 : 2;
 			this.fromL = ph.from ? ph.from : "";		
 		},
 		methods: {
 			//提交订单
-			submitOrder(){		
+			submitOrder(){
+				
+				// this.oldImg
+				let lastImg = _.cloneDeep(this.upimageList);
+				if(this.oldImg){
+					lastImg.concat(this.oldImg)
+				}
 				let data = {
 					name:this.name,
 					phone:this.phone,
@@ -135,35 +152,35 @@
 					chepai:this.chepai,
 					car_color_id:this.carColorList[this.selectColor].id,
 					car_brand_id:this.brand.id,
-					covers:JSON.stringify(this.upimageList),
+					covers:JSON.stringify(lastImg),
 					type:this.type
 				}
-				this.$getApi("/api/user/mine/addCar",data,res1=>{
-					this.$store.commit('setbrand',{name:"请选择车的品牌"});
-					
-					// ph.from
-					
-					if(this.type == 1){
-						this.$getApi("/api/user/userinfo",{},res=>{
-							this.$store.commit('login',res.data);
-						})
-						uni.navigateTo({
-							url:'../mine/addAddress'
-						})
-					}else{
-						if(this.fromL){
-							uni.navigateBack({
-								delta:2
+				if(this.name && this.phone && this.chepai && this.brand.id && lastImg.length > 0 ){
+					this.$getApi("/api/user/mine/addCar",data,res1=>{
+						// this.$store.commit('setbrand',{name:"请选择车的品牌"});
+						if(this.type == 1){
+							this.$getApi("/api/user/userinfo",{},res=>{
+								this.$store.commit('login',res.data);
+							})
+							uni.navigateTo({
+								url:'../mine/addAddress'
 							})
 						}else{
-							uni.reLaunch({
-								url:"./addSuccess"
-							})
-						}
-					}
-					
-					
-				})
+							if(this.fromL){
+								uni.navigateBack({
+									delta:2
+								})
+							}else{
+								uni.reLaunch({
+									url:"../store/car"
+								})
+							}
+						}	
+					})
+				}else{
+					this.$msg("请完善信息!")
+				}
+				
 			},
 			selColor(item, index) {
 				this.selectColor = index;
@@ -191,6 +208,7 @@
 								token: token
 							  },
 							success(res1) {
+								this_.$msg("图片上传成功")
 								// 显示上传信息
 								console.log(JSON.parse(res1.data).data.url)
 								this_.upimageList.push(JSON.parse(res1.data).data.url)

@@ -164,7 +164,7 @@
 	}
 
 	.car_list {
-		height: 100vh;
+		min-height: 100vh;
 		background-color: #f0f0f0;
 		border-top: 1upx solid #eee;
 

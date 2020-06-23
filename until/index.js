@@ -29,34 +29,39 @@ Vue.prototype.$getApi = function(url, data, callsuc, token) {
 		},
 		success: (res) => {
 			// uni.hideLoading();
-			// console.log(res)this.$msg("您输入的参数有误,请检查")
 			if (res.data.code == 200) {
-				// this.$msg(res.data.msg)
 				callsuc instanceof Function && callsuc(res.data)
 			} else
 			if (res.data.code == 201) {
 				this.$msg(res.data.msg)
 			} else
-			if (res.data.code == 202) {
-				this.$msg(res.data.msg)
-			} else
 			if (res.data.code == 401) {
-				this.$msg("登录已过期,请重新登录")
-				uni.reLaunch({
-					url: '../login/yLogin'
-				})
-			} else {
-				this.$msg(res.data.msg)	
-			}
+				this.$msg("请重新登录")
+				// #ifndef MP
+					uni.reLaunch({
+						url: '../login/yLogin',
+						success(){
+							location.reload()
+						} 
+					})
+				// #endif
+				// #ifdef MP
+					uni.reLaunch({
+						url: '../home/home',
+						success(){
+							location.reload() 
+						}
+					})
+				// #endif
+			} 
 		},
 		fail: (err) => {
-			this.$msg("网络错误,请联系管理员")
+			this.$msg("网络请求出错")
 		}
 	});
 }
 
 Vue.prototype.$getApiTime = function(url, data, callsuc, token) {
-	// url = 'System/Login?loginContent=admin&password=123456'
 	token = token == "false" ? false : true;
 	data = data ? data : {};
 	console.log("token", token);
@@ -66,9 +71,7 @@ Vue.prototype.$getApiTime = function(url, data, callsuc, token) {
 		data.page = 1;
 		data.paginate = 200;
 	}
-	// console.log("data", data)
 	uni.request({
-		// url: apiUrl +'/api/'+ url +'?'+Qs.stringify(data), //仅为示例，并非真实接口地址。
 		url: apiUrl + url,
 		method: 'post',
 		data: data,
@@ -76,27 +79,29 @@ Vue.prototype.$getApiTime = function(url, data, callsuc, token) {
 			'content-type': 'application/x-www-form-urlencoded'
 		},
 		success: (res) => {
-			// console.log(res)this.$msg("您输入的参数有误,请检查")
-			if (res.data.code == 200) {
+			console.log(res)
+			if (res.data.code == 200 || res.data.code == 202) {
 				// this.$msg(res.data.msg)
 				callsuc instanceof Function && callsuc(res.data)
 			} else
-			if (res.data.code == 201) {
-				this.$msg(res.data.msg)
-			} else
-			if (res.data.code == 202) {
-				this.$msg(res.data.msg)
-			} else
 			if (res.data.code == 401) {
 				this.$msg("登录已过期,请重新登录")
-				uni.reLaunch({
-					url: '../login/yLogin',
-					success(){
-						location.reload()
-					}
-				})
-			} else {
-				this.$msg(res.data.msg)	
+				// #ifndef MP
+					uni.reLaunch({
+						url: '../login/yLogin',
+						success(){
+							location.reload()
+						}
+					})
+				// #endif
+				// #ifdef MP
+					// uni.reLaunch({
+					// 	url: '../home/home',
+					// 	success(){
+					// 		location.reload()
+					// 	}
+					// })
+				// #endif
 			}
 		},
 		fail: (err) => {

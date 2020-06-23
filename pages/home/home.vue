@@ -31,7 +31,7 @@
 						</view>
 						<view class="li_info">
 							<view class="l_l">
-								剩余{{userInfo ? userInfo.ticket_num : 0}}张
+								剩余{{userInfo && userInfo.ticket_num ? userInfo.ticket_num : 0}}张
 							</view>
 							<image src="../../static/img/home/xicj.png" mode="widthFix" class="l_r"></image>
 
@@ -49,10 +49,10 @@
 						</view>
 					</view>
 				</view>
-					<view class="p_car" @click="toOrder">
-						<text class="iconfont icon-"></text>
-						<text>预约洗车</text>
-					</view>
+				<view class="p_car" @click="toOrder">
+					<text class="iconfont icon-"></text>
+					<text>预约洗车</text>
+				</view>
 			</view>
 		</view>
 		<uni-popup type="center" ref="juan2">
@@ -94,16 +94,17 @@
 				<view class="ju_title2">
 					洗车优惠券
 				</view>
+				<scroll-view scroll-y="true" class="scroll-Y">
 				<view class="item_card" v-for="item in juan1List" :key="item.id">
 					<image src="../../static/img/mine/zhekj.png" mode="widthFix" class="img"></image>
 					<view class="item_ab">
 						<view class="left">
 							<view class="p1">
-								<text class="t">{{Number(item.discount)}}</text>
-								<text>折</text>
+								<text class="t">{{Number(item.money)}}</text>
+								<text>元</text>
 							</view>
 							<view class="p2">
-								折扣券
+								满减券
 							</view>
 						</view>
 						<view class="right">
@@ -119,6 +120,7 @@
 						</view>
 					</view>
 				</view>
+				</scroll-view>
 				<view class="t_btn">
 					<button class="round btn sm" @click="getQuanSucc">确定</button>
 				</view>
@@ -134,129 +136,196 @@
 	} from 'vuex'
 	export default {
 		data() {
-			return {	
+			return {
 				juan1List: [],
-				getQuan:undefined
+				getQuan: undefined
 			};
 		},
-		onShow(){
-			this.$getApiTime("/api/user/userinfo",{},res=>{
-				this.$store.commit('login',res.data);
-			})
-			if(!this.hasLogin){
-				uni.reLaunch({
-					url:'../login/yLogin'
-				})
-			}else{
-				if (this.userInfo && this.userInfo.is_take == 0) {
-					this.getQList()
-				}
-			}
-			if(this.userInfo && this.userInfo.groupid != 0){
-				try{
-					this.$nextTick(()=>{
-						this.$refs['juan0'].close();
-					})
-				}catch(e){
-					//TODO handle the exception
-				}
-			}
-			console.log("sss")
-			let this_ = this;
-			// #ifdef MP
-			uni.login({
-			  provider: 'weixin',
-			  success: function (loginRes) {
-			    console.log(loginRes);
-				this_.$getApiTime("/api/auth/getopenid",{code:loginRes.code},res=>{
-					console.log(res)
-					if(res.is_bind == 0){
-						uni.getUserInfo({
-						  provider: 'weixin',
-						  success: function (infoRes) {
-							  console.log(infoRes)
-						    console.log('用户昵称为：' + infoRes.userInfo.nickName);
-							uni.navigateTo({
-								url:'./login?openid='+res.openid+'&nickname='+infoRes.userInfo.nickName
-							})
-						  }
-						});
-					}
-				})
-			    // 获取用户信息
-			    
-			  }
-			});
-			// #endif
+		mounted() {
+			console.log("homemounted")
 			
 		},
-		onHide(){
+		onShow() {
+			let this_ = this;
+			// #ifndef MP
+			if (!this_.hasLogin) {
+				uni.reLaunch({
+					url: '../login/yLogin'
+				})
+			} else {
+				if (this_.userInfo && this_.userInfo.is_take < 1) {
+					this_.getQList()
+				}
+			}
+			// #endif
+			// #ifdef MP
+			
+			if(!this.hasLogin){
+				this.xcxisLogin();
+				this_.getQList();
+			}
+			// #endif
+			if (this.hasLogin) {
+				this.$getApi("/api/user/userinfo", {}, res => {
+					this.$store.commit('login', res.data);
+				})
+			}
+			try {
+				this.$nextTick(() => {
+					this.$refs['juan0'].close();
+					this.$refs['juan2'].close();
+				})
+			} catch (e) {
+				//TODO handle the exception
+			}
+				
+		},
+		onHide() {
 			console.log("onHide1112121000")
 		},
-		computed:{
-			...mapState(['hasLogin', 'userInfo','selCity']),
-			group(){
-				if(this.userInfo){
+		computed: {
+			...mapState(['hasLogin', 'userInfo', 'selCity']),
+			group() {
+				if (this.userInfo) {
 					switch (this.userInfo.groupid) {
-						case 1 : return "会员" ; break;
-						case 2 : return "vip会员" ; break;
-						default: return "游客" ; break;
+						case 1:
+							return "会员";
+							break;
+						case 2:
+							return "vip会员";
+							break;
+						default:
+							return "游客";
+							break;
 					}
-				}else{
+				} else {
 					return "游客"
 				}
 			}
 		},
-		mounted() {
-			// uni.authorize({
-			//     scope: 'scope.userLocation',
-			//     success() {
-			//         uni.getLocation()
-			//     }
-			// })
-		},
 		methods: {
-			addCarH(){
+			xcxisLogin(){
+				let this_ = this;
+				uni.login({
+					provider: 'weixin',
+					success: function(loginRes) {
+						console.log(loginRes);
+						this_.$getApiTime("/api/auth/getopenid", {
+							code: loginRes.code
+						}, res => {
+							console.log(res)
+							if (res.data.is_bind == 1){
+								console.log(res)
+								this_.$store.commit('login', res.data);
+								setTimeout(() => {
+									this_.getInit(() => {
+										this_.$msg("登录成功")
+									});
+								}, 500)
+							}
+						}, "false")
+					},
+				})
+			},
+			getUserInfoWX() {
+				let this_ = this;
+				if (!this.$store.state.hasLogin) {
+					uni.login({
+						provider: 'weixin',
+						success: function(loginRes) {
+							console.log(loginRes);
+							this_.$getApiTime("/api/auth/getopenid", {
+								code: loginRes.code
+							}, res => {
+								console.log(res)
+								if (res.data.is_bind == 0) {
+									console.log("11")
+									uni.getUserInfo({
+										provider: 'weixin',
+										success: function(infoRes) {
+											console.log(infoRes)
+											console.log('用户昵称为：' + infoRes.userInfo.nickName);
+											uni.navigateTo({
+												url: '../login/login?xcx=ws&openid=' + res.data.openid + '&nickname=' + infoRes.userInfo.nickName
+											})
+										} 
+									});
+								} else
+								if (res.data.is_bind == 1){
+									console.log(res)
+									this_.$store.commit('login', res.data);
+									setTimeout(() => {
+										this_.getInit(() => {
+											uni.navigateTo({
+												url:'../mine/addCar?ws=1&xcx=ws'
+											})
+										});
+									}, 500)
+								}
+							}, "false")
+							// 获取用户信息
+						}
+					});
+				}else{
+					uni.navigateTo({
+						url:'../mine/addCar?xcx=ws&ws=1'
+					})
+				}
+			},
+			addCarH() {
+				// #ifdef MP
+				this.getUserInfoWX();
+				// #endif
+				// #ifndef MP
 				uni.navigateTo({
 					url:'../mine/addCar?ws=1'
 				})
+				// #endif
 			},
 			//home弹窗优惠券
-			getQList(){
-				this.$getApi("/api/auth/coupon/list",{},res=>{
+			getQList() { 
+				this.$getApi("/api/auth/coupon/list", {}, res => {
 					console.log(res.data)
 					this.juan1List = res.data;
 					this.$refs['juan1'].open()
-				})
+				})	
 			},
 			//跳转洗车券
-			getXCQ(){
-				if(this.userInfo.ticket_num > 0){
-					uni.navigateTo({
-						url:'../store/vouchersCar'
-					})
+			getXCQ() {
+				if(this.hasLogin){
+					if (this.userInfo.ticket_num > 0) {
+						uni.navigateTo({
+							url: '../store/vouchersCar'
+						})
+					} else {
+						this.$refs['juan2'].open()
+					}
 				}else{
 					this.$refs['juan2'].open()
 				}
 			},
 			//预约洗车
-			toOrder(){			
-				if(this.userInfo && this.userInfo.groupid == 0){
+			toOrder() {
+				if (!this.userInfo || this.userInfo.groupid == 0) {
 					this.$refs['juan0'].open()
-				}else{
+				} else {
 					uni.navigateTo({
-						url:'../orders/toOrder'
+						url: '../orders/toOrder'
 					})
 				}
 			},
 			closeJuan(num) {
 				console.log(num)
-				if(num == 1){
-					this.$getApi("/api/user/coupon/cancle",{},res=>{
+				if (num == 1) {
+					if(this.hasLogin){
+						this.$getApi("/api/user/coupon/cancle", {}, res => {
+							this.$refs['juan1'].close()
+							this.$store.commit("setCoupon");
+						});
+					}else{
 						this.$refs['juan1'].close()
-						this.$store.commit("setCoupon");
-					});
-				}else{
+					}
+				} else {
 					this.$refs['juan' + num].close()
 				}
 			},
@@ -266,18 +335,40 @@
 				})
 			},
 			getQuanSucc() {
-				this.$getApi("/api/user/coupon/take",{},res=>{
-					this.$refs['juan1'].close()
-					this.$msg('优惠券领取成功,可在个人中心中查看');
-					this.$store.commit("setCoupon");
-				});
-				
+				if(this.hasLogin){
+					this.$getApi("/api/user/coupon/take", {}, res => {
+						this.$refs['juan1'].close()
+						this.$msg('优惠券领取成功,可在个人中心中查看');
+						this.$store.commit("setCoupon");
+					});
+				}else{
+					this.getUserInfoWX();
+				}
+
+			},
+			async getInit(call) {
+				await this.$getApi("/api/user/car/xing", {}, res => {
+					this.$store.commit("setCarXing", res.data)
+				})
+				await this.$getApi("/api/user/car/color", {}, res => {
+					this.$store.commit("setCarColor", res.data)
+				})
+				await this.$getApi("/api/user/car/brand", {}, res => {
+					this.$store.commit("setCarBrand", res.data)
+				})
+				await this.$getApi("/api/user/car/service", {}, res => {
+					this.$store.commit("setService", res.data)
+				})
+				call instanceof Function && call()
 			}
 		}
 	}
 </script>
 
 <style lang="scss" scoped>
+	.scroll-Y{
+		max-height: 560upx;
+	}
 	.juan1_body {
 		background-color: $uni-bl;
 		position: relative;
@@ -312,7 +403,7 @@
 					text-align: center;
 
 					.p1 {
-						color: #f00;
+						color: $uni-bl;
 						font-weight: bold;
 
 						.t {
