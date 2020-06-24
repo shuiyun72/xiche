@@ -14,7 +14,6 @@ Vue.prototype.$getApi = function(url, data, callsuc, token) {
 		data.page = 1;
 		data.paginate = 200;
 	}
-	console.log("data", data)
 	uni.showLoading({
 	    title: '加载中'
 	});
@@ -30,13 +29,51 @@ Vue.prototype.$getApi = function(url, data, callsuc, token) {
 			uni.hideLoading();
 			// console.log(res)
 			if (res.data.code == 200) {
-				this.$msg(res.data.msg)
 				callsuc instanceof Function && callsuc(res.data)
 			} else
 			if (res.data.code == 401) {
 				this.$msg("登录已过期,请重新登录")
 				uni.reLaunch({
-					url: '../login/yLogin'
+					url: '../login/login'
+				})
+			} else {
+				this.$msg(res.data.msg)
+			}
+		},
+		fail: (err) => {
+			callerr instanceof Function && callerr(err)
+		}
+	});
+}
+
+Vue.prototype.$getApiTime = function(url, data, callsuc, token) {
+	// url = 'System/Login?loginContent=admin&password=123456'
+	token = token == "false" ? false : true;
+	data = data ? data : {};
+	console.log("token", token);    
+	let userInfo = uni.getStorageSync('userInfo') || this.$store.state.userInfo;
+	if (token && userInfo) {
+		data.token = userInfo.remember_token;
+		data.page = 1;
+		data.paginate = 200;
+	}
+	uni.request({
+		// url: apiUrl +'/api/'+ url +'?'+Qs.stringify(data), //仅为示例，并非真实接口地址。
+		url: apiUrl + url,
+		method: 'post',
+		data: data,
+		header: {
+			'content-type': 'application/x-www-form-urlencoded'
+		},
+		success: (res) => {
+			// console.log(res)
+			if (res.data.code == 200) {
+				callsuc instanceof Function && callsuc(res.data)
+			} else
+			if (res.data.code == 401) {
+				this.$msg("登录已过期,请重新登录")
+				uni.reLaunch({
+					url: '../login/login'
 				})
 			} else {
 				this.$msg(res.data.msg)

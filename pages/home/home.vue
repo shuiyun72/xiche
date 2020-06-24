@@ -6,7 +6,7 @@
 				<view class="msg" @click="navigatorUrl('./appraise')">
 					<text class="name">{{homeInfo.nickname}}</text>
 					<view class="star_box">
-						<uni-rate :value="homeInfo.star" :margin="5" :size="12"  />
+						<uni-rate :value="homeInfo.star" :margin="5" :size="12"  disabled="false"/>
 						<text class="star_n">{{starC}}星</text>
 					</view>
 					<text class="address">所属小区 : {{userInfo.house && userInfo.house.name}}</text>
@@ -82,8 +82,8 @@
 				</view>
 			</view>
 		</view>
-		<view class="o_start" v-show="orderState && msgInfo.length == 0">
-			<view class="o_start_b">
+		<view class="o_card_list no_order" v-if="orderState && msgInfo.length == 0">
+			<view class="o_stop">
 				<view @click="isOrderHandle(false)">
 					<text>停止</text>
 					<text>接单</text>
@@ -105,11 +105,35 @@
 					star: 5,
 					address: "升龙又一城"
 				},
-				msgInfo: []
+				msgInfo: [],
+				timerLL:undefined
 			}
 		},
-		mounted() {
+		onShow() {
 			this.getInit();
+			console.log(this.orderState)
+			let this_ = this;
+			if(this.orderState == 1){
+				this.timerLL = setInterval(()=>{
+					this_.getOList();
+				},5000)
+			}else{
+				try{
+					clearInterval(this_.timerLL);
+					this_.timerLL = undefined;
+				}catch(e){
+					//TODO handle the exception
+				}
+			}
+		},
+		onHide() {
+			let this_ = this;
+			try{
+				clearInterval(this_.timerLL);
+				this_.timerLL = undefined;
+			}catch(e){
+				//TODO handle the exception
+			}
 			
 		},
 		computed: {
@@ -145,30 +169,44 @@
 					this.$store.commit('setHome',res.data);
 					console.log(res)
 				})
-				
+			},
+			getOList(){
+				let orderData = {
+					type:1,
+					page:1,
+					paginate:100
+				}
+				this.$getApiTime('/api/operator/orderList',orderData,ress => {
+					console.log(ress)
+					if(ress.data.data.length > 0){
+						this.msgInfo = ress.data.data;
+						// this.msgInfo = []
+						
+					}else{
+						this.msgInfo = []
+					}
+				})
 			},
 			isOrderHandle(el){
+				let this_ = this;
 				if(el){	
-					this.$getApi('/api/operator/start',{},res=>{		
-						let orderData = {
-							type:1,
-							page:1,
-							paginate:100
+					this.$getApi('/api/operator/start',{},res=>{	
+						this.$store.commit('setState',1)
+						if(!this_.timerLL){
+							this.timerLL = setInterval(()=>{
+								this_.getOList();
+							},1000)
 						}
-						this.$getApi('/api/operator/orderList',orderData,ress => {
-							console.log(ress)
-							if(ress.data.data.length > 0){
-								this.msgInfo = ress.data.data;
-								
-							}else{
-								this.msgInfo = []
-							}
-							this.$store.commit('setState',1)
-						})
 					})
 				}else{
 					this.$getApi('/api/operator/stop',{},res=>{
 						this.$store.commit('setState',0)
+						try{
+							clearInterval(this_.timerLL);
+							this_.timerLL = undefined;
+						}catch(e){
+							//TODO handle the exception
+						}
 					})
 				}
 			},
@@ -211,7 +249,7 @@
 	.o_start{
 		display: flex;
 		justify-content: center;
-		margin-top: 300upx;
+		margin: 300upx 0;
 		.o_start_b{
 			background-color: $uni-or;
 			width: 200upx;
@@ -239,7 +277,10 @@
 		box-sizing: border-box;
 		padding: 24upx 30upx;
 		position:relative;
-		
+		&.no_order{
+			background-color: transparent;
+			padding-top: 800upx;
+		}
 		.o_stop{
 			position: absolute;
 			right: -16upx;

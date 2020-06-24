@@ -157,26 +157,7 @@
 		data() {
 			return {
 				carList: ["qianb.png", "houb.png", "zuoc.png", "youc.png"],
-				infoMsg: {
-					code: "12345782515",
-					state: "待接单",
-					title: "单次外部清洗",
-					time: "2020-05-06 13:00-14:00",
-					name: "张萌萌",
-					phone: "13233333333",
-					carNum: "豫A668899",
-					xing: "小型汽车",
-					color: "蓝色",
-					carBrand: "别克GLB",
-					img: "tu.png",
-					address: "郑州是郑州是郑州郑州是郑州是郑州是2号楼",
-					location: "12号停车位",
-					remark: "请清洗干净一些",
-					beforeTime: "2020-05-06 13:01",
-					afterTime: "2020-05-06 13:01",
-					qxCase: "到达指定位置未找到指定车辆",
-					qxTime: "2020-05-06 13:01"
-				},
+				infoMsg: {},
 				tabSel: 0
 			};
 		},

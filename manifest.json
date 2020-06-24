@@ -99,6 +99,11 @@
             "urlCheck" : true,
             "postcss" : true,
             "minified" : true
+        },
+        "permission" : {
+            "scope.userLocation" : {
+                "desc" : "获取用户位置"
+            }
         }
     },
     "h5" : {

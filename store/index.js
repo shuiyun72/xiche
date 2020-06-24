@@ -10,7 +10,9 @@ const store = new Vuex.Store({
 		hasLogin: hasLogin,
 		userInfo: uni.getStorageSync("userInfo") || {},
 		homeInfo: uni.getStorageSync("userInfo") || {},
-		httpp:"https://yuyue.wsstreet.net/uploads/"
+		httpp:"https://yuyue.wsstreet.net/uploads/",
+		carXing:uni.getStorageSync("carXing") || [],
+		carServe:[]
 	},
 	getters:{
 		orderState: state => {
@@ -27,6 +29,9 @@ const store = new Vuex.Store({
 		},
 		brand(state, data){
 			state.brand = data;
+		},
+		setCarServe(state, data){
+			state.carServe = data;
 		},
 		setCarXing(state, data){
 			state.carXing = data;

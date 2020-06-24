@@ -7,14 +7,13 @@
 					<text class="p">匿名评价</text>
 				</view>
 				<view class="star_box">
-					<uni-rate :value="item.star" :margin="5" :size="16" />
+					<uni-rate :value="item.star" :margin="5" :size="16" disabled="false"/>
 					<text class="star_n">{{starC(item.star)}}星</text>
 				</view>
 				<view class="grow_btn_app">
 					<view class="item_btn" v-for="itemC in item.tags">
 						<button class="btn default_n round sm active">{{itemC}}</button>
 					</view>
-
 				</view>
 				<view class="a_raise">
 					{{item.content}}

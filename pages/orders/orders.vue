@@ -88,35 +88,7 @@
 						type: 4
 					}
 				],
-				msgInfo: [{
-						type: "单次外部清洗",
-						state: "待接单",
-						car: "小型汽车",
-						carP: "豫A668899",
-						name: "张倩倩",
-						phone: "13233333333",
-						time: "2020-05-06 13:00-14:00",
-						p: "12号停车位",
-						addr: "郑州市中关区郑州市中关区郑州市",
-						ftime: "2020-05-06 13:58",
-						ntime: "2020-05-06 13:58",
-						cause: "到达指定位置未找到指定车辆"
-					},
-					{
-						type: "单次外部清洗",
-						state: "待接单",
-						car: "小型汽车",
-						carP: "豫A668899",
-						name: "张倩倩",
-						phone: "13233333333",
-						time: "2020-05-06 13:00-14:00",
-						p: "12号停车位",
-						addr: "郑州市中关区郑州市中关区郑州市",
-						ftime: "2020-05-06 13:58",
-						ntime: "2020-05-06 13:58",
-						cause: "到达指定位置未找到指定车辆"
-					}
-				],
+				msgInfo: [],
 				getInterval:undefined
 			}
 		},
@@ -130,8 +102,18 @@
 		computed: {
 			
 		},
-		onLoad() {
-			this.getOrder(1);
+		onShow() {
+			let this_ = this;
+			this.getInterval = setInterval(()=>{
+				this_.getOrder(this_.tabSel+1);
+			},1000)
+		},
+		onHide() {
+			let this_ = this;
+			clearInterval(this_.getInterval);
+			this_.getInterval = undefined;
+		},
+		onLoad(ph) {
 			uni.startPullDownRefresh();
 		},
 		onPullDownRefresh() {
@@ -160,7 +142,7 @@
 					page:1,
 					paginate:100
 				}
-				this.$getApi('/api/operator/orderList',orderData,res=>{
+				this.$getApiTime('/api/operator/orderList',orderData,res=>{
 					console.log(res.data)
 					this.msgInfo = res.data.data
 				})
@@ -175,10 +157,11 @@
 				});
 			},
 			toPosition(item) {
+				console.log(item)
 				uni.openLocation({
-					longitude: item.lng, //要去的经度-地址
-					latitude: item.lat, //要去的纬度-地址       
-					name: 'item.address', //地址名称
+					longitude: Number(item.lng), //要去的经度-地址
+					latitude: Number(item.lat), //要去的纬度-地址       
+					name: item.address, //地址名称
 					address: item.address, //详细地址名称
 					success: function() {
 						console.log('导航成功');

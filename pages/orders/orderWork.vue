@@ -89,6 +89,7 @@
 								token: token
 							  },
 							success(res1) {
+								this_.$msg("图片上传成功")
 								// 显示上传信息
 								console.log(JSON.parse(res1.data).data.url)
 								this_.upimageList.push(JSON.parse(res1.data).data.url)
@@ -99,6 +100,10 @@
 			},
 			submitBtn(){
 				console.log(JSON.stringify(this.upimageList))
+				if(this.upimageList.length < 1){
+					this.$msg("请上传照片");
+					return false;
+				}
 				if(this.orderInfo.stateN == 2){
 					this.$getApi("/api/operator/order/begin",{
 						id:this.orderInfo.id,

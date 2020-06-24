@@ -14,19 +14,22 @@
 			</view>
 			<view class="select_sy">
 				<view class="bdb1 select_title_s">
-					<view class="item_bef item" @click="classifyShow" :class="{'item_aft':classifyS >= 0}">
+					<view class="item_bef item" @click="classifyShow" :class="{'item_aft':carXshow}">
 						类型筛选
 					</view>
 					<view class="item_bef item" @click="dateShow" :class="{'item_aft':dateShowS}" v-show="cItem.type != 1">
 						日期筛选
 					</view>
+					<view class="item_bef item" @click="serveShow" :class="{'item_aft':carSershow}">
+						类目筛选
+					</view>
 				</view>
 				
-				<view class="shade_sy" v-show="classifyS >= 0">
+				<view class="shade_sy" v-show="carXshow">
 					<view class="select_box_sy">
 						<view class="item_s" v-for="(item,index) in classifyList" :key="item.uid" :class="{'active':index == classifyS}"
 						 @click="classifySe(item,index)">
-							{{item.text}}
+							{{item.name}}
 						</view>
 					</view>
 					<view class="true_btn">
@@ -55,6 +58,22 @@
 							重置
 						</view>
 						<view class="btn or" @click="subBtn('date')">
+							确定
+						</view>
+					</view>
+				</view>
+				<view class="shade_sy" v-show="carSershow">
+					<view class="select_box_sy">
+						<view class="item_s" v-for="(item,index) in carServeList" :class="{'active':index == carSer}"
+						 @click="carSerC(item,index)">
+							{{item}}
+						</view>
+					</view>
+					<view class="true_btn">
+						<view class="btn" @click="initBtn('carSer')">
+							重置
+						</view>
+						<view class="btn or" @click="subBtn('carSer')">
 							确定
 						</view>
 					</view>
@@ -93,92 +112,128 @@
 						xing: "小型汽车",
 						afterTime: "2020-05-06 13:01",
 						id: 332
-					},
-					{
-						title: "单次外部清洗",
-						code: "51215233145",
-						xing: "小型汽车",
-						afterTime: "2020-05-06 13:01",
-						id: 333
-					},
-					{
-						title: "单次外部清洗",
-						code: "51215233145",
-						xing: "小型汽车",
-						afterTime: "2020-05-06 13:01",
-						id: 334
-					},
-					{
-						title: "单次外部清洗",
-						code: "51215233145",
-						xing: "小型汽车",
-						afterTime: "2020-05-06 13:01",
-						id: 336
-					},
-					{
-						title: "单次外部清洗",
-						code: "51215233145",
-						xing: "小型汽车",
-						afterTime: "2020-05-06 13:01",
-						id: 337
 					}
 				],
-				classifyList: [{
-						text: "全部",
-						uid: 1
-					},
-					{
-						text: "小型汽车",
-						uid: 2
-					},
-					{
-						text: "SUV汽车",
-						uid: 3
-					},
-					{
-						text: "MPV汽车",
-						uid: 4
-					}
-				],
+				classifyList: [],
+				carServeList:[],
 				classifyS: -1,
+				carSer: -1,
+				carXshow:false,
 				dateShowS: false,
+				carSershow:false,
 				date: this.getDate(),
 				startDate: "",
 				endDate: "",
+				carX:""
 			}
 		},
 		onLoad(op) {
 			console.log(op.item)
+			let time = (new Date).getTime();
+			let thisDateL = new Date(time); // 获取的是前一天日期
+			
+			let nowDate = new Date();
+			let cloneNowDate = new Date();
+			let fullYear = nowDate.getFullYear();
+			let month = nowDate.getMonth() + 1; // getMonth 方法返回 0-11，代表1-12月
+			let endOfMonth = new Date(fullYear, month, 0).getDate(); // 获取本月最后一天
+			
+			
 			this.cItem = JSON.parse(op.item);
 			if(this.cItem.type == 1){
 				uni.setNavigationBarTitle({
 					title: '今日订单'
 				})
+				thisDateL = thisDateL.getFullYear() + "-" + (thisDateL.getMonth()> 9 ? (thisDateL.getMonth() + 1) : "0" + (thisDateL.getMonth() + 1)) + "-" +(thisDateL.getDate()> 9 ? (thisDateL.getDate()) : "0" + (thisDateL.getDate()));
+				this.getOrder("",thisDateL+' 00:00:00',thisDateL+" 23:59:59");
+				
 			}else
 			if(this.cItem.type == 2){
+				let statD = fullYear+"-"+month+"-01 00:00:00";
+				let endTD = fullYear+"-"+month+"-"+endOfMonth+" 23:59:59";
+				this.getOrder("",statD,endTD);
 				uni.setNavigationBarTitle({
 					title: '本月订单'
 				})
 			}else
 			if(this.cItem.type == 3){
+				this.getOrder()
 				uni.setNavigationBarTitle({
 					title: '累计订单'
 				})
 			}
+			// classifyList
+			this.$getApiTime("/api/user/car/xing",{},res=>{
+				console.log(res)
+				let carXing = [{name:'全部',id:""}];
+				this.$store.commit("setCarXing",res.data);
+				this.classifyList = carXing.concat(res.data)
+			})
+			this.$getApiTime("/api/operator/car/service",{},res=>{
+				let CarServe = ['全部'];
+				this.$store.commit("setCarServe",res.data);
+				this.carServeList = CarServe.concat(res.data)
+			})
 		},
 		methods: {
+			calcDate(type){
+				if(type == 1){
+					
+				}
+			},
+			getOrder(carX,startT,endT,carC){
+				carX = carX || "";
+				startT = startT || "";
+				endT = endT || "";
+				
+				if(carC && carC != "全部"){
+					carC = carC
+				}else{
+					carC = ""
+				}
+				let orderData = {
+					type:0,
+					car_xing_id:carX,
+					start_time:startT,
+					end_time:endT,
+					service_name:carC,
+					page:1,
+					paginate:100
+				}
+				console.log(orderData)
+				this.$getApiTime('/api/operator/orderList',orderData,res=>{
+					console.log(res.data)
+					this.orderList = res.data.data;
+					this.dateShowS = false;
+					this.carXshow = false;
+					this.carSershow = false;
+					// this.msgInfo = res.data.data
+				})
+			},
 			classifySe(item, index) {
 				this.classifyS = index;
+				this.carX = item.id;
 				console.log(item)
+			},
+			carSerC(item, index){
+				this.carSer = index;
 			},
 			classifyShow() {
 				this.dateShowS = false;
-				this.classifyS = this.classifyS == -1 ? 0 : -1
+				this.carSershow = false;
+				this.carXshow = !this.carXshow; 
 			},
 			dateShow() {
-				this.classifyS = -1;
-				this.dateShowS = !this.dateShowS
+				this.carXshow = false;
+				this.carSershow = false;
+				this.dateShowS = !this.dateShowS;
 			},
+			serveShow(){
+				this.carXshow = false;
+				this.dateShowS = false;
+				this.carSershow = !this.carSershow; 
+			},
+			
 			getDate(type) {
 				const date = new Date();
 
@@ -197,22 +252,26 @@
 				return `${year}-${month}-${day}`;
 			},
 			startDateChange: function(e) {
-				this.startDate = e.detail.value
+				this.startDate = e.detail.value+" 00:00:00";
 			},
 			endDateChange: function(e) {
-				this.endDate = e.detail.value
+				this.endDate = e.detail.value+" 23:59:59";
 			},
 			initBtn(el){
 				this.classifyS = -1;
+				this.carSer = -1;
 				this.startDate = "";
-				this.endDate = ""
+				this.endDate = "",
+				this.carX = "";
+				this.getOrder(this.carX,this.startDate,this.endDate)
 			},
 			subBtn(el){
-				if(el=='classify'){
-					console.log(this.classifyS)
+				if(this.carSer < 0){
+					this.getOrder(this.carX,this.startDate,this.endDate)
 				}else{
-					console.log(this.startDate,this.endDate)
+					this.getOrder(this.carX,this.startDate,this.endDate,this.carServeList[this.carSer])
 				}
+				
 			}
 		}
 	}
