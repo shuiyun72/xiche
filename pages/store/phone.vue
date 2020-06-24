@@ -1,7 +1,7 @@
 <template>
 	<view>
 		<view class="car_list">
-			<view class="item" v-for="item in phoneList" :key="item.id" @click="selPhone(item)">
+			<view class="item" v-for="item in phoneList" @click="selPhone(item)">
 				<view class="part0">
 					<view class="name">
 						{{item.name}}
@@ -98,8 +98,24 @@
 				})
 			},
 			deleteP(item) {
-				this.$refs['juan0'].open();
+				// this.$refs['juan0'].open();
 				this.item = item;
+				let this_ = this;
+				uni.showModal({
+					title: "删除",
+					content: "是否确认删除?",
+					confirmText: "确定",
+					cancelText: "取消",
+					success: function(res) { 
+						if (res.confirm) {
+						this_.$getApi("/api/user/user/del",{id:this_.item.id},resl=>{
+							// this.$refs['juan0'].close();
+							this_.init();
+							this_.$msg("删除成功");
+						})
+						}
+					}
+				})
 			},
 			editP(item) {
 				uni.navigateTo({

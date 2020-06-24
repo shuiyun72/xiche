@@ -1,7 +1,7 @@
 <template>
 	<view>
 		<view class="coupon">
-			<view class="item_card" v-for="item in juan1List" :key="item.id" @click="selQ(item)">
+			<view class="item_card" v-for="item in juan1List"  @click="selQ(item)">
 					<image src="../../static/img/mine/zhekj.png" mode="widthFix" class="img"></image>
 					<view class="item_ab">
 						<view class="left" >

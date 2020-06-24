@@ -137,15 +137,38 @@
 			console.log("ssss")
 			if (!this.userInfo || this.userInfo.groupid == 0) {
 				this.$nextTick(()=>{
-					this.$refs['juan0'].open()
+					// this.$refs['juan0'].open()
+					let this_ = this;
+					uni.showModal({
+						title: "去完善信息",
+						content: "您还没有完善信息,需完善信息,才能查看,现在去填写?",
+						confirmText: "确定",
+						cancelText: "取消",
+						success: function(res) {
+							if (res.confirm) {
+								// #ifdef MP
+								this_.getUserInfoWX();
+								// #endif
+								// #ifndef MP
+								uni.navigateTo({
+									url:'../mine/addCar?ws=1'
+								})
+								// #endif
+							}else{
+								uni.switchTab({
+									url:'../home/home'
+								})
+							}
+						}
+					})
 				})
 				
 			}else{
-				try{
-					this.$refs['juan0'].close()	
-				}catch(e){
-					//TODO handle the exception
-				}
+				// try{
+				// 	this.$refs['juan0'].close()	
+				// }catch(e){
+				// 	//TODO handle the exception
+				// }
 			}
 			let this_ = this;
 			if(this.hasLogin){

@@ -1,71 +1,72 @@
 <template>
 	<view>
-		<view class="to_order" v-for="(itemC,index) in lastData"  :class="{active:indexI == index}" @click.stop="showHide(index)">
+		<view class="to_order" v-for="(itemC,index) in lastData" :class="{active:indexI == index}" @click.stop="showHide(index)">
 			<view class="show_more_o">
 				<view class="">
 					预约订单{{index+1}}
 				</view>
 				<view class="r">
 					<text class="iconfont iconqingkongshanchu more_btn_del" @click.stop="deleteAdd(itemC,index)" v-if="index != 0">删除</text>
-					<uni-icons :type="indexI == index?'arrowdown':'arrowright'"  size="16" color="#eeeeee"/>
+					<uni-icons :type="indexI == index?'arrowdown':'arrowright'" size="16" color="#eeeeee" />
 				</view>
 			</view>
 			<view class="itemOrder">
-			<uni-list>
-				<uni-list-item-point title="车辆" :rightText="itemC.car_id.name"></uni-list-item-point>
-				<uni-list-item-point title="洗车地址" :rightText="itemC.address_id.name"></uni-list-item-point>
-				<uni-list-item-point title="停车位" :rightText="itemC.park_id.name"></uni-list-item-point>
-			</uni-list>
-			<uni-list class="mt10">
-				<uni-list-item-point title="洗车内容选择" :showArrow="false" rightText=""></uni-list-item-point>
-			</uni-list>
-			<view class="car_com">
-				<radio-group  class="sel_car_com">
-					<label v-for="(item, index) in itemsCarList">
-						<view class="item">
-							<image src="../../static/img/jiag.png" mode="widthFix" class="img"></image>
-							<view class="item_b">
-								<view class="part1">
-									<radio :value="item.value" :checked="index === itemC.mall_id?true:false" class="radio" :disabled="true"/>
-									<text class="t">{{item.title}}</text>
+				<uni-list>
+					<uni-list-item-point title="车辆" :rightText="itemC.car_id.name"></uni-list-item-point>
+					<uni-list-item-point title="洗车地址" :rightText="itemC.address_id.name"></uni-list-item-point>
+					<uni-list-item-point title="停车位" :rightText="itemC.park_id.name"></uni-list-item-point>
+				</uni-list>
+				<uni-list class="mt10">
+					<uni-list-item-point title="洗车内容选择" :showArrow="false" rightText=""></uni-list-item-point>
+				</uni-list>
+				<view class="car_com">
+					<radio-group class="sel_car_com">
+						<label v-for="(item, index) in itemsCarList">
+							<view class="item">
+								<image src="../../static/img/jiag.png" mode="widthFix" class="img"></image>
+								<view class="item_b">
+									<view class="part1">
+										<radio :value="item.value" :checked="index === itemC.mall_id?true:false" class="radio" :disabled="true" />
+										<text class="t">{{item.title}}</text>
+									</view>
+									<view class="part2">
+										<image src="../../static/img/vip.png" mode="widthFix" class="vip_img"></image>
+										洗车券1张<text v-if="Number(item.price) > 0">+{{Number(item.price)}}元</text>
+									</view>
+									<view class="p" v-for="ic in item.chexing">{{ic.chexing}}￥{{ic.price}}</view>
 								</view>
-								<view class="part2">
-									<image src="../../static/img/vip.png" mode="widthFix" class="vip_img"></image> 
-									洗车券1张<text v-if="Number(item.price) > 0">+{{Number(item.price)}}元</text>
-								</view>
-								<view class="p" v-for="ic in item.chexing">{{ic.chexing}}￥{{ic.price}}</view>
 							</view>
-						</view>
-					</label>
-				</radio-group>
-			</view>
-			<view class="other_s">
-				<view class="title">
-					其他服务(现金支付)
+						</label>
+					</radio-group>
 				</view>
-				<checkbox-group  class="checkbox_other">
-					<label v-for="(item,indexss) in checkboxOther">
-						<view class="item">
-							<checkbox :value="item.name" :checked="(itemC.service_ids[0]-1) == indexss || (itemC.service_ids[indexss]-1) == indexss ?true:false" class="checkbox" :disabled="true"/>
-							<text>{{item.name}}</text>
-							<text class="red">￥{{item.price}}</text>
-						</view>
-					</label>
-				</checkbox-group>
-			</view>
-			<uni-list class="time_pick">
-				<uni-list-item-point title="清洗时间" point="true" :rightText="itemC.time">
-				</uni-list-item-point>
-			</uni-list>
-			<uni-list>
-				<uni-list-item-point title="联系电话" point="true" :rightText="itemC.relation_id.name"></uni-list-item-point>
-			</uni-list>
-			<view class="bezhu">
-				<view class="title">
-					备注信息
+				<view class="other_s">
+					<view class="title">
+						其他服务(现金支付)
+					</view>
+					<checkbox-group class="checkbox_other">
+						<label v-for="(item,indexss) in checkboxOther">
+							<view class="item">
+								<checkbox :value="item.name" :checked="(itemC.service_ids[0]-1) == indexss || (itemC.service_ids[indexss]-1) == indexss ?true:false"
+								 class="checkbox" :disabled="true" />
+								<text>{{item.name}}</text>
+								<text class="red">￥{{item.price}}</text>
+							</view>
+						</label>
+					</checkbox-group>
 				</view>
-				<textarea :value="itemC.remark" placeholder="请在这里填写备注信息" class="textarea" />
-			</view>
+				<uni-list class="time_pick">
+					<uni-list-item-point title="清洗时间" point="true" :rightText="itemC.time">
+					</uni-list-item-point>
+				</uni-list>
+				<uni-list>
+					<uni-list-item-point title="联系电话" point="true" :rightText="itemC.relation_id.name"></uni-list-item-point>
+				</uni-list>
+				<view class="bezhu">
+					<view class="title">
+						备注信息
+					</view>
+					<textarea :value="itemC.remark" placeholder="请在这里填写备注信息" class="textarea" />
+					</view>
 			</view>
 		</view>
 		
@@ -87,7 +88,7 @@
 				<uni-list-item-point title="停车位" point="true" :rightText="orderP.name" @click="selStop"></uni-list-item-point>
 			</uni-list>
 			<uni-list class="mt10">
-				<uni-list-item-point title="洗车内容选择" point="true" :showArrow="false" rightText=""></uni-list-item-point>
+				<uni-list-item-point title="洗车内容选择" point="true" :showArrow="false" ></uni-list-item-point>
 			</uni-list>
 			<view class="car_com">
 				<radio-group @change="radioChange" class="sel_car_com">
@@ -214,6 +215,11 @@
 		computed:{
 			...mapState(['orderCar','orderAddress','orderP','orderPhone','carServe'])
 		},
+		onHide() {
+			this.$store.commit('setQuan', {
+				name: "请选择优惠券"
+			})
+		},
 		mounted() {
 			this.$getApi("/api/auth/mall/neirong",{},res=>{
 				this.itemsCarList = res.data
@@ -248,15 +254,29 @@
 			//删除未来订单
 			cellDelete(){
 				this.isCellDelete = false;
+				this.$msg("删除成功")
 			},
 			//删除已确定订单
 			deleteAdd(item,index){
 				this.deleIndex = index;
-				this.$refs['juan1'].open();
+				// this.$refs['juan1'].open();
+				let this_ = this;
+				uni.showModal({
+					title: "删除",
+					content: "确定删除预约订单"+(this_.deleIndex+1)+",确定?",
+					confirmText: "确定",
+					cancelText: "取消",
+					success: function(res) {
+						if (res.confirm) {
+						this_.lastData.splice(this.deleIndex,1);
+						this_.$msg("删除成功")
+						}
+					}
+				})
 			},
 			deleteNext(){
 				this.lastData.splice(this.deleIndex,1);
-				this.$refs['juan1'].close();
+				// this.$refs['juan1'].close();
 			},
 			showHide(index){
 				console.log(index)
@@ -344,6 +364,7 @@
 								url:'./orderSuccess'
 							})
 						}else{
+							console.log("ss")
 							uni.navigateTo({
 								url:'./orderTrue?item='+JSON.stringify(res.data.orderList)+'&user_coupon='+JSON.stringify(res.data.user_coupon)
 							})
@@ -361,10 +382,47 @@
 				this.$refs['juan'+num].close();
 			},
 			beforeMoreNext(){
-				this.$refs['juan0'].open();
+				// this.$refs['juan0'].open();
+				let this_ = this;
+				uni.showModal({
+					title: "添加洗车订单",
+					content: "请确定订单信息完整,继续添加订单?",
+					confirmText: "确定",
+					cancelText: "取消",
+					success: function(res) {
+						if (res.confirm) {
+						uni.pageScrollTo({
+											scrollTop: 0,
+											duration: 500
+										});
+										let itemsCarListId = this_.itemsCarList.length > 0 ? this_.itemsCarList[this_.current].id : "";
+										let dataL = {
+											car_id: this_.orderCar,
+											address_id: this_.orderAddress,
+											park_id: this_.orderP,
+											mall_id: itemsCarListId,
+											time: this_.rinseTimeList[0][this_.rinseTimeSel[0]]+' '+this_.rinseTimeList[1][this_.rinseTimeSel[1]] ,
+											relation_id: this_.orderPhone,
+											remark: this_.vTextarea,
+											service_ids:this_.otherC
+										}
+										if(dataL.car_id.id && dataL.address_id.id && dataL.park_id.id && dataL.relation_id.id){
+											this_.lastData.push(dataL);
+										}else{
+											this_.$msg('信息不完善,请完善信息');
+											return false;
+										}
+										for(let i=0;i<this_.lastData.length;i++){
+											this_.$nextTick(()=>{
+												// console.log(this_.$refs[`Model${i}`].$el)	
+											})
+										}
+						}
+					}
+				})
 			},
 			moreNext(){
-				this.$refs['juan0'].close();
+				// this.$refs['juan0'].close();
 				uni.pageScrollTo({
 					scrollTop: 0,
 					duration: 500

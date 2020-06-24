@@ -53,7 +53,7 @@
 				示例: 前后左右
 			</view>
 			<view class="for_ext">
-				<view class="item_img" v-for="item in carList" :key="item.id">
+				<view class="item_img" v-for="item in carList">
 					<image :src="'../../static/img/'+item.img"></image>
 				</view>
 			</view>
@@ -122,6 +122,7 @@
 				this.$store.commit('setbrand',{name:item.chebrand.name,id:item.chebrand.id});
 				this.rightTextCarColor = item.checolor.name;
 				this.carId = item.id;
+				console.log(item,item.img)
 				this.oldImg = item.img;
 			}else
 			if(ph.ws){
@@ -138,11 +139,10 @@
 		methods: {
 			//提交订单
 			submitOrder(){
-				
 				// this.oldImg
 				let lastImg = _.cloneDeep(this.upimageList);
 				if(this.oldImg){
-					lastImg.concat(this.oldImg)
+					lastImg.push(this.oldImg)
 				}
 				let data = {
 					name:this.name,
@@ -155,6 +155,7 @@
 					covers:JSON.stringify(lastImg),
 					type:this.type
 				}
+				console.log(data)
 				if(this.name && this.phone && this.chepai && this.brand.id && lastImg.length > 0 ){
 					this.$getApi("/api/user/mine/addCar",data,res1=>{
 						// this.$store.commit('setbrand',{name:"请选择车的品牌"});
@@ -163,15 +164,18 @@
 								this.$store.commit('login',res.data);
 							})
 							uni.navigateTo({
-								url:'../mine/addAddress'
+								url:'../orders/toOrder'
 							})
 						}else{
-							if(this.fromL){
-								uni.navigateBack({
-									delta:2
+							if(this.fromL && this.type == 1){
+								// uni.navigateBack({
+								// 	delta:2
+								// })
+								uni.navigateTo({
+									url:'../mine/addAddress'
 								})
 							}else{
-								uni.reLaunch({
+								uni.navigateTo({
 									url:"../store/car"
 								})
 							}

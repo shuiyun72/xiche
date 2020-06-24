@@ -1,13 +1,13 @@
 <template>
 	<view class="appraise">
 		<view class="appraise_body">
-			<view class="item" v-for="item in myA" :key="item.id">
+			<view class="item" v-for="item in myA">
 				<view class="a_title">
 					<text class="ping">评</text>
 					<text class="ps">订单编号: </text>
 					<text class="ps"> {{item.code}}</text>
 				</view>
-				<view class="info_img_name">
+				<view class="info_img_name" v-if="item.operator">
 					<image :src="httpp+item.operator.avatar" mode="widthFix" class="img"></image>
 					<text class="name">展示通</text>
 				</view>
@@ -16,7 +16,7 @@
 					<text class="star_n">{{starC(item.star)}}星</text>
 				</view>
 				<view class="grow_btn_app">
-					<view class="item_btn" v-for="(itemC,index) in item.tags" :key="index">
+					<view class="item_btn" v-for="(itemC,index) in item.tags">
 						<button class="btn default_n round sm activec">{{itemC}}</button>
 					</view>
 				</view>
@@ -33,11 +33,7 @@
 	export default {
 		data() {
 			return {
-				myA:[
-					{
-						operator:{}
-					}
-				],
+				myA:[],
 				orderReject:[
 					{cause:"服务态度好",text:"两个订单距离太远,无法及时赶到",id:1003},
 					{cause:"不错",text:"订单时间不够,无法及时赶到",id:1004},

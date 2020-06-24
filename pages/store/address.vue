@@ -1,7 +1,7 @@
 <template>
 	<view class="address_list">
 		<view class="item" v-for="(item,index) in addressList" :class="{'active':index == sIndex}" @click="selItem(item,index)">
-			{{item.text}}
+			<!-- {{item.text}} -->
 			{{item.city_name}}{{item.area_name}}{{item.street_name}}{{item.house_detail}}
 		</view>
 		<view class="sub_btn">

@@ -164,7 +164,7 @@
 					</view>
 				</view>
 				<view class="for_ext">
-					<view class="item_img" v-for="(img,index) in infoMsg.beforeimglist" :key="index">
+					<view class="item_img" v-for="(img,index) in infoMsg.beforeimglist">
 						<image :src="httpp+img"></image>
 					</view>
 				</view>
@@ -176,7 +176,7 @@
 					</view>
 				</view>
 				<view class="for_ext">
-					<view class="item_img" v-for="(img,index) in infoMsg.afterimglist" :key="index">
+					<view class="item_img" v-for="(img,index) in infoMsg.afterimglist">
 						<image :src="httpp+img"></image>
 					</view>
 				</view>

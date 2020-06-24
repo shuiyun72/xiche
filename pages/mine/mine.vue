@@ -42,7 +42,7 @@
 			</view>
 			<view class="mine_body">
 				<uni-list>
-					<uni-list-item v-for="item in mineList" :key="item.type" :title="item.title" :thumb="'../../static/img/mine/'+item.icon" @click="nativeTo(item.type)"></uni-list-item>
+					<uni-list-item v-for="item in mineList" :title="item.title" :thumb="'../../static/img/mine/'+item.icon" @click="nativeTo(item.type)"></uni-list-item>
 				</uni-list>
 			</view>
 			
@@ -97,7 +97,26 @@
 			console.log(this.userInfo,!this.userInfo)
 			if (!this.userInfo || this.userInfo.groupid == 0) {
 				this.$nextTick(()=>{
-					this.$refs['juan0'].open()
+					// this.$refs['juan0'].open()
+					let this_ = this;
+					uni.showModal({
+						title: "去完善信息",
+						content: "您还没有完善信息,需完善信息,才能查看,现在去填写?",
+						confirmText: "确定",
+						cancelText: "取消",
+						success: function(res) {
+							if (res.confirm) {
+								// #ifdef MP
+								this_.getUserInfoWX();
+								// #endif
+								// #ifndef MP
+								uni.navigateTo({
+									url:'../mine/addCar?ws=1'
+								})
+								// #endif
+							}
+						}
+					})
 				})	
 			}else{
 				try{
@@ -169,7 +188,26 @@
 			},
 			topNativeTo(type){
 				if(!this.hasLogin){
-					this.$refs['juan0'].open()
+					// this.$refs['juan0'].open()
+					let this_ = this;
+					uni.showModal({
+						title: "去完善信息",
+						content: "您还没有完善信息,需完善信息,才能查看,现在去填写?",
+						confirmText: "确定",
+						cancelText: "取消",
+						success: function(res) {
+							if (res.confirm) {
+								// #ifdef MP
+								this_.getUserInfoWX();
+								// #endif
+								// #ifndef MP
+								uni.navigateTo({
+									url:'../mine/addCar?ws=1'
+								})
+								// #endif
+							}
+						}
+					})
 				}else{
 					let urlL;
 					switch(type){
@@ -185,7 +223,26 @@
 			},
 			nativeTo(type){
 				if(!this.hasLogin){
-					this.$refs['juan0'].open()
+					// this.$refs['juan0'].open()
+					let this_ = this;
+					uni.showModal({
+						title: "去完善信息",
+						content: "您还没有完善信息,需完善信息,才能查看,现在去填写?",
+						confirmText: "确定",
+						cancelText: "取消",
+						success: function(res) {
+							if (res.confirm) {
+								// #ifdef MP
+								this_.getUserInfoWX();
+								// #endif
+								// #ifndef MP
+								uni.navigateTo({
+									url:'../mine/addCar?ws=1'
+								})
+								// #endif
+							}
+						}
+					})
 				}else{
 					let url;
 					switch(type){
@@ -203,7 +260,26 @@
 			},
 			toImginfo(){
 				if(!this.hasLogin){
-					this.$refs['juan0'].open()
+					// this.$refs['juan0'].open()
+					let this_ = this;
+					uni.showModal({
+						title: "去完善信息",
+						content: "您还没有完善信息,需完善信息,才能查看,现在去填写?",
+						confirmText: "确定",
+						cancelText: "取消",
+						success: function(res) {
+							if (res.confirm) {
+								// #ifdef MP
+								this_.getUserInfoWX();
+								// #endif
+								// #ifndef MP
+								uni.navigateTo({
+									url:'../mine/addCar?ws=1'
+								})
+								// #endif
+							}
+						}
+					})
 				}else{
 					uni.navigateTo({
 						url:'./mineInfo'

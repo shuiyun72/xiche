@@ -55,11 +55,14 @@
 					console.log(res)
 					// uni.navigateBack()
 					if(this_.fromL){
-						uni.navigateBack({
-							delta:2
+						// uni.navigateBack({
+						// 	delta:2
+						// })
+						uni.navigateTo({
+							url:'../orders/toOrder'
 						})
 					}else{
-						uni.reLaunch({
+						uni.navigateTo({
 							url:"./phone"
 						})
 					}

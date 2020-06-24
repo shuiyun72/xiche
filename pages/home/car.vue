@@ -4,7 +4,7 @@
 			<view class="text_title_city" @tap="selectCityTitle">
 				{{t.title}}
 			</view>
-			<view class="city_title" v-for="(tc,ic) in t.lists" :key="tc.id" @tap="selectCity(tc)">
+			<view class="city_title" v-for="(tc,ic) in t.lists"  @tap="selectCity(tc)">
 				<view class="img_car">
 					<image :src="httpp+tc.cover" mode="widthFix" class="img"></image>
 				</view>

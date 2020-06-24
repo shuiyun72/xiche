@@ -21,8 +21,12 @@ const store = new Vuex.Store({
 		orderPhone:uni.getStorageSync("orderPhone") || {name:"请选择手机号"},
 		torderQuan:{name:"请选择优惠券"},
 		selCity:"郑州",
+		back:1
 	},
 	mutations: {
+		setBack(state,num){
+			state.back = num;
+		},
 		//设置洗车券状态
 		setCoupon(state){
 			state.userInfo.is_take = 1

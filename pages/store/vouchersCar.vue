@@ -5,7 +5,7 @@
 		</view>
 		<view class="bg10_f"></view>
 		<view class="coupon">
-			<view class="item_card" v-for="item in juan1List" :key="item.id">
+			<view class="item_card" v-for="item in juan1List">
 				
 				<image :src="'../../static/img/mine/juanxxc.png'"  class="img" v-if="tabSel == 0"></image>
 				<image :src="'../../static/img/mine/juanhs.png'"  class="img" v-else></image>

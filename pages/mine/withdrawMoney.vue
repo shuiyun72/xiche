@@ -10,7 +10,7 @@
 			<uni-list-item title="提现至" :showArrow="false">
 				<template v-slot:right="">
 					<radio-group @change="radioChange" class="group_box">
-						<label class="group_item" v-for="(item, index) in items" :key="item.value">
+						<label class="group_item" v-for="(item, index) in items" :key="index">
 							<view class="vis">
 								<radio :value="item.value" :checked="index === current" class="radio"/>
 								<image :src="'../../static/img/mine/'+item.img" mode="widthFix" class="w_img"></image>

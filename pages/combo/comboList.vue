@@ -4,7 +4,7 @@
 			<view class="combo_title">
 				{{comboTitle}}
 			</view>
-			<view class="taocan_box" :class="{'active':index == selType}" v-for="(item,index) in comboListData" :key="item.current_price"
+			<view class="taocan_box" :class="{'active':index == selType}" v-for="(item,index) in comboListData"
 			 @click="selectItem(item,index)">
 				<view class="iconl">
 					<!-- {{item.class}} -->

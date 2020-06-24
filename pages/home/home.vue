@@ -95,7 +95,7 @@
 					洗车优惠券
 				</view>
 				<scroll-view scroll-y="true" class="scroll-Y">
-				<view class="item_card" v-for="item in juan1List" :key="item.id">
+				<view class="item_card" v-for="item in juan1List">
 					<image src="../../static/img/mine/zhekj.png" mode="widthFix" class="img"></image>
 					<view class="item_ab">
 						<view class="left">
@@ -298,16 +298,62 @@
 							url: '../store/vouchersCar'
 						})
 					} else {
-						this.$refs['juan2'].open()
+						// this.$refs['juan2'].open()
+						let this_ = this;
+						uni.showModal({
+							title: "购买套餐",
+							content: "您还没有购买套餐,没有洗车券,现在去购买套餐?",
+							confirmText: "确定",
+							cancelText: "取消",
+							success: function(res) {
+								if (res.confirm) {
+									uni.switchTab({
+										url:"../combo/combo"
+									})
+								}
+							}
+						})
 					}
 				}else{
-					this.$refs['juan2'].open()
+					// this.$refs['juan2'].open()
+					uni.showModal({
+						title: "购买套餐",
+						content: "您还没有购买套餐,没有洗车券,现在去购买套餐?",
+						confirmText: "确定",
+						cancelText: "取消",
+						success: function(res) {
+							if (res.confirm) {
+							uni.switchTab({
+								url:"../combo/combo"
+							})
+							}
+						}
+					})
 				}
 			},
 			//预约洗车
 			toOrder() {
 				if (!this.userInfo || this.userInfo.groupid == 0) {
-					this.$refs['juan0'].open()
+					// this.$refs['juan0'].open()
+					let this_ = this;
+					uni.showModal({
+						title: "去完善信息",
+						content: "您还没有完善信息,需完善信息,才能查看,现在去填写?",
+						confirmText: "确定",
+						cancelText: "取消",
+						success: function(res) {
+							if (res.confirm) {
+								// #ifdef MP
+								this_.getUserInfoWX();
+								// #endif
+								// #ifndef MP
+								uni.navigateTo({
+									url:'../mine/addCar?ws=1'
+								})
+								// #endif
+							}
+						}
+					})
 				} else {
 					uni.navigateTo({
 						url: '../orders/toOrder'

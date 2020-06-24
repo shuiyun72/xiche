@@ -1,7 +1,7 @@
 <template>
 	<view>
 		<view class="car_list">
-			<view class="item" v-for="i in swMsg" :key="i.id" @click="selectCar(i)">
+			<view class="item" v-for="i in swMsg" @click="selectCar(i)">
 				<view class="part1">
 					<image :src="$httpp + i.checolor.cover" mode="widthFix" class="l_img"></image>
 					<view class="content">
@@ -83,11 +83,11 @@
 				}
 			},
 			closeJuan(){
-				this.$refs['juan0'].close();
+				// this.$refs['juan0'].close();
 			},
 			deleteBtn(){
 				this.$getApi("/api/user/car/del",{id:this.item.id},resl=>{
-					this.$refs['juan0'].close();
+					// this.$refs['juan0'].close();
 					this.$getApi("/api/user/car/list", {}, res => {
 						this.swMsg = res.data
 					})
@@ -110,7 +110,25 @@
 				})
 			},
 			deletePs(item) {
-				this.$refs['juan0'].open();
+				// this.$refs['juan0'].open();
+				let this_ = this;
+				uni.showModal({
+					title: "删除",
+					content: "是否确认删除?",
+					confirmText: "确定",
+					cancelText: "取消",
+					success: function(res) {
+						if (res.confirm) {
+						this_.$getApi("/api/user/car/del",{id:this_.item.id},resl=>{
+							// this.$refs['juan0'].close();
+							this_.$getApi("/api/user/car/list", {}, res => {
+								this_.swMsg = res.data;
+								this_.$msg("删除成功")
+							})
+						})
+						}
+					}
+				})
 				this.item = item;
 			}
 		}
