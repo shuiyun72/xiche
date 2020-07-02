@@ -66,13 +66,13 @@
 				</navigator>
 				<button class="btn round sm orange nav_to" @click="toosC(item)">确认接单</button>
 			</view>
-			<view class="o_stop">
+			<!-- <view class="o_stop">
 				<view @click="isOrderHandle(false)">
 					<text>停止</text>
 					<text>接单</text>
 				</view>
 				
-			</view>
+			</view> -->
 		</view>
 		<view class="o_start" v-show="!orderState">
 			<view class="o_start_b">
@@ -82,7 +82,7 @@
 				</view>
 			</view>
 		</view>
-		<view class="o_card_list no_order" v-if="orderState && msgInfo.length == 0">
+		<view class="no_order"  v-if="orderState">
 			<view class="o_stop">
 				<view @click="isOrderHandle(false)">
 					<text>停止</text>
@@ -114,9 +114,10 @@
 			console.log(this.orderState)
 			let this_ = this;
 			if(this.orderState == 1){
+				this_.getOList();
 				this.timerLL = setInterval(()=>{
 					this_.getOList();
-				},5000)
+				},3000)
 			}else{
 				try{
 					clearInterval(this_.timerLL);
@@ -242,14 +243,14 @@
 	}
 	.orders{
 		background-color: $uni-def;
-		min-height: 90vh;
+		min-height: 100vh;
 		display: flex;
 		flex-direction: column;
 	}
 	.o_start{
 		display: flex;
 		justify-content: center;
-		margin: 300upx 0;
+		margin: 300upx 0 0;
 		.o_start_b{
 			background-color: $uni-or;
 			width: 200upx;
@@ -268,24 +269,11 @@
 			}
 		}
 	}
-	.o_card_list{
-		background-color: #fff;
-		box-shadow: 2upx 0upx 4upx 4upx #eee;
-		width: 94%;
-		margin: 0 auto 26upx;
-		border-radius: 10upx;
-		box-sizing: border-box;
-		padding: 24upx 30upx;
-		position:relative;
-		&.no_order{
-			background-color: transparent;
-			padding-top: 800upx;
-		}
+	.no_order{
 		.o_stop{
-			position: absolute;
-			right: -16upx;
-			top: 50%;
-			margin-top: -50upx;
+			position:fixed;
+			top: 780upx;
+			right:10upx;
 			background-color: $uni-or;
 			color: #fff;
 			width: 120upx;
@@ -302,6 +290,16 @@
 				line-height: 1;
 			}
 		}
+	}
+	.o_card_list{
+		background-color: #fff;
+		box-shadow: 2upx 0upx 4upx 4upx #eee;
+		width: 94%;
+		margin: 0 auto 26upx;
+		border-radius: 10upx;
+		box-sizing: border-box;
+		padding: 24upx 30upx;
+		position:relative;
 		.sub_btn{
 			text-align: right;
 			padding-top: 30upx;

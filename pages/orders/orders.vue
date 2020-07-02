@@ -104,6 +104,7 @@
 		},
 		onShow() {
 			let this_ = this;
+			this_.getOrder(this_.tabSel+1);
 			this.getInterval = setInterval(()=>{
 				this_.getOrder(this_.tabSel+1);
 			},1000)
