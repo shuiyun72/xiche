@@ -228,7 +228,7 @@
 		/* #ifndef APP-NVUE */
 		display: flex;
 		/* #endif */
-		flex: 1;
+/* 		flex: 1; */
 		overflow: hidden;
 		flex-direction: column;
 		color: #3b4144;
@@ -254,6 +254,8 @@
 		/* #ifndef APP-NVUE */
 		display: flex;
 		/* #endif */
+		flex:1;
+		text-align: right;
 		flex-direction: row;
 		justify-content: flex-end;
 		align-items: center;

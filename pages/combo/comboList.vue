@@ -48,7 +48,6 @@
 </template>
 
 <script>
-	import { comboType1,comboType4 } from "../../static/const/combo.js";
 	export default {
 		data() {
 			return {
@@ -60,16 +59,6 @@
 		},
 		onLoad(op) {
 			this.init(op.item);
-			// if(op.type == 1){
-			// 	this.comboListData = comboType1;
-			// 	this.comboTitle = "小型汽车套餐";
-			// }else
-			// if(op.type == 4){
-			// 	this.comboListData = comboType4;
-			// 	this.comboTitle = "综合车型全家桶";
-			// }else{
-			// 	this.comboListData = comboType1
-			// }
 		},
 		mounted() {
 			this.corrItem = this.comboListData[0]

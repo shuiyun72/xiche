@@ -1,5 +1,7 @@
 <template>
-	<view>
+	<view class="address_sss">
+		<uni-nav-bar color="#333333" background-color="#ffffff" 
+		:status-bar="true" left-icon="arrowleft" title="添加地址信息" @clickLeft="back" />
 		<uni-list>
 			<uni-list-item-point title="市" point="true" rightText="郑州市" :showArrow="false">
 				<!-- <template v-slot:right="">
@@ -8,24 +10,33 @@
 				</picker>
 				</template> -->
 			</uni-list-item-point>
-			<uni-list-item-point title="县/区" point="true">
+			<uni-list-item-point title="县/区" point="true" :showArrow="false">
 				<template v-slot:right="">
-					<picker @change="quListC" :value="quListSel" :range="quList" range-key="name">
-						<view class="uni-input">{{quList[quListSel].name}}</view>
+					<picker @change="quListC" :value="quListSel" :range="quList" range-key="name" >
+						<view class="pick_flex">
+							<text class="uni-input">{{quList[quListSel].name}}</text>
+							<text class="iconfont iconjiantou"></text>
+						</view>
 					</picker>
 				</template>
 			</uni-list-item-point>
-			<uni-list-item-point title="街道" point="true" @click="routeListCh">
+			<uni-list-item-point title="街道" point="true" @click="routeListCh" :showArrow="false">
 				<template v-slot:right="">
 					<picker @change.stop="routeListC" :value="routeListSel" :range="routeList" range-key="name" :disabled="disJiedao">
-						<view class="uni-input">{{routeList[routeListSel].name}}</view>
+						<view class="pick_flex">
+							<text class="uni-input">{{routeList[routeListSel].name}}</text>
+							<text class="iconfont iconjiantou"></text>
+						</view>
 					</picker>
 				</template>
 			</uni-list-item-point>
-			<uni-list-item-point title="小区" point="true" @click="areaListCh">
+			<uni-list-item-point title="小区" point="true" @click="areaListCh" :showArrow="false">
 				<template v-slot:right="">
 					<picker @change="areaListC" :value="areaListSel" :range="areaList" range-key="name" :disabled="disJiedao">
-						<view class="uni-input">{{areaList[areaListSel].name}}</view>
+						<view class="pick_flex">
+							<text class="uni-input">{{areaList[areaListSel].name}}</text>
+							<text class="iconfont iconjiantou"></text>
+						</view>
 					</picker>
 				</template>
 			</uni-list-item-point>
@@ -98,7 +109,8 @@
 				lng: 113.33,
 				lat: 33.03,
 				disJiedao: true,
-				disArea: true
+				disArea: true,
+				ws:""
 
 			};
 		},
@@ -146,7 +158,20 @@
 			} else {
 				this.getLocal(151, 2, 'quList');
 			}
+			if(ph.ws){
+				this.ws = ph.ws;
+			}
 		},
+		// onBackPress(op) {  	
+		//    if(this.ws == 1){
+		// 	   console.log("bace2")
+		// 	  uni.switchTab({
+		// 	  	url:"../home/home"
+		// 	  })
+		// 	   return true;
+		//    }
+		  
+		// },
 		computed: {
 			parksList() {
 				let parksListO = [];
@@ -166,6 +191,19 @@
 			}
 		},
 		methods: {
+			back(){
+				if(this.ws == 1){
+					console.log("bace2")
+					uni.switchTab({
+						url:"../home/home"
+					})
+					return true;
+				}else{
+					uni.navigateBack({
+						delta:1
+					})
+				}
+			},
 			getLocal(id, type, event) {
 				this.$getApi("/api/auth/area", {
 					pid: id,
@@ -234,7 +272,7 @@
 						this.$getApi("/api/user/userinfo", {}, res => {
 							this.$store.commit('login', res.data);
 							uni.navigateTo({
-								url: './addSuccess'
+								url: '../store/addressList'
 							})
 						})
 
@@ -255,6 +293,20 @@
 </script>
 
 <style lang="scss" scoped>
+	.address_sss{
+		picker{
+			width: 100%;
+			.pick_flex{
+				display: flex;
+				justify-content: flex-end;
+				.iconjiantou{
+					color: #cccccc;
+					font-size: 46upx;
+				}
+			}
+		}
+		
+	}
 	.sub_btn {
 		padding: 154upx 40upx;
 		background-color: #f0f0f0;

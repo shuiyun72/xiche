@@ -1,5 +1,7 @@
 <template>
 	<view class="page">
+		<uni-nav-bar color="#333333" background-color="#ffffff" 
+		:status-bar="true" left-icon="arrowleft" title="地址库" @clickLeft="back" />
 		<view class="add_list_address" v-for="i in dataList">
 			<view class="p_list">
 				<view class="item_p" v-for="it in i.park">
@@ -58,7 +60,19 @@
 		mounted() {
 			this.addressInit();
 		},
+		// onBackPress() {
+		// 	uni.switchTab({
+		// 		url:"../mine/mine"
+		// 	})  
+		// 	return true; 
+		// },
 		methods: {
+			back(){
+				uni.switchTab({
+					url:"../mine/mine"
+				})  
+				return true;
+			},
 			closeJuan(){
 				this.$refs['juan0'].close();
 			},

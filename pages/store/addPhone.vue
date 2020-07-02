@@ -3,7 +3,7 @@
 		<uni-list>
 			<uni-list-item-point title="姓名" :showArrow="false" point="true">
 				<template v-slot:right="">
-					<input type="text" v-model="name" placeholder="客户" class="add_car_input"/>
+					<input type="text" v-model="name" placeholder="请输入姓名" class="add_car_input"/>
 				</template>
 			</uni-list-item-point>
 			<uni-list-item-point title="手机号" :showArrow="false" point="true">
@@ -54,12 +54,9 @@
 				},res=>{
 					console.log(res)
 					// uni.navigateBack()
-					if(this_.fromL){
-						// uni.navigateBack({
-						// 	delta:2
-						// })
+					if(this_.fromL == 'toOrder'){
 						uni.navigateTo({
-							url:'../orders/toOrder'
+							url:'./phone?from=toOrder'
 						})
 					}else{
 						uni.navigateTo({

@@ -92,7 +92,12 @@
         ,{
             "path" : "pages/mine/addCar",
             "style" : {
-				"navigationBarTitleText": "添加车辆信息"
+				"navigationBarTitleText": "添加车辆信息",
+				"navigationStyle": "custom",
+				"enablePullDownRefresh": true,
+				"app-plus": {
+					"titleNView": false
+				}
 			}
         }
         ,{
@@ -104,7 +109,12 @@
 		,{
 		    "path" : "pages/mine/addAddress",
 		    "style" : {
-				"navigationBarTitleText": "添加地址信息"
+				"navigationBarTitleText": "添加地址信息",
+				"navigationStyle": "custom",
+				"enablePullDownRefresh": true,
+				"app-plus": {
+					"titleNView": false
+				}
 			}
 		}
         
@@ -129,7 +139,12 @@
         ,{
             "path" : "pages/orders/toOrder",
             "style" : {
-				"navigationBarTitleText": "预约洗车"
+				"navigationBarTitleText": "预约洗车",
+				"navigationStyle": "custom",
+				"enablePullDownRefresh": true,
+				"app-plus": {
+					"titleNView": false
+				}
 			}
         }
         ,{
@@ -141,7 +156,12 @@
         ,{
             "path" : "pages/store/car",
             "style" : {
-				"navigationBarTitleText": "车辆库"
+				"navigationBarTitleText": "车辆库",
+				"navigationStyle": "custom",
+				"enablePullDownRefresh": true,
+				"app-plus": {
+					"titleNView": false
+				}
 			}
         }
         ,{
@@ -153,7 +173,17 @@
         ,{
             "path" : "pages/store/phone",
             "style" : {
-				"navigationBarTitleText": "手机号库"
+				"navigationBarTitleText": "手机号库",
+				"navigationStyle": "custom",
+				"enablePullDownRefresh": true,
+				"app-plus": {
+					"titleNView": false
+					// "bounce": "none",
+					// "pullToRefresh": {
+					// 	"style": "circle",
+					// 	"offset": "70px"
+					// }
+				}
 			}
         }
         ,{
@@ -255,7 +285,12 @@
         ,{
             "path" : "pages/store/addressList",
             "style" : {
-				"navigationBarTitleText": "地址库"
+				"navigationBarTitleText": "地址库",
+				"navigationStyle": "custom",
+				"enablePullDownRefresh": true,
+				"app-plus": {
+					"titleNView": false
+				}
 			}
         }
         ,{

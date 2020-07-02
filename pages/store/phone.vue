@@ -1,5 +1,6 @@
 <template>
 	<view>
+		<uni-nav-bar color="#333333" background-color="#ffffff" :status-bar="true" left-icon="arrowleft" title="手机号库" @clickLeft="back" />
 		<view class="car_list">
 			<view class="item" v-for="item in phoneList" @click="selPhone(item)">
 				<view class="part0">
@@ -49,7 +50,7 @@
 		data() {
 			return {
 				phoneList: [],
-				pathL:"",
+				from:"",
 				item:{}
 			}
 		},
@@ -57,9 +58,25 @@
 			this.init();
 		},
 		onLoad(ph) {
-			this.pathL = ph.from;
+			this.from = ph.from;
 		},
+		// onBackPress() {
+		    
+		// },
 		methods: {
+			back(){
+				if(this.from) {
+				  uni.navigateTo({
+				  	url:"../orders/toOrder"
+				  })  
+				  return true;  
+				}else{
+					uni.switchTab({
+						url:"../mine/mine"
+					})  
+					return true; 
+				}
+			},
 			closeJuan(){
 				this.$refs['juan0'].close();
 			},
@@ -70,7 +87,7 @@
 				})
 			},
 			addItem(){
-				if(this.pathL){
+				if(this.from){
 					uni.navigateTo({
 						url:"../store/addPhone?from=toOrder"
 					})
@@ -81,13 +98,13 @@
 				}
 			},
 			selPhone(item) {
-				if(this.pathL){
+				if(this.from){
 					this.$store.commit('setPhone', {
 						name: item.phone,
 						id: item.id
 					});
-					uni.navigateBack({
-
+					uni.navigateTo({
+						url:"../orders/toOrder"
 					})
 				}
 			},

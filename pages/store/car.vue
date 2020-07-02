@@ -1,5 +1,7 @@
 <template>
 	<view>
+		<uni-nav-bar color="#333333" background-color="#ffffff" 
+		:status-bar="true" left-icon="arrowleft" title="车辆库" @clickLeft="back" />
 		<view class="car_list">
 			<view class="item" v-for="i in swMsg" @click="selectCar(i)">
 				<view class="part1">
@@ -70,7 +72,33 @@
 				this.from = ph.from;
 			}
 		},
+		// onBackPress() {  
+		//   if(this.from) {  
+		//     uni.navigateTo({
+		//     	url:"../orders/toOrder"
+		//     })  
+		//     return true;  
+		//   }else{
+		// 	uni.switchTab({
+		// 		url:"../mine/mine"
+		// 	})  
+		// 	return true; 
+		//   }  
+		// },
 		methods: {
+			back(){
+				if(this.from) {  
+					uni.navigateTo({
+						url:"../orders/toOrder"
+					})  
+					return true;  
+				}else{
+					uni.switchTab({
+						url:"../mine/mine"
+					})  
+					return true; 
+				} 
+			},
 			addItem(){
 				if(this.from){
 					uni.navigateTo({

@@ -12,7 +12,12 @@
 			<text class="yzm" v-if="timeout>=0">{{timeout}}s 重新获取</text>
 		</view>
 		<view class="sub_top">
+			<!-- #ifndef MP -->
 			<button class="btn blue ms" @click="loginIn">确定</button>
+			<!-- #endif -->
+			<!-- #ifdef MP -->
+			<button class="btn blue ms" open-type="getUserInfo" @getuserinfo="getUserInfoc">确定</button>
+			<!-- #endif -->
 		</view>
 	</view>
 </template>
@@ -28,7 +33,8 @@
 				dsf:"",
 				accessToken:"",
 				timeout:-1,
-				toWhere:""
+				toWhere:"",
+				wxsq:""
 			};
 		},
 		onLoad(ph) {
@@ -48,8 +54,50 @@
 			if(ph.xcx){
 				this.toWhere = ph.xcx
 			}
+			if(ph.wxsq){
+				this.wxsq = ph.wxsq
+			}
 		},
 		methods:{
+			getUserInfoc({
+				detail
+			}) {
+				let this_ = this;
+				console.log(detail.userInfo.nickName)
+				if (detail.userInfo) {
+					console.log(detail)
+					let dataLL = {
+						phone:this_.phone,
+						code:this_.yzm,
+						openid:this_.openid,
+						nickname:detail.userInfo.nickName
+					}
+					// console.log(data)
+					this_.$getApi('/api/auth/bindPhone',dataLL,res=>{
+						console.log(res)
+						this_.$store.commit('login',res.data);			
+						setTimeout(()=>{
+							this_.getInit(()=>{
+								if(this_.toWhere == 'ws'){
+									uni.navigateTo({
+										url:'../mine/addCar?ws=1'
+									})
+								}else{
+									uni.switchTab({
+										url:'../home/home'
+									})
+								}
+							});	
+						},500)
+					},"false")
+					// this.toMain(detail.userInfo.nickName);
+				} else {
+					uni.showToast({
+						icon: 'none',
+						title: '登陆失败'
+					});
+				}
+			},
 			//获取验证码
 			getYZM(){
 				let data = {

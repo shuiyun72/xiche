@@ -1,5 +1,7 @@
 <template>
-	<view>
+	<view class="to_order_sss">
+		<uni-nav-bar color="#333333" background-color="#ffffff" 
+		:status-bar="true" left-icon="arrowleft" title="预约洗车" @clickLeft="back" />
 		<view class="to_order" v-for="(itemC,index) in lastData" :class="{active:indexI == index}" @click.stop="showHide(index)">
 			<view class="show_more_o">
 				<view class="">
@@ -73,7 +75,7 @@
 		
 		
 		
-		<view class="to_order" v-show="isCellDelete">
+		<view class="to_order">
 			<view class="show_more_o" v-if="lastData.length > 0">
 				<view class="">
 					预约订单{{lastData.length+1}}
@@ -125,16 +127,21 @@
 				</checkbox-group>
 			</view>
 			<uni-list class="time_pick">
-				<uni-list-item-point title="清洗时间" point="true" @click="showChangeTime">
+				
+				<uni-list-item-point title="清洗时间" point="true" :showArrow="false">
 					<template v-slot:right="">
+						
 						<picker mode="multiSelector" @columnchange="rinseTimeChange" :value="rinseTimeSel" :range="rinseTimeList">
 							<view class="uni-input">
-								<!-- <text v-show="JSON.stringify(rinseTimeSel) == '[0,0]'">请选择时间</text> -->
-								<text>{{rinseTimeList[0][rinseTimeSel[0]]}},{{rinseTimeList[1][rinseTimeSel[1]]}}</text>
+							<view class="pick_flex">
+							<text class="uni-input">{{rinseTimeList[0][rinseTimeSel[0]]}},{{rinseTimeList[1][rinseTimeSel[1]]}}</text>
+							<text class="iconfont iconjiantou"></text>
+						</view>
 							</view>
 						</picker>
 					</template>
 				</uni-list-item-point>
+				
 			</uni-list>
 			<uni-list>
 				<uni-list-item-point title="联系电话" point="true" :rightText="orderPhone.name" @click="navigateTo('../store/phone?from=toOrder')"></uni-list-item-point>
@@ -146,7 +153,7 @@
 				<textarea v-model="vTextarea" placeholder="请在这里填写备注信息" class="textarea" />
 			</view>
 		</view>
-		<view class="c_add_or" @click="beforeMoreNext" v-show="isCellDelete">
+		<view class="c_add_or" @click="beforeMoreNext">
 			<text class="iconfont icontianjia"></text>
 			<text>继续添加洗车订单</text>
 		</view>
@@ -220,6 +227,12 @@
 				name: "请选择优惠券"
 			})
 		},
+		// onBackPress() {
+		//   uni.switchTab({
+		//   	url:'../home/home'
+		//   })  
+		//   return true;
+		// },
 		mounted() {
 			this.$getApi("/api/auth/mall/neirong",{},res=>{
 				this.itemsCarList = res.data
@@ -231,6 +244,12 @@
 		},
 		methods: {
 			...mapMutations(['setSelCar','setAddress','setP','setPhone']),
+			back(){
+				uni.switchTab({
+					url:'../home/home'
+				})  
+				return true;
+			},
 			selRadio(index){
 				console.log(index);
 				this.current = index
@@ -253,8 +272,15 @@
 			},
 			//删除未来订单
 			cellDelete(){
-				this.isCellDelete = false;
+				// this.isCellDelete = false;
 				this.$msg("删除成功")
+				let newDateShow = this.lastData.pop();
+				console.log(newDateShow)
+				this.$store.commit('setSelCar',newDateShow.car_id);
+				this.$store.commit('setAddress',newDateShow.address_id);
+				this.$store.commit('setP',newDateShow.park_id);
+				this.$store.commit('setPhone',newDateShow.relation_id);
+				this.vTextarea = newDateShow.remark;
 			},
 			//删除已确定订单
 			deleteAdd(item,index){
@@ -317,16 +343,12 @@
 					}
 				})
 				console.log(nnLastData);
-				let lastDataL;
-				if(this.isCellDelete){
-					if(dataL.car_id && dataL.address_id && dataL.park_id && dataL.relation_id){
-						lastDataL = nnLastData.concat(dataL);
-					}else{
-						this.$msg('信息不完善,请完善信息');
-						return false;
-					}
+				let lastDataL;		
+				if(dataL.car_id && dataL.address_id && dataL.park_id && dataL.relation_id){
+					lastDataL = nnLastData.concat(dataL);
 				}else{
-					lastDataL = nnLastData
+					this.$msg('信息不完善,请完善信息');
+					return false;
 				}
 				
 				let newlastDataL = _.cloneDeep(lastDataL)
@@ -445,12 +467,12 @@
 					return false;
 				}
 				
-				let this_ = this;
-				for(let i=0;i<this.lastData.length;i++){
-					this_.$nextTick(()=>{
-						// console.log(this_.$refs[`Model${i}`].$el)	
-					})
-				}
+				// let this_ = this;
+				// for(let i=0;i<this.lastData.length;i++){
+				// 	this_.$nextTick(()=>{
+				// 		// console.log(this_.$refs[`Model${i}`].$el)	
+				// 	})
+				// }
 				
 				// this.init();
 			},
@@ -512,6 +534,20 @@
 </script>
 
 <style lang="scss" scoped>
+	.to_order_sss{
+		picker{
+			width: 100%;
+			.pick_flex{
+				display: flex;
+				justify-content: flex-end;
+				.iconjiantou{
+					color: #cccccc;
+					font-size: 46upx;
+				}
+			}
+		}
+		
+	}
 	.juan_body {
 		background-color: #fff;
 		position: relative;

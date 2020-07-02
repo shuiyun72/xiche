@@ -95,7 +95,7 @@
 					洗车优惠券
 				</view>
 				<scroll-view scroll-y="true" class="scroll-Y">
-				<view class="item_card" v-for="item in juan1List">
+				<view class="item_card" v-for="(item,index) in juan1List" :key="index">
 					<image src="../../static/img/mine/zhekj.png" mode="widthFix" class="img"></image>
 					<view class="item_ab">
 						<view class="left">
@@ -153,31 +153,42 @@
 					url: '../login/yLogin'
 				})
 			} else {
-				if (this_.userInfo && this_.userInfo.is_take < 1) {
-					this_.getQList()
-				}
+				this_.$getApi("/api/user/userinfo", {}, res => {
+					this_.$store.commit('login', res.data);
+					if (this_.userInfo && this_.userInfo.is_take < 1) {
+						this_.getQList()
+					}
+				})	
 			}
 			// #endif
 			// #ifdef MP
 			
 			if(!this.hasLogin){
-				this.xcxisLogin();
+				this_.xcxisLogin();
 				this_.getQList();
+			}else{
+				this_.$getApiTime("/api/user/userinfo", {}, res => {
+					console.log(res)
+					if(res.code == 401){ 
+						console.log("40111111111111")
+						this.$store.commit("logout");
+						this_.xcxisLogin();
+					}else{
+						console.log("40111111111100000000000000")
+						this.$store.commit('login', res.data);
+					}
+				})
 			}
 			// #endif
-			if (this.hasLogin) {
-				this.$getApi("/api/user/userinfo", {}, res => {
-					this.$store.commit('login', res.data);
-				})
-			}
-			try {
-				this.$nextTick(() => {
-					this.$refs['juan0'].close();
-					this.$refs['juan2'].close();
-				})
-			} catch (e) {
-				//TODO handle the exception
-			}
+			
+			// try {
+			// 	this.$nextTick(() => {
+			// 		this.$refs['juan0'].close();
+			// 		this.$refs['juan2'].close();
+			// 	})
+			// } catch (e) {
+			// 	//TODO handle the exception
+			// }
 				
 		},
 		onHide() {
@@ -228,6 +239,7 @@
 				})
 			},
 			getUserInfoWX() {
+				console.log("getUserInfoWX")
 				let this_ = this;
 				if (!this.$store.state.hasLogin) {
 					uni.login({
@@ -240,25 +252,35 @@
 								console.log(res)
 								if (res.data.is_bind == 0) {
 									console.log("11")
-									uni.getUserInfo({
-										provider: 'weixin',
-										success: function(infoRes) {
-											console.log(infoRes)
-											console.log('用户昵称为：' + infoRes.userInfo.nickName);
-											uni.navigateTo({
-												url: '../login/login?xcx=ws&openid=' + res.data.openid + '&nickname=' + infoRes.userInfo.nickName
-											})
-										} 
-									});
+									uni.navigateTo({
+										url: '../login/login?xcx=ws&openid=' + res.data.openid + '&wxsq=1'
+									})
+									// uni.getUserInfo({
+									// 	provider: 'weixin',
+									// 	success: function(infoRes) {
+									// 		console.log(infoRes)
+									// 		console.log('用户昵称为：' + infoRes.userInfo.nickName);
+									// 		uni.navigateTo({
+									// 			url: '../login/login?xcx=ws&openid=' + res.data.openid + '&nickname=' + infoRes.userInfo.nickName
+									// 		})
+									// 	} 
+									// });
 								} else
 								if (res.data.is_bind == 1){
 									console.log(res)
 									this_.$store.commit('login', res.data);
 									setTimeout(() => {
 										this_.getInit(() => {
-											uni.navigateTo({
-												url:'../mine/addCar?ws=1&xcx=ws'
-											})
+											if(this_.userInfo.is_perfect == 0){
+												uni.navigateTo({
+													url:'../mine/addCar?ws=1&xcx=ws'
+												})
+											}else
+											if(this_.userInfo.is_perfect == 1){
+												uni.navigateTo({
+													url:'../mine/addAddress?ws=1&xcx=ws'
+												})
+											}
 										});
 									}, 500)
 								}
@@ -267,9 +289,16 @@
 						}
 					});
 				}else{
-					uni.navigateTo({
-						url:'../mine/addCar?xcx=ws&ws=1'
-					})
+					if(this_.userInfo.is_perfect == 0){
+						uni.navigateTo({
+							url:'../mine/addCar?ws=1&xcx=ws'
+						})
+					}else
+					if(this_.userInfo.is_perfect == 1){
+						uni.navigateTo({
+							url:'../mine/addAddress?ws=1&xcx=ws'
+						})
+					}
 				}
 			},
 			addCarH() {
@@ -288,7 +317,7 @@
 					console.log(res.data)
 					this.juan1List = res.data;
 					this.$refs['juan1'].open()
-				})	
+				},'false')	
 			},
 			//跳转洗车券
 			getXCQ() {
@@ -333,7 +362,7 @@
 			},
 			//预约洗车
 			toOrder() {
-				if (!this.userInfo || this.userInfo.groupid == 0) {
+				if (!this.userInfo || this.userInfo.is_perfect != 2) {
 					// this.$refs['juan0'].open()
 					let this_ = this;
 					uni.showModal({
@@ -347,9 +376,16 @@
 								this_.getUserInfoWX();
 								// #endif
 								// #ifndef MP
-								uni.navigateTo({
-									url:'../mine/addCar?ws=1'
-								})
+								if(this_.userInfo.is_perfect == 0){
+									uni.navigateTo({
+										url:'../mine/addCar?ws=1'
+									})
+								}else
+								if(this_.userInfo.is_perfect == 1){
+									uni.navigateTo({
+										url:'../mine/addAddress?ws=2'
+									})
+								}
 								// #endif
 							}
 						}
@@ -361,7 +397,6 @@
 				}
 			},
 			closeJuan(num) {
-				console.log(num)
 				if (num == 1) {
 					if(this.hasLogin){
 						this.$getApi("/api/user/coupon/cancle", {}, res => {

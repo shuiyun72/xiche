@@ -18,7 +18,7 @@ const store = new Vuex.Store({
 		orderCar:uni.getStorageSync("orderCar") || {name:"请选择车辆"},
 		orderAddress:uni.getStorageSync("orderAddress") || {name:"请选择地址"},
 		orderP:uni.getStorageSync("orderP") || {name:"请选择停车位"},
-		orderPhone:uni.getStorageSync("orderPhone") || {name:"请选择手机号"},
+		orderPhone:uni.getStorageSync("setPhone") || {name:"请选择手机号"},
 		torderQuan:{name:"请选择优惠券"},
 		selCity:"郑州",
 		back:1

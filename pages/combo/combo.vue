@@ -106,13 +106,29 @@
 								console.log(res)
 								if (res.data.is_bind == 0) {
 									console.log("11")
-									uni.getUserInfo({
-										provider: 'weixin',
-										success: function(infoRes) {
-											console.log(infoRes)
-											console.log('用户昵称为：' + infoRes.userInfo.nickName);
+									// uni.getUserInfo({
+									// 	provider: 'weixin',
+									// 	success: function(infoRes) {
+									// 		console.log(infoRes)
+									// 		console.log('用户昵称为：' + infoRes.userInfo.nickName);
+									// 		uni.navigateTo({
+									// 			url: '../login/login?xcx=home&openid=' + res.data.openid + '&nickname=' + infoRes.userInfo.nickName
+									// 		})
+									// 	}
+									// });
+									uni.navigateTo({
+										url: '../login/login?xcx=ws&openid=' + res.data.openid + '&wxsq=1'
+									})
+								}else{
+									this_.getInit(() => {
+										if(this_.userInfo.is_perfect == 0){
 											uni.navigateTo({
-												url: '../login/login?xcx=home&openid=' + res.data.openid + '&nickname=' + infoRes.userInfo.nickName
+												url:'../mine/addCar?ws=1&xcx=ws'
+											})
+										}else
+										if(this_.userInfo.is_perfect == 1){
+											uni.navigateTo({
+												url:'../mine/addAddress?ws=1&xcx=ws'
 											})
 										}
 									});
@@ -121,7 +137,33 @@
 							// 获取用户信息
 						}
 					});
+				}else{
+					if(this_.userInfo.is_perfect == 0){
+						uni.navigateTo({
+							url:'../mine/addCar?ws=1&xcx=ws'
+						})
+					}else
+					if(this_.userInfo.is_perfect == 1){
+						uni.navigateTo({
+							url:'../mine/addAddress?ws=1&xcx=ws'
+						})
+					}
 				}
+			},
+			async getInit(call) {
+				await this.$getApi("/api/user/car/xing", {}, res => {
+					this.$store.commit("setCarXing", res.data)
+				})
+				await this.$getApi("/api/user/car/color", {}, res => {
+					this.$store.commit("setCarColor", res.data)
+				})
+				await this.$getApi("/api/user/car/brand", {}, res => {
+					this.$store.commit("setCarBrand", res.data)
+				})
+				await this.$getApi("/api/user/car/service", {}, res => {
+					this.$store.commit("setService", res.data)
+				})
+				call instanceof Function && call()
 			}
 		}
 	}

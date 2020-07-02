@@ -1,5 +1,6 @@
 <template>
 	<view>
+		<uni-nav-bar color="#333333" background-color="#ffffff" :status-bar="true" left-icon="arrowleft" :title="titleText" @clickLeft="back" />
 		<uni-list>
 			<uni-list-item-point title="姓名" :showArrow="false" point="true">
 				<template v-slot:right="">
@@ -102,7 +103,9 @@
 				carId:"",
 				type:2,
 				fromL:"",
-				oldImg:""
+				oldImg:"",
+				isTrueImg:true,
+				titleText:"添加车辆信息"
 			};
 		},
 		computed: {
@@ -110,9 +113,10 @@
 		},
 		onLoad(ph) {
 			if(ph.item){
-				uni.setNavigationBarTitle({
-					title:'编辑车辆信息'
-				})
+				// uni.setNavigationBarTitle({
+				// 	title:'编辑车辆信息'
+				// })
+				this.titleText = "编辑车辆信息";
 				this.type = 2;
 				let item = JSON.parse(ph.item);
 				console.log(item)
@@ -126,9 +130,10 @@
 				this.oldImg = item.img;
 			}else
 			if(ph.ws){
-				uni.setNavigationBarTitle({
-					title:'完善信息'
-				})
+				// uni.setNavigationBarTitle({
+				// 	title:'完善信息'
+				// })
+				this.titleText = "完善信息";
 			}else{
 				this.$store.commit('setbrand',{name:"请选择车的品牌"})
 			}
@@ -137,6 +142,11 @@
 			this.fromL = ph.from ? ph.from : "";		
 		},
 		methods: {
+			back(){
+				uni.switchTab({
+					url:'../home/home'
+				})
+			},
 			//提交订单
 			submitOrder(){
 				// this.oldImg
@@ -155,25 +165,27 @@
 					covers:JSON.stringify(lastImg),
 					type:this.type
 				}
+				if(!this.isTrueImg){
+					this.$msg("检查图片是否上传成功,请稍后再试");
+					return false;
+				}
 				console.log(data)
 				if(this.name && this.phone && this.chepai && this.brand.id && lastImg.length > 0 ){
 					this.$getApi("/api/user/mine/addCar",data,res1=>{
 						// this.$store.commit('setbrand',{name:"请选择车的品牌"});
+						this.$getApi("/api/user/userinfo",{},res=>{
+							this.$store.commit('login',res.data);
+						})
 						if(this.type == 1){
-							this.$getApi("/api/user/userinfo",{},res=>{
-								this.$store.commit('login',res.data);
-							})
 							uni.navigateTo({
-								url:'../orders/toOrder'
+								url:'../mine/addAddress?ws=1'
 							})
 						}else{
-							if(this.fromL && this.type == 1){
-								// uni.navigateBack({
-								// 	delta:2
-								// })
+							if(this.fromL == 'toOrder'){
 								uni.navigateTo({
-									url:'../mine/addAddress'
+									url:'../store/car?from=toOrder'
 								})
+								
 							}else{
 								uni.navigateTo({
 									url:"../store/car"
@@ -196,6 +208,7 @@
 			},
 			chooseImage(){
 				let this_ = this;
+				this_.isTrueImg = false;
 				let token = this_.$store.state.userInfo.remember_token ||
 				uni.getStorageSync('userInfo').remember_token ;	
 				uni.chooseImage({
@@ -204,6 +217,7 @@
 				    success: (res) => {
 				        this.imageList = this.imageList.concat(res.tempFilePaths);				
 						console.log(this_.$apiUrl + '/api/auth/upload')
+						console.log(res.tempFilePaths[0]);
 						uni.uploadFile({
 							url:this_.$apiUrl + '/api/auth/upload',
 							filePath: res.tempFilePaths[0],
@@ -216,14 +230,20 @@
 								// 显示上传信息
 								console.log(JSON.parse(res1.data).data.url)
 								this_.upimageList.push(JSON.parse(res1.data).data.url)
+								this_.isTrueImg = true;
 							}
 						});
 				    }
 				});
 			},
 			deleteImg(i) {
-				this.imageList.splice(i, 1)
-				this.upimageList.splice(i, 1)
+				this.imageList.splice(i, 1);
+				this.upimageList.splice(i, 1);
+				if(this.upimageList.length > 0){
+					this.isTrueImg  = true;
+				}else{
+					this.isTrueImg = false;
+				}
 			},
 			previewImage: function(e) {
 				var current = e.target.dataset.src

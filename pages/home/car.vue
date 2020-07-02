@@ -24,9 +24,6 @@
 </template>
 
 <script>
-	import {
-		car as Car
-	} from '../../static/const/car.js';
 	export default {
 		data() {
 			return {

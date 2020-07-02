@@ -29,6 +29,7 @@ Vue.prototype.$getApi = function(url, data, callsuc, token) {
 		},
 		success: (res) => {
 			// uni.hideLoading();
+			console.log(res)
 			if (res.data.code == 200) {
 				callsuc instanceof Function && callsuc(res.data)
 			} else
@@ -38,20 +39,24 @@ Vue.prototype.$getApi = function(url, data, callsuc, token) {
 			if (res.data.code == 401) {
 				this.$msg("请重新登录")
 				// #ifndef MP
+					this.$store.commit("logout");
 					uni.reLaunch({
 						url: '../login/yLogin',
 						success(){
-							location.reload()
+							// location.reload()
 						} 
 					})
 				// #endif
 				// #ifdef MP
-					uni.reLaunch({
-						url: '../home/home',
-						success(){
-							location.reload() 
-						}
-					})
+					this.$store.commit("logout");
+					setTimeout(()=>{
+						uni.reLaunch({
+							url: '../home/home',
+							success(){
+								// location.reload() 
+							}
+						})
+					},1000)
 				// #endif
 			} 
 		},
@@ -87,20 +92,18 @@ Vue.prototype.$getApiTime = function(url, data, callsuc, token) {
 			if (res.data.code == 401) {
 				this.$msg("登录已过期,请重新登录")
 				// #ifndef MP
+					this.$store.commit("logout");
 					uni.reLaunch({
 						url: '../login/yLogin',
 						success(){
-							location.reload()
+							// location.reload()
 						}
 					})
 				// #endif
 				// #ifdef MP
-					// uni.reLaunch({
-					// 	url: '../home/home',
-					// 	success(){
-					// 		location.reload()
-					// 	}
-					// })
+					this.$store.commit("logout");
+					callsuc instanceof Function && callsuc(res.data)
+					
 				// #endif
 			}
 		},
