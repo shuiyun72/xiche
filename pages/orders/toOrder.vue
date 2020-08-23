@@ -19,17 +19,16 @@
 					<uni-list-item-point title="停车位" :rightText="itemC.park_id.name"></uni-list-item-point>
 				</uni-list>
 				<uni-list class="mt10">
-					<uni-list-item-point title="洗车内容选择" :showArrow="false" rightText=""></uni-list-item-point>
+					<uni-list-item-point title="洗车内容选择" :showArrow="false"></uni-list-item-point>
 				</uni-list>
 				<view class="car_com">
-			
 					<radio-group class="sel_car_com">
 						<label v-for="(item, index) in itemsCarList">
 							<view class="item">
 								<image src="../../static/img/jiag.png" mode="widthFix" class="img"></image>
 								<view class="item_b">
 									<view class="part1">
-										<radio :value="item.value" :checked="item.id === itemC.mall_id?true:false" class="radio" :disabled="true" />
+										<radio :value="item.id" :checked="item.id === itemC.mall_id?true:false" class="radio" :disabled="true" />
 										<text class="t">{{item.title}}</text>
 									</view>
 									<view class="part2">
@@ -370,8 +369,6 @@
 					}
 				}
 				let sssData = JSON.stringify(lastDataL)
-				console.log(sssData)
-				return false;
 				this.$getApi("/api/user/order/sure",{data:sssData},res=>{
 					console.log(res)
 					
