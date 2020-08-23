@@ -5,7 +5,7 @@
 		<view class="car_list">
 			<view class="item" v-for="i in swMsg" @click="selectCar(i)">
 				<view class="part1">
-					<image :src="$httpp + i.checolor.cover" mode="widthFix" class="l_img"></image>
+					<image :src="httpp + i.checolor.cover" mode="widthFix" class="l_img"></image>
 					<view class="content">
 						<view class="t1">
 							<view class="l">{{i.chepai}}</view>
@@ -16,7 +16,7 @@
 							<view class="r">{{i.chebrand.name}}</view>
 						</view>
 					</view>
-					<image :src="i.img ? $httpp + i.img :'../../static/img/youc.png'" mode="widthFix" class="r_img"></image>
+					<image :src="i.img ? httpp + i.img :'../../static/img/youc.png'" mode="widthFix" class="r_img"></image>
 				</view>
 				<view class="part2">
 					<view class="item2" @click.stop="editCar(i)">
@@ -65,6 +65,11 @@
 			this.$getApi("/api/user/car/list", {}, res => {
 				this.swMsg = res.data
 			})
+		},
+		computed:{
+			httpp(){
+				return this.$store.state.httpp;
+			}
 		},
 		onLoad(ph) {
 			console.log(ph)

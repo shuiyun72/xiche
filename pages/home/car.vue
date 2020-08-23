@@ -1,6 +1,6 @@
 <template>
 	<view class="city_search">
-		<view v-for="(t,i) in Car">
+		<view v-for="(t,i) in Car" :key="i">
 			<view class="text_title_city" @tap="selectCityTitle">
 				{{t.title}}
 			</view>
@@ -24,6 +24,7 @@
 </template>
 
 <script>
+	import _ from "../../until/lodash";
 	export default {
 		data() {
 			return {
@@ -34,12 +35,14 @@
 		computed:{
 			httpp(){
 				return this.$store.state.httpp;
+			},
+			carBrand(){
+				return this.$store.state.carBrand;
 			}
 		},
 		mounted() {
-			this.$getApi("/api/user/car/brand",{},res=>{
-				console.log(res)
-				let ss = _.keys(res.data,item=>{
+			if(JSON.stringify(this.carBrand) != "[]"){
+				let ss = _.keys(this.carBrand,item=>{
 					return item
 				})
 				console.log(ss)
@@ -47,12 +50,29 @@
 				_.map(ss,itemC=>{
 					sscc.push({
 						title:itemC,
-						lists:res.data[itemC]
+						lists:this.carBrand[itemC]
 					})
 				})
 				console.log(sscc)
 				this.Car = sscc
-			})
+			}else{
+				this.$getApi("/api/user/car/brand",{},res=>{
+					console.log(res)
+					let ss = _.keys(res.data,item=>{
+						return item
+					})
+					console.log(ss)
+					let sscc = [];
+					_.map(ss,itemC=>{
+						sscc.push({
+							title:itemC,
+							lists:res.data[itemC]
+						})
+					})
+					console.log(sscc)
+					this.Car = sscc
+				})
+			}
 		},
 		methods: {
 			selectCityTitle(el){

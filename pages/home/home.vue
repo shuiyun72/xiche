@@ -143,7 +143,6 @@
 		},
 		mounted() {
 			console.log("homemounted")
-			
 		},
 		onShow() {
 			let this_ = this;
@@ -174,8 +173,13 @@
 						this.$store.commit("logout");
 						this_.xcxisLogin();
 					}else{
-						console.log("40111111111100000000000000")
+						console.log("40111111111100000000000000",res.data)
 						this.$store.commit('login', res.data);
+						// #ifdef MP
+						if(res.data.is_take >= 1){
+							this.$refs['juan1'].close()
+						}
+						// #endif
 					}
 				})
 			}
@@ -189,10 +193,10 @@
 			// } catch (e) {
 			// 	//TODO handle the exception
 			// }
-				
+			uni.hideToast();	
 		},
 		onHide() {
-			console.log("onHide1112121000")
+			uni.hideToast();
 		},
 		computed: {
 			...mapState(['hasLogin', 'userInfo', 'selCity']),
@@ -242,6 +246,7 @@
 				console.log("getUserInfoWX")
 				let this_ = this;
 				if (!this.$store.state.hasLogin) {
+					console.log("getUserInfoWX1")
 					uni.login({
 						provider: 'weixin',
 						success: function(loginRes) {
@@ -255,16 +260,6 @@
 									uni.navigateTo({
 										url: '../login/login?xcx=ws&openid=' + res.data.openid + '&wxsq=1'
 									})
-									// uni.getUserInfo({
-									// 	provider: 'weixin',
-									// 	success: function(infoRes) {
-									// 		console.log(infoRes)
-									// 		console.log('用户昵称为：' + infoRes.userInfo.nickName);
-									// 		uni.navigateTo({
-									// 			url: '../login/login?xcx=ws&openid=' + res.data.openid + '&nickname=' + infoRes.userInfo.nickName
-									// 		})
-									// 	} 
-									// });
 								} else
 								if (res.data.is_bind == 1){
 									console.log(res)
@@ -421,6 +416,8 @@
 						this.$refs['juan1'].close()
 						this.$msg('优惠券领取成功,可在个人中心中查看');
 						this.$store.commit("setCoupon");
+					},"true",err=>{
+						this.$refs['juan1'].close()
 					});
 				}else{
 					this.getUserInfoWX();

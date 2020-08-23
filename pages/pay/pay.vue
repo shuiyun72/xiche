@@ -7,8 +7,6 @@
 			</view>
 
 		</view>
-		<!-- #ifndef MP -->
-		
 		
 		<view class="pay_type">支付方式</view>
 		<radio-group class="block" @change="RadioChange">
@@ -18,12 +16,14 @@
 				</view>
 				<radio :class="radio=='wepay'?'checked':''" :checked="radio=='wepay'?true:false" value="wepay" class="radio"></radio>
 			</view>
-			<view class="cu-form-group">
+			<!-- #ifndef MP -->
+			<!-- <view class="cu-form-group">
 				<view class="item">
 					<image style="width: 44rpx;height: 44rpx;" src="../../static/img/zhifb.png" mode=""></image><text class="margin-left-xs">支付宝支付</text>
 				</view>
 				<radio :class="radio=='alipay'?'checked':''" :checked="radio=='alipay'?true:false" value="alipay"  class="radio"></radio>
-			</view>
+			</view> -->
+			<!-- #endif -->
 			<view class="cu-form-group">
 				<view class="item">
 					<image style="width: 44rpx;height: 44rpx;" src="../../static/img/yue.png" mode=""></image><text class="margin-left-xs">余额支付</text>
@@ -33,7 +33,7 @@
 				</view>
 			</view>
 		</radio-group>
-		<!-- #endif -->
+		
 		<!-- <view @tap="next()" class="cu-bar foot" style="box-shadow: 0;"><button class="cu-btn bg-blue lg" style="width: 750rpx; height: 100rpx;" type="">确定</button></view> -->
 		<view class="bottom_c">
 			<view class="pay-num">
@@ -48,18 +48,18 @@
 	export default {
 		data() {
 			return {
-				radio: '',
+				radio: 'money',
 				money:0,
 				typeId:""
 			};
 		},
 		onShow() {
-			// #ifdef MP
-				this.radio = 'minipay'
-			// #endif
-			// #ifndef MP
-				this.radio = 'money'
-			// #endif
+			// // #ifdef MP
+			// 	this.radio = 'minipay'
+			// // #endif
+			// // #ifndef MP
+			// 	this.radio = 'money'
+			// // #endif
 		},
 		onLoad(op) {
 			this.money = JSON.parse(op.item).current_price;
@@ -67,10 +67,14 @@
 		},
 		computed:{
 			payType() {
-				// #ifndef MP
 				switch (this.radio) {
 					case 'wepay':
+						// #ifndef MP
 						return 'wepay';
+						// #endif
+						// #ifdef MP
+						return 'minipay'
+						// #endif
 						break;
 					case 'alipay':
 						return 'alipay';
@@ -79,10 +83,6 @@
 						return 'money';
 						break;
 				}
-				// #endif
-				// #ifdef MP
-				return 'minipay'
-				// #endif
 			}
 		},
 		methods: {

@@ -53,6 +53,9 @@
 			// 	}
 			// }
 		},
+		onHide() {
+			uni.hideToast();
+		},
 		methods: {
 			buyCombo(item) {
 				if (this.$store.state.hasLogin) {

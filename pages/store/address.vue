@@ -1,8 +1,10 @@
 <template>
 	<view class="address_list">
-		<view class="item" v-for="(item,index) in addressList" :class="{'active':index == sIndex}" @click="selItem(item,index)">
-			<!-- {{item.text}} -->
-			{{item.city_name}}{{item.area_name}}{{item.street_name}}{{item.house_detail}}
+		<view v-if="addressList.length > 0">
+			<view class="item" v-for="(item,index) in addressList" :class="{'active':index == sIndex}" @click="selItem(item,index)">
+				<!-- {{item.text}} -->
+				{{item.city_name}}{{item.area_name}}{{item.street_name}}{{item.house_detail}}
+			</view>
 		</view>
 		<view class="sub_btn">
 			<button class="btn blue" @click="next">确认</button>
@@ -14,9 +16,7 @@
 	export default {
 		data() {
 			return {
-				addressList:[
-					{}
-				],
+				addressList:[],
 				sIndex:-1
 			};
 		},

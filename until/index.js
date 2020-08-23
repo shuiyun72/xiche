@@ -3,8 +3,13 @@ import store from '../store';
 // let apiUrl = "http://39.100.62.29:9922";
 let apiUrl = 'https://yuyue.wsstreet.net';
 Vue.prototype.$apiUrl = 'https://yuyue.wsstreet.net';
+
+import './lodash';
+import lodash from './lodash';
+Vue.prototype._ = lodash;
+
 // import Qs from "qs";
-Vue.prototype.$getApi = function(url, data, callsuc, token) {
+Vue.prototype.$getApi = function(url, data, callsuc, token,err) {
 	// url = 'System/Login?loginContent=admin&password=123456'
 	token = token == "false" ? false : true;
 	data = data ? data : {};
@@ -35,6 +40,7 @@ Vue.prototype.$getApi = function(url, data, callsuc, token) {
 			} else
 			if (res.data.code == 201) {
 				this.$msg(res.data.msg)
+				err instanceof Function && err(res.data.msg)
 			} else
 			if (res.data.code == 401) {
 				this.$msg("请重新登录")

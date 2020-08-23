@@ -9,7 +9,7 @@ const store = new Vuex.Store({
 	state: {
 		hasLogin: hasLogin,
 		userInfo: uni.getStorageSync("userInfo") || undefined,
-		carXing:uni.getStorageSync("carXing") || [],
+		carXing:uni.getStorageSync("carXing") || [{name:"请选择车型"}],
 		carColor:uni.getStorageSync("carColor") || [],
 		carBrand:uni.getStorageSync("carBrand") || [],
 		carServe:uni.getStorageSync("carServe") || [],
@@ -109,6 +109,18 @@ const store = new Vuex.Store({
 			uni.removeStorage({  
                 key: 'userInfo'  
             })
+			state.carXing = [{name:"请选择车型"}];
+			state.carColor = [];
+			state.carBrand = [];
+			uni.removeStorage({
+			    key: 'carXing'  
+			})
+			uni.removeStorage({
+			    key: 'carColor'  
+			})
+			uni.removeStorage({
+			    key: 'carBrand'  
+			})
 		},
 		clearSe(state) {
 			state.brand = {name:"请选择车的品牌"};

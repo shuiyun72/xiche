@@ -63,7 +63,7 @@
 		<uni-list class="od_t" v-if="isNc">
 			<uni-list-item title="优惠券" :rightText="oderQuan.name" @click="selQUan"></uni-list-item>
 		</uni-list>
-		<!-- #ifndef MP -->
+		
 		<view class="pay_type">支付方式</view>
 		<radio-group class="block" @change="RadioChange">
 			<view class="cu-form-group">
@@ -72,13 +72,14 @@
 				</view>
 				<radio :class="radio=='A'?'checked':''" :checked="radio=='A'?true:false" value="A" class="radio"></radio>
 			</view>
-			
-			<view class="cu-form-group">
+			<!-- #ifndef MP -->
+			<!-- <view class="cu-form-group">
 				<view class="item">
 					<image style="width: 44rpx;height: 44rpx;" src="../../static/img/zhifb.png" mode=""></image><text class="margin-left-xs">支付宝支付</text>
 				</view>
 				<radio :class="radio=='B'?'checked':''" :checked="radio=='B'?true:false" value="B" class="radio"></radio>
-			</view>
+			</view> -->
+			<!-- #endif -->
 			<view class="cu-form-group">
 				<view class="item">
 					<image style="width: 44rpx;height: 44rpx;" src="../../static/img/yue.png" mode=""></image><text class="margin-left-xs">余额支付</text>
@@ -88,11 +89,11 @@
 				</view>
 			</view>
 		</radio-group>
-		<!-- #endif -->
+		
 		<view class="bottom_c">
 			<view @click="next" class="btn">立即支付</view>
 			<view class="pay-num">
-				实付款：<text class="red">￥{{totalAmount}}.00</text>
+				实付款：<text class="red">￥{{totalAmount}}</text>
 			</view>
 		</view>
 	</view>
@@ -100,6 +101,7 @@
 </template>
 
 <script>
+	import _ from "../../until/lodash";
 	export default {
 		data() {
 			return {
@@ -124,12 +126,7 @@
 
 		},
 		onShow() {
-			// #ifdef MP
-				this.radio = 'minipay'
-			// #endif
-			// #ifndef MP
-				this.radio = 'C'
-			// #endif
+
 		},
 		computed: {
 			totalAmount() {
@@ -146,10 +143,15 @@
 				return this.$store.state.torderQuan
 			},
 			payType() {
-				// #ifndef MP
+				
 				switch (this.radio) {
 					case 'A':
+						// #ifndef MP
 						return 'wepay';
+						// #endif
+						// #ifdef MP
+						return 'minipay'
+						// #endif
 						break;
 					case 'B':
 						return 'alipay';
@@ -158,10 +160,8 @@
 						return 'money';
 						break;
 				}
-				// #endif
-				// #ifdef MP
-				return 'minipay'
-				// #endif
+				
+				
 			}
 		},
 		methods: {
@@ -170,6 +170,7 @@
 			},
 			// thisText
 			next() {
+				console.log("支付")
 				let ordernos;
 				let this_ = this;
 				if (this.cellItem.length > 1) {
@@ -184,7 +185,6 @@
 				let dataL = {
 					order_no: ordernos,
 					payment: this.payType,
-
 					// payment:"minipay",
 					user_coupon_id: this.oderQuan.id ? this.oderQuan.id : ""
 				}
@@ -194,7 +194,7 @@
 					console.log(this_.payType)
 					if(this_.payType == "wepay") {
 						console.log("wepay")
-						uni.requestPayment({ 
+						uni.requestPayment({
 						    provider: 'wxpay',
 						    orderInfo: JSON.parse(resbuy.data.payinfo), //微信、支付宝订单数据
 						    success: function (res) {
@@ -267,8 +267,6 @@
 							}
 						});
 					}
-					
-					
 				})
 				// uni.navigateTo({
 				// 	url: './orderSuccess'

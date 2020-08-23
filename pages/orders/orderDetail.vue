@@ -56,7 +56,7 @@
 			<view class="d_msg" v-if="infoMsg.img">
 				<view class="d_label">车辆照片:</view>
 				<view class="d_img">
-					<image :src="httpp+infoMsg.img" mode="widthFix" class="img"></image>
+					<image :src="httpp+infoMsg.img" mode="widthFix" class="img" @tap="previewImage(httpp+infoMsg.img)"></image>
 				</view>
 			</view>
 		</view>
@@ -142,9 +142,9 @@
 							联系他
 						</view>
 					</view>
-					<view class="star_box">
-						<uni-rate :value="infoMsg.operator.star" :margin="5" :size="12" :disabled="true"/>
-						<text class="star_n">{{starC(infoMsg.operator.star)}}星</text>
+					<view class="star_box"  v-if="infoMsg.operator">
+						<uni-rate :value="star" :margin="5" :size="12" :disabled="true"/>
+						<text class="star_n">{{starC(star)}}星</text>
 					</view>
 					<view class="">
 						{{infoMsg.operator.intro}}
@@ -165,7 +165,7 @@
 				</view>
 				<view class="for_ext">
 					<view class="item_img" v-for="(img,index) in infoMsg.beforeimglist">
-						<image :src="httpp+img"></image>
+						<image :src="httpp+img" @tap="previewImage(httpp+img)"></image>
 					</view>
 				</view>
 			</view>
@@ -177,7 +177,7 @@
 				</view>
 				<view class="for_ext">
 					<view class="item_img" v-for="(img,index) in infoMsg.afterimglist">
-						<image :src="httpp+img"></image>
+						<image :src="httpp+img" @tap="previewImage(httpp+img)"></image>
 					</view>
 				</view>
 				<view class="d_msg">
@@ -226,25 +226,38 @@
 		computed: {
 			httpp(){
 				return this.$store.state.httpp;
+			},
+			star(){
+				if(this.infoMsg.operator){
+					return this.infoMsg.operator.star
+				}else{
+					return 5
+				}
 			}
 		},
 		methods:{
+			previewImage: function(e) {
+				console.log(e)
+				uni.previewImage({
+					current: 1,
+					urls: [e]
+				})
+			},
 			itemState(n,p){
-				switch (n) {
-					case 1 : 
-						if(p == 0){
-							return "未支付成功" ;
-						}else{
-							return "订单已确认" ;
-						}
-					break;
-					case 2 : return "订单已确认" ;break;
-					case 3 : return "正在洗车中" ;break;
-					case 4 : return "已完成" ;break;
-					case 5 : return "洗车工已取消" ;break;
-					case 6 : return "洗车工已取消" ;break;
-					case 7 : return "本人取消订单" ;break;
+				if(p == 0){
+					return "未支付成功" ;
+				}else{
+					switch (n) {
+						case 1 : return "订单已确认" ;break;
+						case 2 : return "订单已确认" ;break;
+						case 3 : return "正在洗车中" ;break;
+						case 4 : return "已完成" ;break;
+						case 5 : return "洗车工已取消" ;break;
+						case 6 : return "洗车工已取消" ;break;
+						case 7 : return "本人取消订单" ;break;
+					}
 				}
+				
 			},
 			starC(n) {
 				switch(n){
@@ -273,6 +286,12 @@
 </script>
 
 <style lang="scss" scoped>
+	.show_big_img{
+		.img{
+			max-width: 80vw;
+			max-height: 80vh;
+		}
+	}
 	.od_t_ss{
 		margin-bottom: 20upx;
 	}

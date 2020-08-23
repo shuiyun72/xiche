@@ -57,7 +57,11 @@
                     "weixin" : {
                         "appid" : "wxecd3f91ea27efd64",
                         "UniversalLinks" : "https://yuyue.wsstreet.net/ulink"
-                    }
+                    },
+                    "alipay" : {
+                        "__platform__" : [ "ios", "android" ]
+                    },
+                    "appleiap" : {}
                 },
                 "push" : {}
             },
@@ -66,7 +70,9 @@
                     "hdpi" : "unpackage/res/icons/72x72.png",
                     "xhdpi" : "unpackage/res/icons/96x96.png",
                     "xxhdpi" : "unpackage/res/icons/144x144.png",
-                    "xxxhdpi" : "unpackage/res/icons/192x192.png"
+                    "xxxhdpi" : "unpackage/res/icons/192x192.png",
+                    "ldpi" : "unpackage/res/icons/48x48.png",
+                    "mdpi" : "unpackage/res/icons/48x48.png"
                 },
                 "ios" : {
                     "appstore" : "unpackage/res/icons/1024x1024.png",
@@ -108,7 +114,8 @@
         "setting" : {
             "urlCheck" : false,
             "es6" : true,
-            "minified" : true
+            "minified" : true,
+            "postcss" : true
         },
         "permission" : {
             "scope.userLocation" : {

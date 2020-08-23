@@ -184,6 +184,7 @@
 			let this_ = this;
 			clearInterval(this_.timersL);
 			this.timersL = undefined;
+			uni.hideToast();
 		},
 		filters: {
 			psd: function(value) {

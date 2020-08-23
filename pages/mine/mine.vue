@@ -42,7 +42,7 @@
 			</view>
 			<view class="mine_body">
 				<uni-list>
-					<uni-list-item v-for="item in mineList" :title="item.title" :thumb="'../../static/img/mine/'+item.icon" @click="nativeTo(item.type)"></uni-list-item>
+					<uni-list-item v-for="(item,index) in mineList" :key="index" :title="item.title" :thumb="'../../static/img/mine/'+item.icon" @click="nativeTo(item.type)"></uni-list-item>
 				</uni-list>
 			</view>
 			
@@ -79,7 +79,7 @@
 					{icon:"wodpj.png",title:"我的评价",type:3},
 					{icon:"shangwhz.png",title:"商务合作",type:4},
 					{icon:"guanywm.png",title:"关于我们",type:5},
-					{icon:"shez.png",title:"设置",type:6},
+					{icon:"shez.png",title:"设置",type:6}
 				]
 			};
 		},
@@ -131,6 +131,9 @@
 				}
 				
 			}
+		},
+		onHide() {
+			uni.hideToast();
 		},
 		methods: {
 			getUserInfoWX() {

@@ -14,7 +14,7 @@
 				<template v-slot:right="">
 					<picker @change="quListC" :value="quListSel" :range="quList" range-key="name" >
 						<view class="pick_flex">
-							<text class="uni-input">{{quList[quListSel].name}}</text>
+							<text class="uni-input">{{quList[quListSel]?quList[quListSel].name:'请选择县/区'}}</text>
 							<text class="iconfont iconjiantou"></text>
 						</view>
 					</picker>
@@ -24,7 +24,7 @@
 				<template v-slot:right="">
 					<picker @change.stop="routeListC" :value="routeListSel" :range="routeList" range-key="name" :disabled="disJiedao">
 						<view class="pick_flex">
-							<text class="uni-input">{{routeList[routeListSel].name}}</text>
+							<text class="uni-input">{{routeList[routeListSel]?routeList[routeListSel].name:'请选择街道'}}</text>
 							<text class="iconfont iconjiantou"></text>
 						</view>
 					</picker>
@@ -34,7 +34,7 @@
 				<template v-slot:right="">
 					<picker @change="areaListC" :value="areaListSel" :range="areaList" range-key="name" :disabled="disJiedao">
 						<view class="pick_flex">
-							<text class="uni-input">{{areaList[areaListSel].name}}</text>
+							<text class="uni-input">{{areaList[areaListSel]?areaList[areaListSel].name:"请选择小区"}}</text>
 							<text class="iconfont iconjiantou"></text>
 						</view>
 					</picker>
@@ -87,19 +87,19 @@
 				shiList: [{
 					name: '请选择小区'
 				}],
-				shiListSel: 0,
+				shiListSel: "",
 				quList: [{
 					name: '请选择县/区'
 				}],
-				quListSel: 0,
+				quListSel: "",
 				routeList: [{
 					name: '请选择街道'
 				}],
-				routeListSel: 0,
+				routeListSel: "",
 				areaList: [{
 					name: '请选择小区'
 				}],
-				areaListSel: 0,
+				areaListSel: "",
 				xiaoquInp: "",
 				inpNum1: "",
 				inpNum2: "",
@@ -217,14 +217,20 @@
 			// 	this.getLocal(this.shiList[this.shiListSel].id,2,'quList');
 			// },
 			quListC(e) {
+				console.log(e)
 				this.quListSel = e.detail.value
-				this.getLocal(this.quList[this.quListSel].id, 3, 'routeList');
+				if(this.quList[this.quListSel]){
+					this.getLocal(this.quList[this.quListSel].id, 3, 'routeList');
+				}
 				this.disJiedao = false;
 			},
 			routeListCh() {
+				if(this.routeList[this.routeListSel]){
+					this.getLocal(this.quList[this.quListSel].id, 3, 'routeList')
+				}
 				console.log("routeListCh")
 				if (this.disJiedao == true) {
-					this.$msg("请先选择县/区")
+					this.$msg("请先选择县/区")	
 				}
 			},
 			routeListC(e) {
@@ -271,9 +277,15 @@
 						this.$store.commit("setGroupid");
 						this.$getApi("/api/user/userinfo", {}, res => {
 							this.$store.commit('login', res.data);
-							uni.navigateTo({
-								url: '../store/addressList'
-							})
+							if(this.ws){
+								uni.switchTab({
+									url:'../home/home'
+								})
+							}else{
+								uni.navigateTo({
+									url: '../store/addressList'
+								})
+							}
 						})
 
 					});

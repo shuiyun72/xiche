@@ -1,20 +1,25 @@
 <template>
 	<view class="stop_car">
-		<radio-group @change="radioChange" class="car_gro">
-			<label v-for="(item, index) in items"  class="item" @click="seItem(item, index)">
-				<view >
-					<radio :value="item.value" :checked="index === current" class="radio"/>
-					<text class="iconfont icontingche"></text>
-					<text>{{item.name}}停车位</text>
-				</view>
-				
-			</label>
-		</radio-group>
-		<view class="info">
-			郑州高新区郑州高新区郑州高新区郑州高新区5号楼
+		<view v-if="items.length>0">
+			<radio-group @change="radioChange" class="car_gro">
+				<label v-for="(item, index) in items"  class="item" @click="seItem(item, index)">
+					<view >
+						<radio :value="item.value" :checked="index === current" class="radio"/>
+						<text class="iconfont icontingche"></text>
+						<text>{{item.name}}停车位</text>
+					</view>
+					
+				</label>
+			</radio-group>
+			<view class="info">
+				{{itemAdd.city_name}}{{itemAdd.area_name}}{{itemAdd.street_name}}{{itemAdd.house_name}}{{itemAdd.house_detail}}
+			</view>
+			<view class="sub_btn">
+				<button class="btn blue" @click="next">确定</button>
+			</view>
 		</view>
-		<view class="sub_btn">
-			<button class="btn blue" @click="next">确定</button>
+		<view v-else>
+			数据加载中...
 		</view>
 	</view>
 </template>
@@ -25,12 +30,14 @@
 			return {
 				items: [],
 				current: 0,
-				currItem:""
+				currItem:"",
+				itemAdd:{}
 			};
 		},
 		onLoad(ph) {
 			let phId = ph.id;
 			this.$getApi("/api/user/address/detail",{id:phId},res=>{
+				this.itemAdd = res.data;
 				this.items = res.data.park;
 				this.currItem = this.items[0];
 			})

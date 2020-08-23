@@ -22,13 +22,14 @@
 					<uni-list-item-point title="洗车内容选择" :showArrow="false" rightText=""></uni-list-item-point>
 				</uni-list>
 				<view class="car_com">
+			
 					<radio-group class="sel_car_com">
 						<label v-for="(item, index) in itemsCarList">
 							<view class="item">
 								<image src="../../static/img/jiag.png" mode="widthFix" class="img"></image>
 								<view class="item_b">
 									<view class="part1">
-										<radio :value="item.value" :checked="index === itemC.mall_id?true:false" class="radio" :disabled="true" />
+										<radio :value="item.value" :checked="item.id === itemC.mall_id?true:false" class="radio" :disabled="true" />
 										<text class="t">{{item.title}}</text>
 									</view>
 									<view class="part2">
@@ -195,6 +196,7 @@
 
 <script>
 	import uniListItemPoint from '../../components/uni-list-item-point/uni-list-item-point.vue';
+	import _ from "../../until/lodash";
 	import { mapState,mapMutations } from "vuex";
 	export default {
 		components:{
@@ -269,6 +271,7 @@
 				// this.setPhone({name:"请选择手机号"});
 				// this.rinseTimeSel = [0,0];
 				// this.vTextarea = "";
+				this.getInit();
 			},
 			//删除未来订单
 			cellDelete(){
@@ -318,6 +321,7 @@
 			next(){
 				console.log(this.lastData);
 				let nnLastData = _.cloneDeep(this.lastData);
+				console.log(nnLastData)
 				let itemsCarListId = this.itemsCarList.length > 0 ? this.itemsCarList[this.current].id : ""
 				let dataL = {
 					car_id: this.orderCar.id,
@@ -367,6 +371,7 @@
 				}
 				let sssData = JSON.stringify(lastDataL)
 				console.log(sssData)
+				return false;
 				this.$getApi("/api/user/order/sure",{data:sssData},res=>{
 					console.log(res)
 					
@@ -528,6 +533,22 @@
 				}else{
 					this.$msg('请选择洗车地址')
 				}
+			},
+			getInit(call){
+				let this_ = this;
+				 this.$getApi("/api/user/car/xing", {}, res => {
+					this_.$store.commit("setCarXing", res.data)
+				})
+				 this.$getApi("/api/user/car/color", {}, res => {
+					this_.$store.commit("setCarColor", res.data)
+				})
+				 this.$getApi("/api/user/car/brand", {}, res => {
+					this_.$store.commit("setCarBrand", res.data)
+				})
+				 this.$getApi("/api/user/car/service", {}, res => {
+					this_.$store.commit("setService", res.data)
+				})
+				call instanceof Function && call()
 			}
 		}
 	}
@@ -684,9 +705,11 @@
 	}
 
 	.car_com {
-		.sel_car_com {
+		width: 100vw;
+		overflow-x: auto;
+		background-color: #fff;
+		.sel_car_com {	
 			display: flex;
-			background-color: #fff;
 			border-top: 1upx solid #eee;
 			padding: 10upx 16upx 0;
 

@@ -63,40 +63,70 @@
 				detail
 			}) {
 				let this_ = this;
-				console.log(detail.userInfo.nickName)
-				if (detail.userInfo) {
-					console.log(detail)
-					let dataLL = {
-						phone:this_.phone,
-						code:this_.yzm,
-						openid:this_.openid,
-						nickname:detail.userInfo.nickName
-					}
-					// console.log(data)
-					this_.$getApi('/api/auth/bindPhone',dataLL,res=>{
-						console.log(res)
-						this_.$store.commit('login',res.data);			
-						setTimeout(()=>{
-							this_.getInit(()=>{
-								if(this_.toWhere == 'ws'){
-									uni.navigateTo({
-										url:'../mine/addCar?ws=1'
-									})
-								}else{
-									uni.switchTab({
-										url:'../home/home'
-									})
+				uni.login({
+					provider: 'weixin',
+					success: function(loginRes) {
+						console.log(loginRes);
+						this_.$getApiTime("/api/auth/getopenid", {
+							code: loginRes.code
+						}, res => {
+							console.log(res)
+							if (res.data.is_bind == 0) {
+								console.log("11")
+								if (detail.userInfo) {
+									let dataLL = {
+										phone:this_.phone,
+										code:this_.yzm,
+										openid:res.data.openid,
+										nickname:detail.userInfo.nickName
+									}
+									console.log("xxss",dataLL)
+									this_.$getApi('/api/auth/bindPhone',dataLL,res2=>{
+										this_.$store.commit('login',res2.data);			
+										setTimeout(()=>{
+											this_.getInit(()=>{
+												if(this_.toWhere == 'ws'){
+													uni.navigateTo({
+														url:'../mine/addCar?ws=1'
+													})
+												}else{
+													uni.switchTab({
+														url:'../home/home'
+													})
+												}
+											});	
+										},500)
+									},"false")
+									// this.toMain(detail.userInfo.nickName);
+								} else {
+									uni.showToast({
+										icon: 'none',
+										title: '登陆失败'
+									});
 								}
-							});	
-						},500)
-					},"false")
-					// this.toMain(detail.userInfo.nickName);
-				} else {
-					uni.showToast({
-						icon: 'none',
-						title: '登陆失败'
-					});
-				}
+							} else
+							if (res.data.is_bind == 1){
+								console.log(res)
+								this_.$store.commit('login', res.data);
+								setTimeout(() => {
+									this_.getInit(() => {
+										if(this_.userInfo.is_perfect == 0){
+											uni.navigateTo({
+												url:'../mine/addCar?ws=1&xcx=ws'
+											})
+										}else
+										if(this_.userInfo.is_perfect == 1){
+											uni.navigateTo({
+												url:'../mine/addAddress?ws=1&xcx=ws'
+											})
+										}
+									});
+								}, 500)
+							}
+						}, "false")
+						// 获取用户信息
+					}
+				});
 			},
 			//获取验证码
 			getYZM(){
@@ -162,15 +192,17 @@
 							this_.$store.commit('login',res.data);			
 							setTimeout(()=>{
 								this_.getInit(()=>{
-									if(this_.toWhere == 'ws'){
-										uni.navigateTo({
-											url:'../mine/addCar?ws=1'
-										})
-									}else{
-										uni.switchTab({
-											url:'../combo/combo'
-										})
-									}
+									setTimeout(()=>{
+										if(this_.toWhere == 'ws'){
+											uni.navigateTo({
+												url:'../mine/addCar?ws=1'
+											})
+										}else{
+											uni.switchTab({
+												url:'../combo/combo'
+											})
+										}
+									})
 								});	
 							},500)
 						},"false")
@@ -180,14 +212,18 @@
 				}
 			},
 			getInit(call){
-				this.$getApi("/api/user/car/xing",{},res=>{
-					uni.setStorageSync('carXing',res.data);
+				let this_ = this;
+				 this.$getApi("/api/user/car/xing", {}, res => {
+					this_.$store.commit("setCarXing", res.data)
 				})
-				this.$getApi("/api/user/car/color",{},res=>{
-					uni.setStorageSync('carColor',res.data);
+				 this.$getApi("/api/user/car/color", {}, res => {
+					this_.$store.commit("setCarColor", res.data)
 				})
-				this.$getApi("/api/user/car/brand",{},res=>{
-					uni.setStorageSync('carBrand',res.data);
+				 this.$getApi("/api/user/car/brand", {}, res => {
+					this_.$store.commit("setCarBrand", res.data)
+				})
+				 this.$getApi("/api/user/car/service", {}, res => {
+					this_.$store.commit("setService", res.data)
 				})
 				call instanceof Function && call()
 			}

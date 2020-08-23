@@ -14,8 +14,8 @@
 			</uni-list-item-point>
 			<uni-list-item-point title="车型" point="true">
 				<template v-slot:right="">
-					<picker @change="bindPickerChange" v-model="carArrayXingSelect" :range="carArrayXing" range-key="name">
-						<view class="uni-input">{{carArrayXing[carArrayXingSelect].name}}</view>
+					<picker @change="bindPickerChange" v-model="carArrayXingSelect" :range="carXing" range-key="name">
+						<view class="uni-input">{{carXing[carArrayXingSelect].name}}</view>
 					</picker>
 				</template>
 			</uni-list-item-point>
@@ -26,7 +26,7 @@
 			</uni-list-item-point>
 			<uni-list-item-point title="车辆颜色" point="true" :showArrow="false" :rightText="rightTextCarColor"></uni-list-item-point>
 			<view class="car_color_list">
-				<view class="item" v-for="(item,index) in carColorList" :class="{'active':index == selectColor}" @click="selColor(item,index)">
+				<view class="item" v-for="(item,index) in carColor" :class="{'active':index == selectColor}" @click="selColor(item,index)" :key="index">
 					<text class="moren" v-show="index == 0">默认</text>
 					<image :src="httpp+item.cover" mode="widthFix" class="img"></image>
 					<view class="text">
@@ -67,6 +67,7 @@
 
 <script>
 	import uniListItemPoint from '../../components/uni-list-item-point/uni-list-item-point.vue';
+	import _ from "../../until/lodash";
 	import {
 		mapState
 	} from 'vuex';
@@ -76,10 +77,9 @@
 				name: this.$store.state.userInfo.nickname,
 				phone: this.$store.state.userInfo.phone,
 				chepai:"",
-				carColorList: this.$store.state.carColor,
 				selectColor: 0,
 				rightTextCarColor: "白色",
-				carArrayXing: this.$store.state.carXing,
+				
 				carArrayXingSelect: 0,
 				imageList: [],
 				upimageList:[],
@@ -109,7 +109,7 @@
 			};
 		},
 		computed: {
-			...mapState(["brand",'httpp'])
+			...mapState(["brand",'httpp','carColor','carXing'])
 		},
 		onLoad(ph) {
 			if(ph.item){
@@ -158,9 +158,9 @@
 					name:this.name,
 					phone:this.phone,
 					id:this.carId,
-					car_xing_id:this.carArrayXing[this.carArrayXingSelect].id,
+					car_xing_id:this.carXing[this.carArrayXingSelect].id,
 					chepai:this.chepai,
-					car_color_id:this.carColorList[this.selectColor].id,
+					car_color_id:this.carColor[this.selectColor].id,
 					car_brand_id:this.brand.id,
 					covers:JSON.stringify(lastImg),
 					type:this.type
